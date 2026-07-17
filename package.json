@@ -1,0 +1,12 @@
+{
+  "name": "hr-exam-sync",
+  "version": "1.0.0",
+  "description": "HR Exam App with multi-device sync",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}

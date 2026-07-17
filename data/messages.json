@@ -1,0 +1,29 @@
+[
+  {
+    "id": "msg_1784258738975_7argv0",
+    "text": "",
+    "image": null,
+    "read": false,
+    "createdAt": 1784258738975
+  },
+  {
+    "id": "msg_1784258852029_b3qwol",
+    "fromPhone": "13760449301",
+    "fromName": "学员",
+    "toPhone": "admin",
+    "text": "12345",
+    "image": null,
+    "read": true,
+    "createdAt": 1784258852029
+  },
+  {
+    "id": "msg_1784261293235_2ej666",
+    "fromPhone": "13800138001",
+    "fromName": "TestUser",
+    "toPhone": "admin",
+    "text": "Unified URL test OK",
+    "image": null,
+    "read": false,
+    "createdAt": 1784261293236
+  }
+]
