@@ -571,7 +571,7 @@ body {
   <div class="overlay-card">
     <div class="overlay-logo">📝</div>
     <div class="overlay-title">注册新账号</div>
-    <div class="overlay-sub">注册后即可免费试用10道题</div>
+    <div class="overlay-sub">注册后即可免费试用30道题</div>
     <div class="form-group">
       <label>📱 手机号</label>
       <input type="tel" id="regPhone" placeholder="请输入手机号" maxlength="11" autocomplete="tel">
@@ -661,7 +661,7 @@ body {
     <button class="overlay-close-btn" id="closeUpgradeBtn" title="关闭">✕</button>
     <div class="upg-icon">🔒</div>
     <h3 id="upgradeTitle">试用次数已用完</h3>
-    <p>您的10道免费试用名额已用完<br>扫码激活后即可继续学习全部题库</p>
+    <p>您的30道免费试用名额已用完<br>扫码激活后即可继续学习全部题库</p>
     <button class="btn btn-warning btn-block" id="btnScanPay">📱 扫码激活</button>
   </div>
 </div>
@@ -894,7 +894,7 @@ body {
 
   <div class="trial-banner hidden" id="trialBanner">
     <div class="trial-left">🎁 <b>试用模式</b></div>
-    <div class="trial-count">剩余 <span id="trialRemaining">10</span>/10 题</div>
+    <div class="trial-count">剩余 <span id="trialRemaining">30</span>/30 题</div>
     <button class="btn btn-sm btn-warning" id="btnUpgradeNow">🔓 激活全部</button>
   </div>
 
@@ -943,7 +943,7 @@ const ADMIN_PHONE = "13760449307";
 const ADMIN_PASSWORD_HASH = "aaffebecec560fec66e75f24062224ffa4e07696d2ae9a1fee3707c3f8fd9373";
 const EMBEDDED_HASHES = ["3ff6aac90cedfcb0879087adea662d2b2d1a268fc4df8d67cd2811d2c3f30a03", "80751e9e1a13a72911c51c0a99685161d115703d8bdd7878fd47d0cfa25c743d", "a60bfe291d8a52111d19cbdc992ccf88a0f46ac795db912a374c05dd8c568d99", "64c76e51b66ee0e236341895c20595351c45fbb13cdbd7906e0b21ac14cfd79d", "6c1df43b606ab74e55ab58d7c7ee7258bdace7604cfd12bada44fa4f2a62e8a1", "2b796c76d0e0afa0188c3b76c7269e738a13a3525297defb3ed8f0f822fc43f5", "866b3b12df470e48112f365b998772a47c691915d95353230edfd2a319b35350", "936cd948bcc85bc5db5388efa0bcc7c8d83dec278904825694272ade95d00a52", "e7fef3e670346dcc17891bd1ad5d145b4160be58366c172fa325e71d759f08af", "c437bb54b96c46172a90a7d6c73f27d9c51bc476c115a819f133064a48eea901", "0bda9dd58f552ba57ceac80cb1d790d0e28f964429e57ea84971db4b7f6f723d", "dcf56d17239c302036d352ed4d6f38ee05fe1509a152d4abff754417f633a709", "3bdde4c8d6d6d880efd0bb3ece72c6de898b9b18f8f2b5c0dd560c0a1360403f", "587c26c3403407193ce0c9321ef45733edd3e72a7657906d5db4498f4bbb8ab9", "ccaf84ca528346751cefd69c0b184e8d0454cf1a8bdb028652ef00b26727c151", "cef76fe88162f69665c3c1726c2c34c77413432a643a97fcac073181da3dbfc7", "fd6a8d85c1f84cd96d2293d7c13057f711ab95753f1ff234f8fda0a0a403995b", "ee9ecc724fdde055a61969915f066555064ee361e2187cc6d18c15cbf9cd27b9", "07408f1d915926277bbd4069a23b7033b6109a2164bed84be3efb9f42ba5929a", "8e3ea995b603434004204848184171016ee8df8030905c44bf00f0bfb7b98ab8"];
 const ACTIVATION_VALIDITY_DAYS = 365;
-const TRIAL_LIMIT = 10;
+const TRIAL_LIMIT = 30;
 const AUTH_KEY = 'hr_exam_v5_auth';
 const ADMIN_CODES_KEY = 'hr_exam_v5_admin_codes';
 const REQUESTS_KEY = 'hr_exam_v5_requests';
@@ -3544,6 +3544,12 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 function startGDExam() {
+  // 试用学员需先扫码激活才能参加模拟考试
+  if (currentUser && currentUser.role === 'trial') {
+    alert("试用学员请先扫码激活，即可参加模拟考试");
+    showUpgradePrompt();
+    return;
+  }
   // Per-chapter exam: draw 60 single + 40 multi from current chapter
   const data = gdChapterMap[gdCurrentChapter.key];
   if (!data) { alert("该章节暂无题目"); return; }
@@ -3793,6 +3799,17 @@ function renderGDPracticeCurrent() {
     document.getElementById("gdPracticeContent").innerHTML = html;
     return;
   }
+  // 试用限制（仅练习模式，不含考试）：额度用尽则锁屏
+  if (!gdExamMode && currentUser && currentUser.role === 'trial' && getTrialCount() >= TRIAL_LIMIT) {
+    document.getElementById("gdPracticeContent").innerHTML =
+      '<div style="text-align:center;padding:60px 20px">' +
+      '<div style="font-size:48px;margin-bottom:16px">🔒</div>' +
+      '<div style="font-size:18px;font-weight:700;margin-bottom:8px">免费试用名额已用完</div>' +
+      '<div style="font-size:14px;color:#64748b;margin-bottom:8px">您已刷完 ' + TRIAL_LIMIT + ' 道免费题</div>' +
+      '<div style="font-size:14px;color:#64748b;margin-bottom:20px">扫码激活后：无限刷题 + 参加模拟考试</div>' +
+      '<button class="btn btn-primary" onclick="showUpgradePrompt()">📱 扫码激活</button></div>';
+    return;
+  }
   const q = gdCurrentQuestions[gdCurrentIndex];
   const typeLabel = q.type === "single" ? "单选题" : "多选题";
   const isMulti = q.type === "multi";
@@ -3876,6 +3893,13 @@ function checkGDAnswer(userAns, correctAns, qtype) {
   // Track score
   gdUserAnswers[gdCurrentIndex] = { userAns, correctAns, isCorrect };
   if (isCorrect) gdCorrectCount++; else gdWrongCount++;
+  // 练习模式消耗试用额度（考试模式不计入）
+  if (!gdExamMode && currentUser && currentUser.role === 'trial') {
+    const used = incrementTrialCount();
+    if (used >= TRIAL_LIMIT) {
+      setTimeout(function(){ showUpgradePrompt(); }, 700);
+    }
+  }
 
   for (let i = 0; i < options.length; i++) {
     const label = String.fromCharCode(65+i);
