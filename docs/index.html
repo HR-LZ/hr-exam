@@ -975,18 +975,18 @@ async function resolveApiBase() {
   const custom = p.get('api');
   if (custom) {
     try {
-      const r = await fetch(custom + '/api/health', { signal: AbortSignal.timeout(2000) });
+      const r = await fetch(custom + '/api/health', { signal: AbortSignal.timeout(8000) });
       if (r.ok) { _apiBaseResolved = custom; API_OK = true; return _apiBaseResolved; }
     } catch(e) {}
   }
   // 2) Single attempt: primary backend, fast fail (2s)
   try {
-    const r = await fetch(API_EMBEDDED_PRIMARY + '/api/health', { signal: AbortSignal.timeout(2000) });
+    const r = await fetch(API_EMBEDDED_PRIMARY + '/api/health', { signal: AbortSignal.timeout(8000) });
     if (r.ok) { _apiBaseResolved = API_EMBEDDED_PRIMARY; API_OK = true; console.log('[Sync] Using primary backend: ' + API_EMBEDDED_PRIMARY); return _apiBaseResolved; }
   } catch(e) {}
   // 3) Fallback: same-origin
   try {
-    const r = await fetch(window.location.origin + '/api/health', { signal: AbortSignal.timeout(2000) });
+    const r = await fetch(window.location.origin + '/api/health', { signal: AbortSignal.timeout(8000) });
     if (r.ok) { _apiBaseResolved = window.location.origin; API_OK = true; console.log('[Sync] Using same-origin backend'); return _apiBaseResolved; }
   } catch(e) {}
   _apiBaseResolved = null; API_OK = false;
@@ -1038,7 +1038,7 @@ _apiProbePromise = (async function probeAPI() {
 })();
 // Safety: force probe to complete within 5 seconds
 (async function() {
-  await new Promise(r => setTimeout(r, 5000));
+  await new Promise(r => setTimeout(r, 9000));
   if (!_apiProbeDone) { _apiProbeDone = true; _apiBaseResolved = null; API_OK = false; }
 })();
 async function waitForApiProbe() {
