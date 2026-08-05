@@ -954,107 +954,606 @@ const MESSAGES_KEY = 'hr_exam_v6_messages';
 const ACTIVATED_PHONES_KEY = 'hr_exam_v6_activated_phones';
 const TRIAL_KEY = 'hr_exam_v5_trial';
 
-// ===== MULTI-DEVICE SYNC LAYER =====
-// All shared data syncs through the server API.
-// localStorage acts as a local cache — data survives offline use.
-// Priority: URL param ?api= > embedded primary > same-origin > fallbacks
-const API_EMBEDDED_PRIMARY = 'https://hr-exam.vercel.app';
-const API_FALLBACKS = [
-  'https://hr-exam.serveo.net'
-];
+// ============================================================================
+// MULTI-DEVICE SYNC LAYER — Gitee 直连（方案A：无服务器）
+// ----------------------------------------------------------------------------
+// 共享数据存放在 Gitee 私有仓库的 JSON 文件里，浏览器直接读写 Gitee OpenAPI。
+// 原后端 api/index.js 的全部路由在此原样复刻，上层业务代码零改动。
+//
+// 数据布局：
+//   hr-exam/db.json            —— 全部共享集合（账号/消息/通知/激活码…），单文件
+//   hr-exam/users/{phone}.json —— 每个学员的答题数据（错题本/收藏/统计）
+//
+// 为什么共享数据用单文件：
+//   管理端每 5 秒轮询 5 个接口。若每个集合一个文件 = 5 次 Gitee 请求/轮
+//   = 3600 次/小时，逼近 Gitee 5000 次/小时的限流。合并单文件 + 4 秒读缓存后，
+//   一轮只产生 1 次真实请求 = 720 次/小时，安全。
+//
+// ⚠️ 安全说明：令牌内嵌在本文件中。持有本文件者即可读写该数据仓库。
+//    请只授予 projects 权限，且该仓库只放本系统数据。
+// ============================================================================
+
+// ---- 配置（部署时填写）----
+const GITEE_OWNER  = 'hr-exam';        // Gitee 用户名，即 gitee.com/xxx 里的 xxx
+const GITEE_REPO   = 'hr-exam-data';        // 数据仓库名，如 hr-exam-data
+const GITEE_TOKEN  = 'cafc907aafed61d3d3b2f31ab397b3d4';        // 私人令牌（只勾 projects 权限）
+const GITEE_BRANCH = 'master';
+
+const GITEE_API = 'https://gitee.com/api/v5';
+const DB_PATH   = 'hr-exam/db.json';
+const USER_DIR  = 'hr-exam/users';
+const DB_TTL_MS = 4000;         // 略小于前端 5 秒轮询，使一轮内多次读取只打一次网络
+const HTTP_TIMEOUT_MS = 12000;
+
+// ---- 对外契约（保持与原后端版本一致）----
 let API_OK = false;
-let _apiBaseResolved = null;
 let _apiProbeDone = false;
 let _apiProbePromise = null;
 
-// Returns: the resolved API base URL (or null if completely offline)
-async function resolveApiBase() {
-  if (_apiBaseResolved) return _apiBaseResolved;
-  // 1) URL param ?api=xxx (explicit override)
-  const p = new URLSearchParams(window.location.search);
-  const custom = p.get('api');
-  if (custom) {
-    try {
-      const r = await fetch(custom + '/api/health', { signal: AbortSignal.timeout(8000) });
-      if (r.ok) { _apiBaseResolved = custom; API_OK = true; return _apiBaseResolved; }
-    } catch(e) {}
-  }
-  // 2) Single attempt: primary backend, fast fail (2s)
-  try {
-    const r = await fetch(API_EMBEDDED_PRIMARY + '/api/health', { signal: AbortSignal.timeout(8000) });
-    if (r.ok) { _apiBaseResolved = API_EMBEDDED_PRIMARY; API_OK = true; console.log('[Sync] Using primary backend: ' + API_EMBEDDED_PRIMARY); return _apiBaseResolved; }
-  } catch(e) {}
-  // 3) Fallback: same-origin
-  try {
-    const r = await fetch(window.location.origin + '/api/health', { signal: AbortSignal.timeout(8000) });
-    if (r.ok) { _apiBaseResolved = window.location.origin; API_OK = true; console.log('[Sync] Using same-origin backend'); return _apiBaseResolved; }
-  } catch(e) {}
-  _apiBaseResolved = null; API_OK = false;
-  console.log('[Sync] API unreachable — offline/local mode');
-  return null;
+const DB_DEFAULT = {
+  accounts: {},          // { phone: { hash, name, registeredAt } }
+  trials: {},            // { phone: count }
+  admin_codes: [],
+  used_codes: {},
+  requests: [],
+  transactions: [],
+  payment_claims: [],
+  activated_phones: [],
+  notifications: [],
+  messages: []
+};
+
+// ============================ 工具函数 ============================
+
+function _utf8Bytes(str) {
+  if (typeof TextEncoder !== 'undefined') return new TextEncoder().encode(str);
+  const esc = unescape(encodeURIComponent(str));
+  const out = new Uint8Array(esc.length);
+  for (let i = 0; i < esc.length; i++) out[i] = esc.charCodeAt(i);
+  return out;
 }
+
+function _bytesToUtf8(bytes) {
+  if (typeof TextDecoder !== 'undefined') return new TextDecoder().decode(bytes);
+  let bin = '';
+  for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+  return decodeURIComponent(escape(bin));
+}
+
+function b64encodeUtf8(str) {
+  const bytes = _utf8Bytes(str);
+  let bin = '';
+  const CHUNK = 0x8000;
+  for (let i = 0; i < bytes.length; i += CHUNK) {
+    bin += String.fromCharCode.apply(null, bytes.subarray(i, i + CHUNK));
+  }
+  return btoa(bin);
+}
+
+function b64decodeUtf8(b64) {
+  const bin = atob(String(b64).replace(/[\s\r\n]/g, ''));
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return _bytesToUtf8(bytes);
+}
+
+// ---- SHA-256（纯 JS 同步实现）----
+// 不用 crypto.subtle：它要求安全上下文，学员用 file:// 直接打开 HTML 时不可用，
+// 会导致登录/注册直接报错。纯 JS 实现在任何环境下行为一致。
+const _K256 = [
+  0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,
+  0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,
+  0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,
+  0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,
+  0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,
+  0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,
+  0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,
+  0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2
+];
+
+function _rotr(x, n) { return (x >>> n) | (x << (32 - n)); }
+
+function sha256Hex(str) {
+  const bytes = _utf8Bytes(str);
+  const len = bytes.length;
+  const bitLenLo = (len * 8) >>> 0;
+  const bitLenHi = Math.floor((len * 8) / 4294967296);
+  const padded = new Uint8Array((((len + 8) >> 6) + 1) << 6);
+  padded.set(bytes);
+  padded[len] = 0x80;
+  const dv = new DataView(padded.buffer);
+  dv.setUint32(padded.length - 8, bitLenHi, false);
+  dv.setUint32(padded.length - 4, bitLenLo, false);
+
+  const h = [0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19];
+  const w = new Uint32Array(64);
+
+  for (let off = 0; off < padded.length; off += 64) {
+    for (let i = 0; i < 16; i++) w[i] = dv.getUint32(off + i * 4, false);
+    for (let i = 16; i < 64; i++) {
+      const x = w[i - 15], y = w[i - 2];
+      const s0 = _rotr(x, 7) ^ _rotr(x, 18) ^ (x >>> 3);
+      const s1 = _rotr(y, 17) ^ _rotr(y, 19) ^ (y >>> 10);
+      w[i] = (w[i - 16] + s0 + w[i - 7] + s1) >>> 0;
+    }
+    let a = h[0], b = h[1], c = h[2], d = h[3], e = h[4], f = h[5], g = h[6], hh = h[7];
+    for (let i = 0; i < 64; i++) {
+      const S1 = _rotr(e, 6) ^ _rotr(e, 11) ^ _rotr(e, 25);
+      const ch = (e & f) ^ (~e & g);
+      const t1 = (hh + S1 + ch + _K256[i] + w[i]) >>> 0;
+      const S0 = _rotr(a, 2) ^ _rotr(a, 13) ^ _rotr(a, 22);
+      const maj = (a & b) ^ (a & c) ^ (b & c);
+      const t2 = (S0 + maj) >>> 0;
+      hh = g; g = f; f = e; e = (d + t1) >>> 0;
+      d = c; c = b; b = a; a = (t1 + t2) >>> 0;
+    }
+    h[0] = (h[0] + a) >>> 0; h[1] = (h[1] + b) >>> 0;
+    h[2] = (h[2] + c) >>> 0; h[3] = (h[3] + d) >>> 0;
+    h[4] = (h[4] + e) >>> 0; h[5] = (h[5] + f) >>> 0;
+    h[6] = (h[6] + g) >>> 0; h[7] = (h[7] + hh) >>> 0;
+  }
+  let out = '';
+  for (let i = 0; i < 8; i++) out += ('00000000' + h[i].toString(16)).slice(-8);
+  return out;
+}
+
+// ============================ Gitee 读写 ============================
+
+function _giteeConfigured() {
+  return !!(GITEE_OWNER && GITEE_REPO && GITEE_TOKEN);
+}
+
+function _contentsUrl(path) {
+  return GITEE_API + '/repos/' + encodeURIComponent(GITEE_OWNER) + '/' +
+         encodeURIComponent(GITEE_REPO) + '/contents/' +
+         path.split('/').map(encodeURIComponent).join('/');
+}
+
+function _withTimeout(opts) {
+  const o = Object.assign({}, opts);
+  try {
+    if (typeof AbortSignal !== 'undefined' && AbortSignal.timeout) {
+      o.signal = AbortSignal.timeout(HTTP_TIMEOUT_MS);
+    }
+  } catch (e) { /* 环境不支持则不设超时 */ }
+  return o;
+}
+
+// 读取一个 JSON 文件 → { value, sha }。文件不存在返回 { value: null, sha: null }
+async function giteeReadFile(path) {
+  const url = _contentsUrl(path) +
+    '?access_token=' + encodeURIComponent(GITEE_TOKEN) +
+    '&ref=' + encodeURIComponent(GITEE_BRANCH) +
+    '&_=' + Date.now();                       // 打散浏览器/CDN 缓存，避免读到旧数据
+  const r = await fetch(url, _withTimeout({
+    method: 'GET',
+    headers: { 'Accept': 'application/json' },
+    cache: 'no-store'
+  }));
+  if (r.status === 404) return { value: null, sha: null };
+  if (!r.ok) {
+    const t = await r.text().catch(() => '');
+    throw new Error('Gitee 读取失败 ' + r.status + ' ' + t.slice(0, 160));
+  }
+  const meta = await r.json();
+  if (!meta || typeof meta.content !== 'string') return { value: null, sha: meta && meta.sha || null };
+  let value = null;
+  try {
+    value = JSON.parse(b64decodeUtf8(meta.content));
+  } catch (e) {
+    // 内容损坏时返回 null 而不是抛错，避免整个应用卡死；调用方会退回默认值
+    console.warn('[Gitee] JSON 解析失败:', path, e.message);
+    value = null;
+  }
+  return { value, sha: meta.sha || null };
+}
+
+// 写入 JSON 文件。sha 为 null 表示新建。
+// 返回新 sha；若发生并发冲突返回 null（由调用方重试）。
+async function giteeWriteFile(path, obj, sha, message) {
+  const payload = {
+    access_token: GITEE_TOKEN,
+    content: b64encodeUtf8(JSON.stringify(obj)),
+    message: message || ('sync ' + new Date().toISOString()),
+    branch: GITEE_BRANCH
+  };
+  if (sha) payload.sha = sha;
+  const r = await fetch(_contentsUrl(path) + '?access_token=' + encodeURIComponent(GITEE_TOKEN),
+    _withTimeout({
+      method: sha ? 'PUT' : 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    }));
+  if (r.ok) {
+    const j = await r.json().catch(() => null);
+    return (j && j.content && j.content.sha) || 'unknown';
+  }
+  // 409 = sha 过期（他人已改）；新建时撞上已存在也会报 400/422
+  if (r.status === 409 || r.status === 400 || r.status === 422) return null;
+  const t = await r.text().catch(() => '');
+  throw new Error('Gitee 写入失败 ' + r.status + ' ' + t.slice(0, 160));
+}
+
+// ============================ 共享库缓存 + 乐观并发 ============================
+
+let _dbCache = null;          // { value, sha, at }
+let _dbReadInFlight = null;
+
+async function dbRead(force) {
+  if (!force && _dbCache && (Date.now() - _dbCache.at) < DB_TTL_MS) return _dbCache.value;
+  if (_dbReadInFlight) return _dbReadInFlight;   // 并发读去重：多处同时读只发一次请求
+  _dbReadInFlight = (async () => {
+    try {
+      const got = await giteeReadFile(DB_PATH);
+      const merged = Object.assign({}, DB_DEFAULT, (got.value && typeof got.value === 'object') ? got.value : {});
+      _dbCache = { value: merged, sha: got.sha, at: Date.now() };
+      return merged;
+    } finally {
+      _dbReadInFlight = null;
+    }
+  })();
+  return _dbReadInFlight;
+}
+
+// 读-改-写，带乐观锁重试。
+// fn 在每次尝试时都对最新数据重新执行，因此"追加"类操作在并发下不会丢数据。
+// 若 fn 未产生任何变化则跳过写入（等价于原后端的 if (changed) 逻辑）。
+async function dbMutate(fn) {
+  let lastErr = null;
+  for (let attempt = 0; attempt < 5; attempt++) {
+    const fresh = await dbRead(attempt > 0);          // 重试时强制拉最新
+    const sha = _dbCache ? _dbCache.sha : null;
+    const before = JSON.stringify(fresh);
+    const draft = JSON.parse(before);
+    const result = await fn(draft);
+    const after = JSON.stringify(draft);
+
+    if (after === before) return result;              // 无变化 → 不写
+
+    try {
+      const newSha = await giteeWriteFile(DB_PATH, draft, sha);
+      if (newSha) {
+        _dbCache = { value: draft, sha: newSha, at: Date.now() };
+        return result;
+      }
+    } catch (e) {
+      lastErr = e;
+    }
+    _dbCache = null;                                  // 冲突/失败 → 丢弃缓存
+    await new Promise(r => setTimeout(r, 150 + Math.random() * 350 * (attempt + 1)));
+  }
+  throw lastErr || new Error('Gitee 写入冲突，重试多次仍失败');
+}
+
+// ---- 每用户答题数据（独立文件，写冲突概率极低）----
+const _userSha = new Map();
+
+async function userDataRead(phone) {
+  const path = USER_DIR + '/' + phone + '.json';
+  const got = await giteeReadFile(path);
+  _userSha.set(path, got.sha);
+  return got.value;
+}
+
+// 合并写入（关键）：前端有两个写入点写同一个文件——
+//   syncAuthToServer() 写 { auth }，saveDB() 写 { wrongBook, favorites, stats... }。
+// 若按"整体覆盖"语义，后写的一方会抹掉另一方，学员答一道题激活状态就丢了。
+// 因此这里改为浅合并：只更新 body 里出现的键，其余保持不变。
+async function userDataWrite(phone, patch) {
+  const path = USER_DIR + '/' + phone + '.json';
+  for (let attempt = 0; attempt < 4; attempt++) {
+    const got = await giteeReadFile(path);
+    const base = (got.value && typeof got.value === 'object' && !Array.isArray(got.value)) ? got.value : {};
+    const merged = Object.assign({}, base, patch);
+    if (JSON.stringify(merged) === JSON.stringify(base)) {
+      _userSha.set(path, got.sha);
+      return true;                                 // 无变化 → 不写，省一次请求
+    }
+    const newSha = await giteeWriteFile(path, merged, got.sha);
+    if (newSha) { _userSha.set(path, newSha); return true; }
+    await new Promise(r => setTimeout(r, 150 + Math.random() * 300 * (attempt + 1)));
+  }
+  return false;
+}
+
+// ============================ 路由（复刻原后端 api/index.js）============================
+
+// 复用页面上方已声明的管理员常量（docs/index.html 中在本层之前声明）。
+// 不重新 const 声明，否则与页面同名常量冲突 → SyntaxError → 整页白屏。
+// 独立测试环境下这两个全局不存在，回退到原后端内置值。
+const SRV_ADMIN_PHONE = (typeof ADMIN_PHONE !== 'undefined')
+  ? ADMIN_PHONE : '13760449307';
+const SRV_ADMIN_PWD_HASH = (typeof ADMIN_PASSWORD_HASH !== 'undefined')
+  ? ADMIN_PASSWORD_HASH : 'ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f';
+
+async function giteeRoute(rawPath, method, body) {
+  const qi = rawPath.indexOf('?');
+  const path = qi === -1 ? rawPath : rawPath.slice(0, qi);
+  const query = new URLSearchParams(qi === -1 ? '' : rawPath.slice(qi + 1));
+  const R = (data, status) => ({ status: status || 200, data: data });
+
+  // ===== AUTH =====
+  if (path === '/api/auth/register' && method === 'POST') {
+    const phone = body.phone, password = body.password, name = body.name;
+    if (!phone || !/^1[3-9]\d{9}$/.test(phone)) return R({ ok: false, error: '无效的手机号' });
+    if (!password || password.length < 6) return R({ ok: false, error: '密码至少6位' });
+    let out;
+    await dbMutate(db => {
+      if (db.accounts[phone]) { out = { ok: false, error: '该手机号已注册' }; return; }
+      const now = Date.now();
+      db.accounts[phone] = { hash: sha256Hex(phone + ':' + password), name: name || '学员', registeredAt: now };
+      out = { ok: true, user: { phone: phone, userName: name || '学员', role: 'trial', registeredAt: now } };
+    });
+    return R(out);
+  }
+
+  if (path === '/api/auth/login' && method === 'POST') {
+    const phone = body.phone, password = body.password;
+    if (!phone || !password) return R({ ok: false, error: '请输入手机号和密码' });
+    if (phone === SRV_ADMIN_PHONE && sha256Hex(password) === SRV_ADMIN_PWD_HASH) {
+      return R({ ok: true, user: { phone: phone, userName: '管理员', role: 'admin' } });
+    }
+    const db = await dbRead();
+    const acc = db.accounts[phone];
+    if (!acc) return R({ ok: false, error: '账号不存在，请先注册' });
+    if (acc.hash !== sha256Hex(phone + ':' + password)) return R({ ok: false, error: '密码错误' });
+    const isActivated = Array.isArray(db.activated_phones) && db.activated_phones.some(p => p.phone === phone);
+    if (isActivated) {
+      return R({ ok: true, user: { phone: phone, userName: acc.name || '学员', role: 'activated',
+        expiresAt: Date.now() + 365 * 24 * 60 * 60 * 1000, activatedAt: Date.now() } });
+    }
+    return R({ ok: true, user: { phone: phone, userName: acc.name || '学员', role: 'trial', registeredAt: acc.registeredAt } });
+  }
+
+  // 前端遗留调用：原后端并无此路由（返回404被忽略）。
+  // 这里显式接受并忽略，避免污染 accounts（其数据结构与注册流程不同）。
+  if (path === '/api/accounts' && method === 'POST') return R({ ok: true, ignored: true });
+
+  // ===== TRIAL =====
+  const trialMatch = path.match(/^\/api\/trial\/(\d+)$/);
+  if (trialMatch) {
+    const phone = trialMatch[1];
+    if (method === 'GET') {
+      const db = await dbRead();
+      return R({ count: db.trials[phone] || 0 });
+    }
+    if (method === 'POST') {
+      let count = 0;
+      await dbMutate(db => { db.trials[phone] = (db.trials[phone] || 0) + 1; count = db.trials[phone]; });
+      return R({ count: count });
+    }
+  }
+
+  // ===== ADMIN CODES =====
+  if (path === '/api/admin/codes') {
+    if (method === 'GET') return R((await dbRead()).admin_codes);
+    if (method === 'POST') { await dbMutate(db => { db.admin_codes.push(body); }); return R({ ok: true }); }
+  }
+
+  // ===== USED CODES =====
+  if (path === '/api/used-codes') {
+    if (method === 'GET') return R((await dbRead()).used_codes);
+    if (method === 'POST') { await dbMutate(db => { db.used_codes[body.hash] = Date.now(); }); return R({ ok: true }); }
+  }
+
+  // ===== REQUESTS =====
+  if (path === '/api/requests') {
+    if (method === 'GET') return R((await dbRead()).requests);
+    if (method === 'POST') {
+      await dbMutate(db => { db.requests.push({ phone: body.phone, wechatId: body.wechatId, createdAt: Date.now() }); });
+      return R({ ok: true });
+    }
+  }
+
+  // ===== TRANSACTIONS =====
+  if (path === '/api/transactions') {
+    if (method === 'GET') return R((await dbRead()).transactions);
+    if (method === 'POST') {
+      await dbMutate(db => { db.transactions.push({ phone: body.phone, code: body.code, paidAt: Date.now() }); });
+      return R({ ok: true });
+    }
+  }
+
+  // ===== PAYMENT CLAIMS =====
+  if (path === '/api/payment-claims') {
+    if (method === 'GET') return R((await dbRead()).payment_claims);
+    if (method === 'POST') {
+      let claim;
+      await dbMutate(db => {
+        const pending = db.payment_claims.find(c => c.phone === body.phone && c.status === 'pending');
+        if (pending) {
+          pending.wechat = body.wechat;
+          pending.createdAt = Date.now();
+          claim = pending;
+          return;
+        }
+        claim = {
+          id: Date.now().toString(36) + Math.random().toString(36).substr(2, 4),
+          phone: body.phone, wechat: body.wechat,
+          createdAt: Date.now(), status: 'pending', code: null
+        };
+        db.payment_claims.push(claim);
+      });
+      return R({ ok: true, claim: claim });
+    }
+  }
+
+  const claimIdMatch = path.match(/^\/api\/payment-claims\/(.+)$/);
+  if (claimIdMatch && method === 'PUT') {
+    let out;
+    await dbMutate(db => {
+      const idx = db.payment_claims.findIndex(c => c.id === claimIdMatch[1]);
+      if (idx === -1) { out = { ok: false, error: 'not found' }; return; }
+      Object.assign(db.payment_claims[idx], body);
+      out = { ok: true, claim: db.payment_claims[idx] };
+    });
+    return R(out);
+  }
+
+  // ===== ACTIVATED PHONES =====
+  if (path === '/api/activated-phones') {
+    if (method === 'GET') return R((await dbRead()).activated_phones);
+    if (method === 'POST') {
+      await dbMutate(db => {
+        if (!db.activated_phones.some(p => p.phone === body.phone)) {
+          db.activated_phones.push({ phone: body.phone, activatedAt: Date.now() });
+        }
+      });
+      return R({ ok: true });
+    }
+  }
+
+  // ===== NOTIFICATIONS =====
+  if (path === '/api/notifications') {
+    if (method === 'GET') {
+      const notifs = (await dbRead()).notifications;
+      const phone = query.get('phone');
+      const isAdmin = query.get('isAdmin');
+      if (isAdmin === 'true') return R(notifs.filter(n => n.targetPhone === 'admin'));
+      if (phone) return R(notifs.filter(n => n.targetPhone === phone));
+      return R(notifs);
+    }
+    if (method === 'POST') {
+      await dbMutate(db => {
+        db.notifications.push({ targetPhone: body.targetPhone, type: body.type, message: body.message, read: false, createdAt: Date.now() });
+      });
+      return R({ ok: true });
+    }
+    if (method === 'DELETE') {
+      await dbMutate(db => { db.notifications = []; });
+      return R({ ok: true });
+    }
+  }
+
+  if (path === '/api/notifications/read' && method === 'PUT') {
+    const phone = body.phone, isAdmin = body.isAdmin;
+    await dbMutate(db => {
+      db.notifications.forEach(n => {
+        if (isAdmin && !n.read) n.read = true;
+        if (!isAdmin && phone && n.targetPhone === phone && !n.read) n.read = true;
+      });
+    });
+    return R({ ok: true });
+  }
+
+  // ===== MESSAGES =====
+  if (path === '/api/messages') {
+    if (method === 'GET') return R((await dbRead()).messages);
+    if (method === 'POST') {
+      const image = body.image;
+      const validImage = (image && typeof image === 'string' && (image.indexOf('data:image/') === 0 || image.indexOf('http') === 0)) ? image : null;
+      await dbMutate(db => {
+        db.messages.push({
+          id: 'msg_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
+          fromPhone: body.fromPhone, fromName: body.fromName, toPhone: body.toPhone,
+          text: body.text || '', image: validImage, read: false, createdAt: Date.now()
+        });
+      });
+      return R({ ok: true });
+    }
+  }
+
+  if (path === '/api/messages/read' && method === 'PUT') {
+    const phone = body.phone, isAdmin = body.isAdmin, fromPhone = body.fromPhone;
+    await dbMutate(db => {
+      db.messages.forEach(m => {
+        if (isAdmin && fromPhone && m.toPhone === 'admin' && m.fromPhone === fromPhone && !m.read) m.read = true;
+        else if (isAdmin && !fromPhone && m.toPhone === 'admin' && !m.read) m.read = true;
+        else if (!isAdmin && phone && m.toPhone === phone && !m.read) m.read = true;
+      });
+    });
+    return R({ ok: true });
+  }
+
+  // ===== 每用户答题数据 =====
+  const dataMatch = path.match(/^\/api\/data\/(\d+)$/);
+  if (dataMatch) {
+    const phone = dataMatch[1];
+    if (method === 'GET') {
+      const data = await userDataRead(phone);
+      if (data) return R(data);
+      return R({ wrongBook: {}, favorites: {}, practiceIdx: {},
+        stats: { totalAnswered: 0, totalCorrect: 0, typeStats: {}, examHistory: [] }, practiceOrder: 'seq' });
+    }
+    if (method === 'PUT') {
+      await userDataWrite(phone, body);
+      return R({ ok: true });
+    }
+  }
+
+  // ===== HEALTH =====
+  if (path === '/api/health') return R({ ok: true, time: Date.now(), platform: 'gitee' });
+
+  return R({ ok: false, error: 'Not found: ' + path }, 404);
+}
+
+// ============================ 对外接口（签名与原版完全一致）============================
 
 async function sfetch(path, opts) {
   if (!opts) opts = {};
-  opts.headers = opts.headers || {};
-  if (!opts.headers['Content-Type'] && opts.method !== 'GET') {
-    opts.headers['Content-Type'] = 'application/json';
-  }
-  const base = await resolveApiBase();
-  if (!base) throw new Error('No API backend available');
-  const resp = await fetch(base + path, opts);
-  if (!resp.ok) throw new Error('HTTP ' + resp.status);
-  return resp;
+  const method = (opts.method || 'GET').toUpperCase();
+  let body = {};
+  if (opts.body) { try { body = JSON.parse(opts.body); } catch (e) { body = {}; } }
+  if (!_giteeConfigured()) throw new Error('No API backend available');
+  const out = await giteeRoute(path, method, body);
+  if (out.status >= 400) throw new Error('HTTP ' + out.status);
+  return { ok: true, status: out.status, json: async () => out.data };
 }
 
 async function apiGet(path) {
-  try { const r = await sfetch(path); return await r.json(); }
-  catch(e) { return null; }
+  try { const r = await sfetch(path); return await r.json(); } catch (e) { return null; }
 }
 async function apiPost(path, body) {
-  try { const r = await sfetch(path, { method: 'POST', body: JSON.stringify(body) }); return await r.json(); }
-  catch(e) { return null; }
+  try { const r = await sfetch(path, { method: 'POST', body: JSON.stringify(body) }); return await r.json(); } catch (e) { return null; }
 }
 async function apiPut(path, body) {
-  try { const r = await sfetch(path, { method: 'PUT', body: JSON.stringify(body) }); return await r.json(); }
-  catch(e) { return null; }
+  try { const r = await sfetch(path, { method: 'PUT', body: JSON.stringify(body) }); return await r.json(); } catch (e) { return null; }
 }
 async function apiDelete(path) {
-  try { const r = await sfetch(path, { method: 'DELETE' }); return await r.json(); }
-  catch(e) { return null; }
+  try { const r = await sfetch(path, { method: 'DELETE' }); return await r.json(); } catch (e) { return null; }
 }
 
-// Probe API on load — MUST complete before any data sync
+// ---- 启动探测：验证仓库可达；db.json 不存在则自动创建 ----
 _apiProbePromise = (async function probeAPI() {
   try {
-    await resolveApiBase();
-  } catch(e) {
-    console.log('[Sync] API probe error:', e.message);
-    _apiBaseResolved = null; API_OK = false;
+    if (!_giteeConfigured()) {
+      API_OK = false;
+      console.log('[Sync] Gitee 未配置 — 离线模式，数据仅存本机');
+    } else {
+      await dbRead(true);
+      if (_dbCache && !_dbCache.sha) {
+        await dbMutate(db => { db._initAt = Date.now(); });   // 首次使用：建库
+        console.log('[Sync] 已初始化数据仓库 ' + DB_PATH);
+      }
+      API_OK = true;
+      console.log('[Sync] Gitee 已连接 ✅ 多设备同步已启用');
+    }
+  } catch (e) {
+    API_OK = false;
+    console.log('[Sync] Gitee 连接失败 ⚠️ ' + e.message + ' — 转入离线模式');
   }
   _apiProbeDone = true;
-  if (API_OK) console.log('[Sync] API connected ✅ — multi-device data sync ACTIVE');
-  else console.log('[Sync] Offline mode ⚠️ — data stays on this device only');
 })();
-// Safety: force probe to complete within 5 seconds
-(async function() {
+
+// 兜底：9 秒内必须结束探测，避免界面无限等待
+(async function () {
   await new Promise(r => setTimeout(r, 9000));
-  if (!_apiProbeDone) { _apiProbeDone = true; _apiBaseResolved = null; API_OK = false; }
+  if (!_apiProbeDone) { _apiProbeDone = true; API_OK = false; }
 })();
+
 async function waitForApiProbe() {
   if (_apiProbeDone) return;
   await _apiProbePromise;
 }
 
-// Sync helpers — push shared data to server on every write (waits for probe)
-async function syncWrite(key, data) { await waitForApiProbe(); if (!API_OK) return; try { await sfetch(key, { method: 'POST', body: JSON.stringify(data) }); } catch(e) {} }
-async function syncPut(key, data) { await waitForApiProbe(); if (!API_OK) return; try { await sfetch(key, { method: 'PUT', body: JSON.stringify(data) }); } catch(e) {} }
-async function syncDelete(key) { await waitForApiProbe(); if (!API_OK) return; try { await sfetch(key, { method: 'DELETE' }); } catch(e) {} }
+// 兼容旧调用点（当前代码库中未被调用，保留以防遗漏）
+async function syncWrite(key, data) { await waitForApiProbe(); if (!API_OK) return; try { await sfetch(key, { method: 'POST', body: JSON.stringify(data) }); } catch (e) {} }
+async function syncPut(key, data) { await waitForApiProbe(); if (!API_OK) return; try { await sfetch(key, { method: 'PUT', body: JSON.stringify(data) }); } catch (e) {} }
+async function syncDelete(key) { await waitForApiProbe(); if (!API_OK) return; try { await sfetch(key, { method: 'DELETE' }); } catch (e) {} }
 
-// Sync auth state to server
 async function syncAuthToServer() {
   if (!API_OK || !currentUser) return;
-  try { await sfetch('/api/data/' + encodeURIComponent(currentUser.phone), { method: 'PUT', body: JSON.stringify({ auth: currentUser }) }); } catch(e) {}
+  try { await sfetch('/api/data/' + encodeURIComponent(currentUser.phone), { method: 'PUT', body: JSON.stringify({ auth: currentUser }) }); } catch (e) {}
 }
 async function syncAuthFromServer(phone) {
   if (!API_OK) return null;
@@ -1062,7 +1561,7 @@ async function syncAuthFromServer(phone) {
     const r = await sfetch('/api/data/' + encodeURIComponent(phone));
     const j = await r.json();
     return j.auth || null;
-  } catch(e) { return null; }
+  } catch (e) { return null; }
 }
 
 // ===== DATA =====
