@@ -3315,7 +3315,7 @@ function renderExam() {
     const isTrial = currentUser.role === 'trial';
     const desc = isTrial
       ? '<div class="exam-desc">试用体验版<br>6道单选题 + 4道多选题 = 共10题 · 满分10分</div><ul class="exam-rules"><li>⏱️ 考试时间：<b>10分钟</b>，倒计时结束自动交卷</li><li>📋 可随时查看答题卡，了解作答进度</li><li>🔢 每题1分，多选题全部选对才得分</li><li>🎯 题目从全部选择题中随机抽取</li><li>🔓 激活后解锁完整120分钟/100题考试</li></ul>'
-      : '<div class="exam-desc">全真模拟理论考试环境<br>75道单选题 + 25道多选题 = 共100题 · 满分100分 · 合格线60分</div><ul class="exam-rules"><li>⏱️ 考试时间：<b>120分钟</b>，倒计时结束自动交卷</li><li>📋 可随时查看答题卡，了解作答进度</li><li>🔢 每题1分，多选题全部选对才得分</li><li>✅ 选完一题自动跳转下一题（不显示对错）</li><li>⚠️ 最后5分钟计时器变红提醒</li></ul>';
+      : '<div class="exam-desc">全真模拟理论考试环境<br>75道单选题 + 25道多选题 = 共100题 · 满分100分 · 合格线60分</div><ul class="exam-rules"><li>⏱️ 考试时间：<b>120分钟</b>，倒计时结束自动交卷</li><li>📋 可随时查看答题卡，了解作答进度</li><li>🔢 每题1分，多选题全部选对才得分</li><li>✅ 单选题选完自动跳转；多选题点击「下一题」继续（均不显示对错）</li><li>⚠️ 最后5分钟计时器变红提醒</li></ul>';
     area.innerHTML = '<div class="card exam-intro"><h2>🏆 模拟考试</h2>' + desc + '<button class="btn btn-warning btn-lg btn-block" id="btnStartExam" style="font-size:18px;padding:16px">▶ 开始考试</button></div>';
     document.getElementById('btnStartExam').addEventListener('click', startExam);
     return;
@@ -3539,12 +3539,8 @@ function selectExamOption(label) {
   else { examAnswers[examIdx] = [label]; }
   if (currentUser.role === 'trial' && !examTrialCounted[examIdx]) { examTrialCounted[examIdx] = true; trackTrialAnswer(); }
   render();
-  // 选完一题自动跳转下一题（首页模拟考试：不显示对错）
-  if (q.type === 'multi') {
-    if (answers.length >= q.ans.length) setTimeout(examNext, 400);
-  } else {
-    setTimeout(examNext, 400);
-  }
+  // 单选题选完自动跳转下一题（不显示对错）；多选题不自动跳转，由用户点击「下一题」按钮
+  if (q.type === 'single') setTimeout(examNext, 400);
 }
 function submitExam() { clearInterval(examTimer); examTimer = null; updateExamTimeLeft(); examSubmitted = true; examActive = false; render(); window.scrollTo(0, 0); }
 function showAnswerSheet() {
@@ -4492,12 +4488,18 @@ function renderGDPracticeCurrent() {
   });
   html += '</div>';
   if (isMulti) {
-    html += '<div id="gdMultiConfirmArea" style="margin-top:16px;text-align:center">' +
-      '<button class="btn btn-primary" onclick="confirmGDMultiAnswer(\'' + q.ans + '\')">✅ 确认答案</button></div>';
+    if (gdExamMode) {
+      // 模拟考试：多选题不自动跳转，由用户点击「下一题」按钮（常驻显示）
+    } else {
+      html += '<div id="gdMultiConfirmArea" style="margin-top:16px;text-align:center">' +
+        '<button class="btn btn-primary" onclick="confirmGDMultiAnswer(\'' + q.ans + '\')">✅ 确认答案</button></div>';
+    }
   }
   html += '<div id="gdResultArea" style="display:none;margin-top:16px;padding:16px;border-radius:12px"></div>';
-  html += '<div id="gdNextBtnArea" style="display:none;margin-top:16px;text-align:center">' +
-    '<button class="btn btn-primary" onclick="gdNextQuestion()">' +
+  // 下一题按钮：模拟考试多选题常驻显示；练习模式在提交后由 checkGDAnswer 显示
+  const gdNextOnclick = (gdExamMode && isMulti) ? 'gdExamNextMulti()' : 'gdNextQuestion()';
+  html += '<div id="gdNextBtnArea" style="' + ((gdExamMode && isMulti) ? 'margin-top:16px;text-align:center' : 'display:none;margin-top:16px;text-align:center') + '">' +
+    '<button class="btn btn-primary" onclick="' + gdNextOnclick + '">' +
     (gdCurrentIndex + 1 >= totalQ ? '📊 查看结果' : '下一题 ▶️') + '</button></div>';
   document.getElementById("gdPracticeContent").innerHTML = html;
   // Scroll to top
@@ -4517,16 +4519,6 @@ function gdToggleMultiOption(el, label) {
     el.style.background = "#f5f3ff";
     el.style.fontWeight = "600";
   }
-  // 模拟考试模式：选满答案数量后自动跳转下一题（不显示对错）
-  if (gdExamMode) {
-    const q = gdCurrentQuestions[gdCurrentIndex];
-    const opts = document.getElementById("gdOptionArea").children;
-    let cnt = 0;
-    for (let i = 0; i < opts.length; i++) {
-      if (opts[i].style.borderColor === "#7c3aed" || opts[i].style.borderColor === "rgb(124, 58, 237)") cnt++;
-    }
-    if (cnt >= (q.ans || '').length) setTimeout(function(){ confirmGDMultiAnswer(q.ans); }, 400);
-  }
 }
 
 // Confirm multi-choice answer
@@ -4544,6 +4536,21 @@ function confirmGDMultiAnswer(correctAns) {
   }
   const userAns = selected.sort().join("");
   checkGDAnswer(userAns, correctAns, "multi");
+}
+
+// 模拟考试多选题：记录当前所选答案并进入下一题（不自动跳转，由「下一题」按钮触发）
+function gdExamNextMulti() {
+  const q = gdCurrentQuestions[gdCurrentIndex];
+  if (!q) return;
+  const options = document.getElementById("gdOptionArea").children;
+  let selected = [];
+  for (let i = 0; i < options.length; i++) {
+    if (options[i].style.borderColor === "rgb(124, 58, 237)" || options[i].style.borderColor === "#7c3aed") {
+      selected.push(String.fromCharCode(65 + i));
+    }
+  }
+  checkGDAnswer(selected.sort().join(""), q.ans, "multi");
+  gdNextQuestion();
 }
 
 function checkGDAnswer(userAns, correctAns, qtype) {
@@ -4570,13 +4577,13 @@ function checkGDAnswer(userAns, correctAns, qtype) {
     }
   }
 
-  // 模拟考试模式：不显示对错，直接跳转下一题（与首页模拟考试一致）
+  // 模拟考试模式：不显示对错。单选题直接跳转下一题；多选题不自动跳转（由「下一题」按钮处理）
   if (gdExamMode) {
     for (let i = 0; i < options.length; i++) {
       options[i].style.pointerEvents = "none";
       options[i].style.cursor = "default";
     }
-    setTimeout(gdNextQuestion, 400);
+    if (qtype === 'single') setTimeout(gdNextQuestion, 400);
     return;
   }
 
