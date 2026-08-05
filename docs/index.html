@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>企业人力资源管理师备考冲刺</title>
@@ -21,6 +24,13 @@
   --safe-bottom: env(safe-area-inset-bottom, 16px);
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
+.conn-status {
+  font-size: 12px; text-align: center; margin: 8px 0 4px; padding: 7px 10px;
+  border-radius: 8px; line-height: 1.4;
+}
+.conn-pending { color: #64748b; background: #f1f5f9; }
+.conn-ok { color: #16a34a; background: #f0fdf4; }
+.conn-bad { color: #dc2626; background: #fef2f2; }
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
   background: var(--bg); color: var(--text); min-height: 100vh;
@@ -572,6 +582,7 @@ body {
     <div class="overlay-logo">📝</div>
     <div class="overlay-title">注册新账号</div>
     <div class="overlay-sub">注册后即可免费试用30道题</div>
+    <div class="js-conn-status conn-pending">⏳ 连接中…</div>
     <div class="form-group">
       <label>📱 手机号</label>
       <input type="tel" id="regPhone" placeholder="请输入手机号" maxlength="11" autocomplete="tel">
@@ -600,6 +611,7 @@ body {
     <div class="overlay-logo">👤</div>
     <div class="overlay-title">账号登录</div>
     <div class="overlay-sub">使用手机号和密码登录</div>
+    <div class="js-conn-status conn-pending">⏳ 连接中…</div>
     <div class="form-group">
       <label>📱 手机号</label>
       <input type="tel" id="loginPhone" placeholder="请输入手机号" maxlength="11" autocomplete="tel">
@@ -1513,6 +1525,15 @@ async function apiDelete(path) {
   try { const r = await sfetch(path, { method: 'DELETE' }); return await r.json(); } catch (e) { return null; }
 }
 
+// 连接状态指示：让学员一眼看出手机是否真的连上了 Gitee 服务器
+function updateConnStatus() {
+  const els = document.querySelectorAll('.js-conn-status');
+  els.forEach(function(el) {
+    if (API_OK) { el.textContent = '🟢 已连接 · 支持多设备同步'; el.className = 'js-conn-status conn-ok'; }
+    else { el.textContent = '🔴 离线模式 · 仅本机数据，请联网后刷新页面'; el.className = 'js-conn-status conn-bad'; }
+  });
+}
+
 // ---- 启动探测：验证仓库可达；db.json 不存在则自动创建 ----
 _apiProbePromise = (async function probeAPI() {
   try {
@@ -1533,6 +1554,7 @@ _apiProbePromise = (async function probeAPI() {
     console.log('[Sync] Gitee 连接失败 ⚠️ ' + e.message + ' — 转入离线模式');
   }
   _apiProbeDone = true;
+  updateConnStatus();
 })();
 
 // 兜底：9 秒内必须结束探测，避免界面无限等待
@@ -1969,6 +1991,7 @@ function showScreen(screenId) {
     if (el) el.classList.add('hidden');
   });
   document.getElementById(screenId).classList.remove('hidden');
+  if (typeof updateConnStatus === 'function') updateConnStatus();
 }
 
 // ===== ACCOUNT STORAGE (phone -> password hash, for login) =====
@@ -2082,6 +2105,7 @@ function syncUserDataBackground(phone) {
 
 // ===== REGISTRATION =====
 document.getElementById('regBtn').addEventListener('click', async function() {
+  const btn = this;
   const phone = document.getElementById('regPhone').value.trim();
   const pwd = document.getElementById('regPassword').value;
   const pwd2 = document.getElementById('regPassword2').value;
@@ -2101,32 +2125,57 @@ document.getElementById('regBtn').addEventListener('click', async function() {
     return;
   }
 
-  // Check if phone already registered (local check first, API check backed in)
+  btn.disabled = true;
+  msg.className = 'form-msg'; msg.textContent = '⏳ 正在校验账号...';
+
+  // 服务器优先：先问 Gitee 该手机号是否已注册（保证跨设备一致）
+  await waitForApiProbe();
+  if (API_OK) {
+    try {
+      const r = await registerViaAPI(phone, pwd, name);
+      if (r && r.ok) {
+        // 服务器注册成功
+        const pwdHash = await sha256(phone + ':' + pwd);
+        saveAccount(phone, pwdHash);
+        currentUser = { phone: phone, userName: name, role: 'trial', registeredAt: Date.now() };
+        isAdmin = false; saveAuth(); localStorage.setItem(TRIAL_KEY, '0');
+        msg.className = 'form-msg success'; msg.textContent = '注册成功！进入试用模式...';
+        setTimeout(() => { enterApp(); }, 500);
+        return;
+      }
+      if (r && r.ok === false && /已注册/.test(r.error || '')) {
+        // 该手机号已在其它设备注册 → 用本密码尝试直接登录（跨设备）
+        const lr = await loginViaAPI(phone, pwd);
+        if (lr && lr.ok) {
+          currentUser = lr.user; isAdmin = currentUser.role === 'admin';
+          if (isAdmin) adminMode = true;
+          saveAuth();
+          msg.className = 'form-msg success'; msg.textContent = '该账号已存在，已自动登录！';
+          setTimeout(() => { enterApp(); }, 500);
+          return;
+        }
+        msg.className = 'form-msg error';
+        msg.textContent = '该手机号已注册，但密码不正确，请用注册时的密码登录';
+        btn.disabled = false;
+        return;
+      }
+      // 其它服务器错误 → 降级到本机注册
+    } catch (e) { /* 网络抖动 → 降级本机注册 */ }
+  }
+
+  // 离线 / 降级：仅本机注册（不与服务器同步）
   const accounts = getAccounts();
   if (accounts[phone]) {
     msg.className = 'form-msg error'; msg.textContent = '该手机号已注册，请直接登录';
-    return;
+    btn.disabled = false; return;
   }
-
   const pwdHash = await sha256(phone + ':' + pwd);
   saveAccount(phone, pwdHash);
-
-  currentUser = {
-    phone: phone,
-    userName: name,
-    role: 'trial',
-    registeredAt: Date.now()
-  };
-  isAdmin = false;
-  saveAuth();
-  localStorage.setItem(TRIAL_KEY, '0');
-
-  // Register on server for cross-device login (fire-and-forget, non-blocking)
+  currentUser = { phone: phone, userName: name, role: 'trial', registeredAt: Date.now() };
+  isAdmin = false; saveAuth(); localStorage.setItem(TRIAL_KEY, '0');
   registerViaAPIBackground(phone, pwd, name);
-
   msg.className = 'form-msg success';
-  msg.textContent = '注册成功！进入试用模式...';
-  document.getElementById('regBtn').disabled = true;
+  msg.textContent = API_OK ? '注册成功！进入试用模式...' : '已在本机注册（离线，联网后自动同步）';
   setTimeout(() => { enterApp(); }, 600);
 });
 
