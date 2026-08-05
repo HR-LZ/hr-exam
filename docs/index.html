@@ -2739,6 +2739,8 @@ function showUserSettings() {
     } else if (myRejectedClaim) {
       html += '<div style="margin-top:6px;background:#fef2f2;border:1px solid #fecaca;border-radius:6px;padding:8px 10px;font-size:12px;color:#991b1b">❌ 付款申请已被拒绝，请确认付款后重新申请或联系管理员</div>';
     }
+    // 试用用户：在设置页提供激活入口（与练习页「激活全部」按钮同逻辑，避免从其它页返回后找不到）
+    html += '<button class="btn btn-warning btn-sm-block" id="btnSettingsActivate" style="margin-top:12px;font-size:15px;padding:11px 0">🔓 扫码激活 / 激活全部</button>';
   } else if (currentUser.role === 'activated') {
     html += '激活时间：' + new Date(currentUser.activatedAt).toLocaleDateString('zh-CN') + '<br>';
     html += '到期时间：' + new Date(currentUser.expiresAt).toLocaleDateString('zh-CN') + '<br>';
@@ -2767,6 +2769,8 @@ function showUserSettings() {
   document.getElementById('btnOpenChat').addEventListener('click', function() {
     openChat(null);
   });
+  const btnSetAct = document.getElementById('btnSettingsActivate');
+  if (btnSetAct) btnSetAct.addEventListener('click', function() { openScanPayOverlay(); });
 }
 
 // ===== ADMIN DASHBOARD =====
@@ -3561,7 +3565,7 @@ function switchTab(newTab) {
     currentIdx = DB.practiceIdx[qType] || 0;
   }
   DB._shuffleCache = {};
-  updateTimerBar(); render(); window.scrollTo(0, 0);
+  updateTimerBar(); render(); updateTrialBanner(); window.scrollTo(0, 0);
 }
 
 function savePracticeIdx() {
