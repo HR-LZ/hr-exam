@@ -345,6 +345,10 @@ body {
 .answer-box.show { display: block; }
 .ans-title { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
 .subj-ans { margin-top: 12px; }
+.subj-tip { background:#eff6ff; padding:10px 12px; border-radius:6px; font-size:13px; color:#2563eb; margin-bottom:12px; line-height:1.6 }
+.subj-input { width:100%; min-height:150px; padding:12px; border:1px solid var(--border); border-radius:var(--radius-sm); font-size:14px; line-height:1.7; resize:vertical; font-family:inherit; box-sizing:border-box; -webkit-user-select:text; user-select:text }
+.subj-input:focus { outline:none; border-color:var(--primary); box-shadow:0 0 0 3px rgba(37,99,235,.12) }
+.ans-ref { white-space:pre-wrap; font-size:14px; line-height:1.8; color:#1e293b; margin-bottom:4px }
 .ans-explain { margin-top: 8px; padding-top: 8px; border-top: 1px dashed #ddd; font-size: 13px; color: #555; line-height: 1.75; }
 
 /* ===== Navigation Row ===== */
@@ -3179,9 +3183,14 @@ function renderPractice() {
     }
     html += '</div><div class="answer-box" id="answerBox"></div>';
   } else {
-    html += '<div class="subj-ans"><div style="background:#fff7ed;padding:10px 12px;border-radius:6px;font-size:13px;color:#ea580c;margin-bottom:12px">💡 点击下方按钮查看参考答案</div>';
-    html += '<div id="subjContent" style="display:none;white-space:pre-wrap">' + escapeHtml(q.ans || '暂无参考答案').replace(/\n/g, '<br>') + '</div></div>';
-    html += '<div style="margin-top:12px"><button class="btn btn-warning btn-sm" id="btnShowAnswer">📖 查看答案</button></div>';
+    // 主观题：先写答案，再提交核对（避免答案直接暴露）
+    const taId = 'subjInput_' + q.id;
+    html += '<div class="subj-ans">';
+    html += '<div class="subj-tip">✍️ 请在下方写下你的答案，点击「提交核对」后查看参考答案与解析</div>';
+    html += '<textarea id="' + taId + '" class="subj-input" placeholder="在此输入你的作答内容..."></textarea>';
+    html += '<div style="margin-top:10px"><button class="btn btn-primary btn-sm" id="btnSubjSubmit">✅ 提交核对</button></div>';
+    html += '<div class="answer-box" id="answerBox"></div>';
+    html += '</div>';
   }
 
   html += '<div class="nav-row">';
@@ -3201,8 +3210,18 @@ function renderPractice() {
   // Event binding
   document.getElementById('btnPrev')?.addEventListener('click', goPrev);
   document.getElementById('btnNext')?.addEventListener('click', goNext);
-  document.getElementById('btnShowAnswer')?.addEventListener('click', function() {
-    const el = document.getElementById('subjContent'); if (el) el.style.display = 'block';
+  document.getElementById('btnSubjSubmit')?.addEventListener('click', function() {
+    const box = document.getElementById('answerBox');
+    if (!box) return;
+    let out = '<div class="ans-title">参考答案</div>';
+    out += '<div class="ans-ref">' + escapeHtml(q.ans || '暂无参考答案').replace(/\n/g, '<br>') + '</div>';
+    if (q.explain && String(q.explain).trim() && q.explain !== q.ans) {
+      out += '<div class="ans-explain">📖 解析：' + escapeHtml(q.explain).replace(/\n/g, '<br>') + '</div>';
+    } else {
+      out += '<div class="ans-explain">📖 解析：以上参考答案即本题评分要点，按要点作答即可得分；答题时紧扣核心概念与对应法规/公式依据。</div>';
+    }
+    box.innerHTML = out;
+    box.classList.add('show');
     if (currentUser.role === 'trial') trackTrialAnswer();
   });
   document.getElementById('btnClearWrong')?.addEventListener('click', clearWrongBook);
