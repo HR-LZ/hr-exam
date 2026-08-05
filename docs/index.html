@@ -1361,6 +1361,15 @@ async function giteeRoute(rawPath, method, body) {
     }
   }
 
+  // Mark a contact-admin activation request as handled (admin confirmed/ignored)
+  if (path === '/api/requests/handle' && method === 'PUT') {
+    await dbMutate(db => {
+      const r = db.requests.find(x => x.phone === body.phone && x.wechatId === body.wechatId);
+      if (r) r.handled = true;
+    });
+    return R({ ok: true });
+  }
+
   // ===== TRANSACTIONS =====
   if (path === '/api/transactions') {
     if (method === 'GET') return R((await dbRead()).transactions);
@@ -2824,7 +2833,7 @@ function showUserSettings() {
 
 // ===== ADMIN DASHBOARD =====
 let _renderingAdmin = false;
-function renderAdminDashboard() {
+async function renderAdminDashboard() {
   // Re-entry guard: skip if already rendering (prevents DOM chaos from concurrent calls)
   if (_renderingAdmin) return;
   _renderingAdmin = true;
@@ -2863,6 +2872,29 @@ function renderAdminDashboard() {
       html += '<div style="display:flex;gap:6px">';
       html += '<button class="btn btn-success btn-sm claim-approve" data-claim-id="' + c.id + '">✅ 确认到账</button>';
       html += '<button class="btn btn-outline btn-sm claim-reject" data-claim-id="' + c.id + '" style="color:#dc2626;border-color:#dc2626">✕ 拒绝</button>';
+      html += '</div></div>';
+    });
+  }
+  html += '</div>';
+
+  // 联系管理员激活请求（待处理）
+  const serverReqs = await getRequestsFromServer();
+  const allReqs = serverReqs || getRequests();
+  const pendingReqs = allReqs.filter(r => !r.handled);
+  html += '<div class="admin-section"><h4>🔔 激活请求 (' + pendingReqs.length + ')</h4>';
+  if (pendingReqs.length === 0) {
+    html += '<p style="font-size:12px;color:#94a3b8">暂无待处理的激活请求</p>';
+  } else {
+    pendingReqs.slice().reverse().forEach(r => {
+      const d = new Date(r.createdAt);
+      const ds = (d.getMonth()+1)+'/'+d.getDate()+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+      const wechat = escapeHtml(r.wechatId || '未提供');
+      html += '<div class="request-item" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">';
+      html += '<div><b>微信号：</b>' + wechat + '<br>';
+      html += '<span style="font-size:11px;color:#94a3b8">手机：' + escapeHtml(r.phone) + ' · ' + ds + '</span></div>';
+      html += '<div style="display:flex;gap:6px">';
+      html += '<button class="btn btn-success btn-sm req-approve" data-phone="' + escapeHtml(r.phone) + '" data-wechat="' + wechat + '">✅ 确认激活</button>';
+      html += '<button class="btn btn-outline btn-sm req-ignore" data-phone="' + escapeHtml(r.phone) + '" data-wechat="' + wechat + '" style="color:#94a3b8">忽略</button>';
       html += '</div></div>';
     });
   }
@@ -2968,6 +3000,38 @@ function renderAdminDashboard() {
       const claim = updatePaymentClaim(claimId, { status: 'rejected' });
       addNotification(claim ? claim.phone : '', 'claim_rejected', '您的付款申请已被拒绝，请联系管理员确认');
       renderAdminDashboard();
+    });
+  });
+
+  // 激活请求：确认激活
+  document.querySelectorAll('.req-approve').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      const phone = this.getAttribute('data-phone');
+      const wechat = this.getAttribute('data-wechat');
+      if (!confirm('确认激活该用户（' + phone + '）的账户？')) return;
+      this.disabled = true; this.textContent = '⏳ 处理中...';
+      (async function() {
+        try {
+          activateUserByPhone(phone);
+          addNotification(phone, 'request_approved', '您的激活请求已通过，账户已被激活，现在可以畅享全部功能！');
+          await apiPut('/api/requests/handle', { phone: phone, wechatId: wechat });
+          alert('✅ 已激活该用户账户！');
+          renderAdminDashboard();
+        } catch (err) { alert('处理失败：' + err.message); btn.disabled = false; btn.textContent = '✅ 确认激活'; }
+      })();
+    });
+  });
+  // 激活请求：忽略（标记已处理）
+  document.querySelectorAll('.req-ignore').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      const phone = this.getAttribute('data-phone');
+      const wechat = this.getAttribute('data-wechat');
+      (async function() {
+        try { await apiPut('/api/requests/handle', { phone: phone, wechatId: wechat }); renderAdminDashboard(); }
+        catch (err) { alert('操作失败：' + err.message); }
+      })();
     });
   });
 
@@ -3251,7 +3315,7 @@ function renderExam() {
     const isTrial = currentUser.role === 'trial';
     const desc = isTrial
       ? '<div class="exam-desc">试用体验版<br>6道单选题 + 4道多选题 = 共10题 · 满分10分</div><ul class="exam-rules"><li>⏱️ 考试时间：<b>10分钟</b>，倒计时结束自动交卷</li><li>📋 可随时查看答题卡，了解作答进度</li><li>🔢 每题1分，多选题全部选对才得分</li><li>🎯 题目从全部选择题中随机抽取</li><li>🔓 激活后解锁完整120分钟/100题考试</li></ul>'
-      : '<div class="exam-desc">全真模拟理论考试环境<br>60道单选题 + 40道多选题 = 共100题 · 满分100分 · 合格线60分</div><ul class="exam-rules"><li>⏱️ 考试时间：<b>120分钟</b>，倒计时结束自动交卷</li><li>📋 可随时查看答题卡，了解作答进度</li><li>🔢 每题1分，多选题全部选对才得分</li><li>⚠️ 最后5分钟计时器变红提醒</li></ul>';
+      : '<div class="exam-desc">全真模拟理论考试环境<br>75道单选题 + 25道多选题 = 共100题 · 满分100分 · 合格线60分</div><ul class="exam-rules"><li>⏱️ 考试时间：<b>120分钟</b>，倒计时结束自动交卷</li><li>📋 可随时查看答题卡，了解作答进度</li><li>🔢 每题1分，多选题全部选对才得分</li><li>✅ 选完一题自动跳转下一题（不显示对错）</li><li>⚠️ 最后5分钟计时器变红提醒</li></ul>';
     area.innerHTML = '<div class="card exam-intro"><h2>🏆 模拟考试</h2>' + desc + '<button class="btn btn-warning btn-lg btn-block" id="btnStartExam" style="font-size:18px;padding:16px">▶ 开始考试</button></div>';
     document.getElementById('btnStartExam').addEventListener('click', startExam);
     return;
@@ -3346,18 +3410,39 @@ function renderExamScore() {
 
 function showExamReview() {
   if (!examSubmitted) return;
-  let html = '<div class="card"><h3 style="margin-bottom:14px">📋 答题详情</h3>';
+  let html = '<div class="card">';
+  html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h3 style="margin:0">📋 答题详情</h3><button class="btn btn-outline btn-sm" id="btnGotoScoreTop">↩ 返回成绩</button></div>';
   examQuestions.forEach((q, i) => {
     const sel = examAnswers[i] || [];
     const correct = isAnswerCorrect(q, sel);
+    const correctLetters = (q.ans || '').split('');
     let iconHtml = sel.length === 0 ? '<span class="ri-status ri-empty">-</span>' : correct ? '<span class="ri-status ri-correct">✓</span>' : '<span class="ri-status ri-wrong">✗</span>';
-    html += '<div class="review-item">' + iconHtml + ' <b>' + (q.type==='single'?'单选':'多选') + '</b> ' + escapeHtml(q.q).substring(0, 55) + '...';
-    var explainHtml_r = q.explain ? '<br><span style="color:#555;font-size:12px">📖 ' + escapeHtml(q.explain).substring(0, 200) + '</span>' : '';
-    html += '<br><span style="color:#999;font-size:12px">你的答案：<b>' + (sel.length ? sel.join('') : '未作答') + '</b> | 正确答案：<b style="color:#16a34a">' + q.ans + '</b></span>' + explainHtml_r + '</div>';
+    html += '<div class="review-item" style="border-bottom:1px solid #eef2f7;padding-bottom:14px;margin-bottom:14px">';
+    html += iconHtml + ' <b>' + (q.type==='single'?'单选题':'多选题') + '</b> 第' + (i + 1) + '题';
+    // 完整题干（不截断）
+    html += '<div style="font-size:15px;line-height:1.8;margin-top:6px;font-weight:600">' + escapeHtml(q.q) + '</div>';
+    // 选项（标注正确项 / 你的选择）
+    if (q.opts && q.opts.length) {
+      html += '<div style="margin:8px 0">';
+      q.opts.forEach((opt, oi) => {
+        const label = String.fromCharCode(65 + oi);
+        const isCorrect = correctLetters.includes(label);
+        const isSel = sel.includes(label);
+        let bg = '#fff', bd = '#e2e8f0', tag = '';
+        if (isCorrect) { bg = '#f0fdf4'; bd = '#16a34a'; tag = ' ✅正确'; }
+        else if (isSel) { bg = '#fef2f2'; bd = '#dc2626'; tag = ' ✗你的选择'; }
+        html += '<div style="padding:7px 10px;border:1px solid ' + bd + ';background:' + bg + ';border-radius:8px;margin-top:6px;font-size:14px;line-height:1.6">' + label + '. ' + escapeHtml(opt.replace(/^[A-D]\.\s*/, '')) + tag + '</div>';
+      });
+      html += '</div>';
+    }
+    html += '<div style="font-size:13px;margin-top:6px">你的答案：<b>' + (sel.length ? sel.join('') : '未作答') + '</b> &nbsp;|&nbsp; 正确答案：<b style="color:#16a34a">' + escapeHtml(q.ans) + '</b></div>';
+    if (q.explain) html += '<div style="margin-top:8px;font-size:13px;color:#475569;line-height:1.75;background:#f8fafc;padding:9px 11px;border-radius:8px">📖 解析：' + escapeHtml(q.explain).replace(/\n/g, '<br>') + '</div>';
+    html += '</div>';
   });
-  html += '<div style="margin-top:12px;text-align:center"><button class="btn btn-outline" id="btnGotoScore">返回成绩</button></div></div>';
+  html += '<div style="margin-top:12px;text-align:center"><button class="btn btn-outline" id="btnGotoScore">↩ 返回成绩</button></div></div>';
   document.getElementById('contentArea').innerHTML = html;
   document.getElementById('btnGotoScore')?.addEventListener('click', renderExamScore);
+  document.getElementById('btnGotoScoreTop')?.addEventListener('click', renderExamScore);
 }
 
 function renderStats() {
@@ -3400,9 +3485,10 @@ function renderStats() {
 function startExam() {
   if (currentUser.role === 'trial' && getTrialCount() >= TRIAL_LIMIT) { showUpgradePrompt(); return; }
   const isTrial = currentUser.role === 'trial';
-  const singles = shuffle(ALL_CHOICE.filter(q => q.type === 'single')).slice(0, isTrial ? 6 : 60);
-  const multis = shuffle(ALL_CHOICE.filter(q => q.type === 'multi')).slice(0, isTrial ? 4 : 40);
-  examQuestions = shuffle([...singles, ...multis]);
+  const singles = shuffle(ALL_CHOICE.filter(q => q.type === 'single')).slice(0, isTrial ? 6 : 75);
+  const multis = shuffle(ALL_CHOICE.filter(q => q.type === 'multi')).slice(0, isTrial ? 4 : 25);
+  // 先全部单选、再全部多选（不整体打乱），符合"前面单选、单选结束才到多选"
+  examQuestions = [...singles, ...multis];
   examIdx = 0; examAnswers = {}; examActive = true; examSubmitted = false;
   examTimeLeft = isTrial ? 600 : 7200; examTotalTime = isTrial ? 600 : 7200;
   examDeadline = Date.now() + examTotalTime * 1000;
@@ -3453,6 +3539,12 @@ function selectExamOption(label) {
   else { examAnswers[examIdx] = [label]; }
   if (currentUser.role === 'trial' && !examTrialCounted[examIdx]) { examTrialCounted[examIdx] = true; trackTrialAnswer(); }
   render();
+  // 选完一题自动跳转下一题（首页模拟考试：不显示对错）
+  if (q.type === 'multi') {
+    if (answers.length >= q.ans.length) setTimeout(examNext, 400);
+  } else {
+    setTimeout(examNext, 400);
+  }
 }
 function submitExam() { clearInterval(examTimer); examTimer = null; updateExamTimeLeft(); examSubmitted = true; examActive = false; render(); window.scrollTo(0, 0); }
 function showAnswerSheet() {
@@ -4425,6 +4517,16 @@ function gdToggleMultiOption(el, label) {
     el.style.background = "#f5f3ff";
     el.style.fontWeight = "600";
   }
+  // 模拟考试模式：选满答案数量后自动跳转下一题（不显示对错）
+  if (gdExamMode) {
+    const q = gdCurrentQuestions[gdCurrentIndex];
+    const opts = document.getElementById("gdOptionArea").children;
+    let cnt = 0;
+    for (let i = 0; i < opts.length; i++) {
+      if (opts[i].style.borderColor === "#7c3aed" || opts[i].style.borderColor === "rgb(124, 58, 237)") cnt++;
+    }
+    if (cnt >= (q.ans || '').length) setTimeout(function(){ confirmGDMultiAnswer(q.ans); }, 400);
+  }
 }
 
 // Confirm multi-choice answer
@@ -4466,6 +4568,16 @@ function checkGDAnswer(userAns, correctAns, qtype) {
     if (used >= TRIAL_LIMIT) {
       setTimeout(function(){ showUpgradePrompt(); }, 700);
     }
+  }
+
+  // 模拟考试模式：不显示对错，直接跳转下一题（与首页模拟考试一致）
+  if (gdExamMode) {
+    for (let i = 0; i < options.length; i++) {
+      options[i].style.pointerEvents = "none";
+      options[i].style.cursor = "default";
+    }
+    setTimeout(gdNextQuestion, 400);
+    return;
   }
 
   for (let i = 0; i < options.length; i++) {
