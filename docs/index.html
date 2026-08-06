@@ -4468,6 +4468,50 @@ function renderGDPracticeCurrent() {
   const q = gdCurrentQuestions[gdCurrentIndex];
   const typeLabel = q.type === "single" ? "单选题" : "多选题";
   const isMulti = q.type === "multi";
+  // ===== 模拟考试模式：进度条 + 答题卡 + 底部导航（上一题/交卷/下一题），与首页模拟考试一致 =====
+  if (gdExamMode) {
+    const answeredCount = Object.keys(gdUserAnswers).filter(k => gdUserAnswers[k] && gdUserAnswers[k].userAns).length;
+    const progress = Math.round((gdCurrentIndex + 1) / totalQ * 100);
+    let html = '';
+    html += '<div class="card" style="padding:12px 16px;margin-bottom:12px"><div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--text-secondary)">';
+    html += '<span>已答 <b style="color:var(--primary)">' + answeredCount + '</b> / ' + totalQ + ' 题</span>';
+    html += '<button class="btn btn-sm btn-outline" id="gdShowSheet">📋 答题卡</button></div>';
+    html += '<div class="progress-bar" style="margin-top:8px;margin-bottom:0"><div class="progress-fill" style="width:' + progress + '%"></div></div></div>';
+    html += '<div class="card"><div class="q-meta"><span class="q-tag ' + TYPE_TAG_CLASS[q.type] + '">' + typeLabel + '</span>';
+    html += '<span style="font-size:12px">' + (gdCurrentIndex + 1) + '/' + totalQ + '</span></div>';
+    html += '<div class="q-text"><span class="q-num">' + (gdCurrentIndex + 1) + '.</span>' + q.q;
+    if (isMulti) html += ' <span style="font-size:13px;color:#7c3aed;font-weight:400">(多选)</span>';
+    html += '</div><div class="options" id="gdOptionArea">';
+    (q.opts || []).forEach((opt, idx) => {
+      const label = String.fromCharCode(65 + idx);
+      const prev = gdUserAnswers[gdCurrentIndex];
+      const answered = !!(prev && prev.userAns);
+      const isSel = answered && prev.userAns.split('').includes(label);
+      let style = 'padding:14px 16px;border:2px solid ' + (isSel ? '#7c3aed' : '#e2e8f0') + ';border-radius:12px;font-size:15px;transition:all 0.2s';
+      if (isSel) style += ';background:#f5f3ff;font-weight:600';
+      let attrs = '';
+      if (answered) { style += ';pointer-events:none;opacity:.85'; }
+      else {
+        const clickHandler = isMulti
+          ? 'gdToggleMultiOption(this, \'' + label + '\')'
+          : 'checkGDAnswer(\'' + label + '\', \'' + q.ans + '\', \'single\')';
+        attrs = ' onclick="' + clickHandler + '"';
+      }
+      html += '<div class="gd-option' + (isSel ? ' selected' : '') + '"' + attrs + ' style="' + style + '"><b>' + label + '.</b> ' + opt + '</div>';
+    });
+    html += '</div><div class="nav-row">';
+    html += '<button class="btn btn-ghost" id="gdPrevBtn"' + (gdCurrentIndex === 0 ? ' disabled' : '') + '>◀ 上一题</button>';
+    html += '<button class="btn btn-danger" id="gdSubmitBtn" style="flex:2">📤 交卷</button>';
+    const nextOnclick = isMulti ? 'gdExamNextMulti()' : 'gdNextQuestion()';
+    html += '<button class="btn btn-ghost" id="gdNextBtn"' + (gdCurrentIndex >= totalQ - 1 ? ' disabled' : '') + ' onclick="' + nextOnclick + '">下一题 ▶</button>';
+    html += '</div></div>';
+    document.getElementById("gdPracticeContent").innerHTML = html;
+    document.getElementById('gdShowSheet')?.addEventListener('click', showGDAnswerSheet);
+    document.getElementById('gdPrevBtn')?.addEventListener('click', gdPrevQuestion);
+    document.getElementById('gdSubmitBtn')?.addEventListener('click', submitGDExam);
+    document.getElementById("gdPracticeContent").parentElement.scrollTop = 0;
+    return;
+  }
   let html = '';
   html += '<div style="font-size:12px;color:#64748b;margin-bottom:8px">' +
     (q.chapter_name ? q.chapter_name + ' | ' : '') +
@@ -4650,6 +4694,45 @@ function gdNextQuestion() {
   renderGDPracticeCurrent();
   document.getElementById("gdPracticeContent").parentElement.scrollTop = 0;
 }
+function gdPrevQuestion() {
+  if (gdCurrentIndex > 0) { gdCurrentIndex--; renderGDPracticeCurrent(); document.getElementById("gdPracticeContent").parentElement.scrollTop = 0; }
+}
+function gdJumpTo(i) {
+  if (i >= 0 && i < gdCurrentQuestions.length) { gdCurrentIndex = i; renderGDPracticeCurrent(); document.getElementById("gdPracticeContent").parentElement.scrollTop = 0; }
+}
+function submitGDExam() {
+  if (!confirm('确定交卷？交卷后将显示本次考试成绩。')) return;
+  if (gdExamTimerId) { clearInterval(gdExamTimerId); gdExamTimerId = null; }
+  gdCurrentIndex = gdCurrentQuestions.length; // 触发结果页
+  renderGDPracticeCurrent();
+}
+// 模拟考试答题卡
+function showGDAnswerSheet() {
+  const totalQ = gdCurrentQuestions.length;
+  let cells = '';
+  for (let i = 0; i < totalQ; i++) {
+    const answered = gdUserAnswers[i] && gdUserAnswers[i].userAns;
+    cells += '<div data-gjump="' + i + '" style="aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;border:2px solid ' + (answered ? '#7c3aed' : '#e2e8f0') + ';background:' + (answered ? '#f5f3ff' : '#fff') + '">' + (i + 1) + '</div>';
+  }
+  let ov = document.getElementById('gdSheetOverlay');
+  if (!ov) {
+    ov = document.createElement('div');
+    ov.id = 'gdSheetOverlay';
+    ov.className = 'full-overlay';
+    ov.style.cssText = 'position:fixed;inset:0;background:rgba(15,23,42,.5);display:flex;align-items:center;justify-content:center;z-index:60';
+    document.getElementById('gdPracticingScreen').appendChild(ov);
+  }
+  ov.innerHTML = '<div style="background:#fff;border-radius:16px;max-width:420px;width:90%;padding:20px">' +
+    '<h3 style="margin:0 0 4px">📋 答题卡</h3>' +
+    '<div style="font-size:12px;color:#64748b;margin-bottom:10px">点击题号可跳转 · 共 ' + totalQ + ' 题</div>' +
+    '<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px">' + cells + '</div>' +
+    '<div style="text-align:center;margin-top:14px"><button class="btn btn-outline btn-sm" onclick="closeGDSheet()">关闭</button></div></div>';
+  ov.style.display = 'flex';
+  ov.querySelectorAll('[data-gjump]').forEach(el => el.addEventListener('click', function() {
+    const i = parseInt(this.dataset.gjump); closeGDSheet(); gdJumpTo(i);
+  }));
+}
+function closeGDSheet() { const ov = document.getElementById('gdSheetOverlay'); if (ov) ov.style.display = 'none'; }
 
 // Override switchTab for GD
 const _origSwitchTab = window.switchTab;
