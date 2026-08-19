@@ -8,7 +8,7 @@
 <meta http-equiv="Expires" content="0">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<title>企业人力资源管理师备考冲刺</title>
+<title>人力资源考试刷题平台</title>
 <style>
 :root {
   --primary: #2563eb; --primary-light: #eff6ff;
@@ -567,8 +567,8 @@ body {
 <div class="full-overlay" id="welcomeScreen">
   <div class="overlay-card">
     <div class="overlay-logo">📋</div>
-    <div class="overlay-title">企业人力资源管理师 · 三级</div>
-    <div class="overlay-sub">企业人力资源管理师备考冲刺</div>
+    <div class="overlay-title">人力资源考试刷题平台</div>
+    <div class="overlay-sub">企业人力资源管理师三级 · 中级经济师人力资源管理</div>
     <button class="btn btn-primary btn-block" id="linkToRegisterFromWelcomeBtn">📝 新用户注册</button>
     <div class="text-divider">或</div>
     <button class="btn btn-outline btn-block" id="linkToLoginFromWelcomeBtn">👤 已有账号，立即登录</button>
@@ -878,8 +878,8 @@ body {
   <div class="header">
     <div class="header-row">
       <div>
-        <div class="header-title" id="headerTitle">📋 企业人力资源管理师 · 三级</div>
-        <div class="header-sub" id="headerSubtitle">2026预测考试题库</div>
+        <div class="header-title" id="headerTitle">人力资源考试刷题平台</div>
+        <div class="header-sub" id="headerSubtitle">企业人力资源管理师 · 三级</div>
         <div class="exam-switch" id="examSwitch" style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
           <button class="exam-switch-btn" data-exam="hrm3" style="font-size:12px;padding:5px 10px;border:1px solid #2563eb;border-radius:999px;background:#2563eb;color:#fff;cursor:pointer">📋 企业HR(三级)</button>
           <button class="exam-switch-btn" data-exam="economist" style="font-size:12px;padding:5px 10px;border:1px solid #e2e8f0;border-radius:999px;background:#fff;color:#475569;cursor:pointer">📈 中级经济师(人力)</button>
@@ -2700,7 +2700,7 @@ function getDaysRemaining() {
 function updateHeaderInfo() {
   if (!currentUser) return;
   document.getElementById('userNameDisplay').textContent = currentUser.userName;
-  document.getElementById('headerSubtitle').textContent = '2026预测考试题库';
+  document.getElementById('headerSubtitle').textContent = EXAM_REGISTRY[currentExamId] ? EXAM_REGISTRY[currentExamId].title : '企业人力资源管理师 · 三级';
   const badge = document.getElementById('expiryBadge');
   const adminBtn = document.getElementById('headerAdminBtn');
   if (isAdmin) {
@@ -4442,8 +4442,8 @@ function applyExam(id) {
   qType = 'single'; currentIdx = 0;
   examActive = false; examSubmitted = false; examQuestions = [];
   gdCurrentChapter = null; gdCurrentQuestions = []; gdCurrentIndex = 0; gdExamMode = false;
-  const ht = document.getElementById('headerTitle'); if (ht) ht.textContent = reg.title;
-  const hs = document.getElementById('headerSubtitle'); if (hs) hs.textContent = reg.subtitle;
+  const ht = document.getElementById('headerTitle'); if (ht) ht.textContent = '人力资源考试刷题平台';
+  const hs = document.getElementById('headerSubtitle'); if (hs) hs.textContent = reg.title;
   const g = document.getElementById('gdChapterSubDesc'); if (g) g.textContent = reg.shortName + ' · 共' + GD_CHAPTERS.length + '个章节';
   updateExamSwitchUI(id);
   if (tab === 'gd') { switchTab('gd'); } else { switchTab(tab); }
