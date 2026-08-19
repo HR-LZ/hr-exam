@@ -1020,7 +1020,8 @@ const DB_DEFAULT = {
   payment_claims: [],
   activated_phones: [],
   notifications: [],
-  messages: []
+  messages: [],
+  subadmins: {}           // { phone: { hash, name, createdAt } }  子管理员账号（仅最高权限管理员可管理）
 };
 
 // ============================ 工具函数 ============================
@@ -1314,6 +1315,11 @@ async function giteeRoute(rawPath, method, body) {
       return R({ ok: true, user: { phone: phone, userName: '管理员', role: 'admin' } });
     }
     const db = await dbRead();
+    // 子管理员登录（账号独立于学员 accounts，由最高权限管理员创建）
+    if (db.subadmins[phone]) {
+      if (db.subadmins[phone].hash !== sha256Hex(phone + ':' + password)) return R({ ok: false, error: '密码错误' });
+      return R({ ok: true, user: { phone: phone, userName: db.subadmins[phone].name || '子管理员', role: 'subadmin' } });
+    }
     const acc = db.accounts[phone];
     if (!acc) return R({ ok: false, error: '账号不存在，请先注册' });
     if (acc.hash !== sha256Hex(phone + ':' + password)) return R({ ok: false, error: '密码错误' });
@@ -1348,6 +1354,116 @@ async function giteeRoute(rawPath, method, body) {
   if (path === '/api/admin/codes') {
     if (method === 'GET') return R((await dbRead()).admin_codes);
     if (method === 'POST') { await dbMutate(db => { db.admin_codes.push(body); }); return R({ ok: true }); }
+  }
+
+  // ===== 账号 / 子管理员 管理（仅最高权限管理员可操作）=====
+  const isSuperAdmin = (body && body.superPhone === SRV_ADMIN_PHONE) || (query.get('superPhone') === SRV_ADMIN_PHONE);
+
+  // 会员本人修改密码
+  const ownPwMatch = path.match(/^\/api\/accounts\/([^\/]+)\/password$/);
+  if (ownPwMatch && method === 'PUT') {
+    const phone = decodeURIComponent(ownPwMatch[1]);
+    const cur = body.currentPassword, nw = body.newPassword;
+    if (!nw || nw.length < 6) return R({ ok: false, error: '新密码至少6位' });
+    let res;
+    await dbMutate(db => {
+      const acc = db.accounts[phone];
+      if (!acc) { res = { ok: false, error: '账号不存在' }; return; }
+      if (sha256Hex(phone + ':' + cur) !== acc.hash) { res = { ok: false, error: '当前密码错误' }; return; }
+      acc.hash = sha256Hex(phone + ':' + nw); acc.updatedAt = Date.now();
+      res = { ok: true };
+    });
+    return R(res);
+  }
+
+  // 子管理员 CRUD（最高权限管理员）
+  const subMatch = path.match(/^\/api\/subadmins(?:\/([^\/]+))?$/);
+  if (subMatch && isSuperAdmin) {
+    if (method === 'GET') {
+      const db = await dbRead();
+      return R(Object.keys(db.subadmins).map(p => ({ phone: p, name: db.subadmins[p].name })));
+    }
+    if (method === 'POST') {
+      const phone = body.phone;
+      const pwd = body.password;
+      if (!phone || !/^1[3-9]\d{9}$/.test(phone)) return R({ ok: false, error: '无效的手机号' });
+      if (!pwd || pwd.length < 6) return R({ ok: false, error: '密码至少6位' });
+      let res;
+      await dbMutate(db => {
+        if (db.subadmins[phone]) { res = { ok: false, error: '该子管理员已存在' }; return; }
+        db.subadmins[phone] = { hash: sha256Hex(phone + ':' + pwd), name: body.name || '子管理员', createdAt: Date.now() };
+        res = { ok: true };
+      });
+      return R(res);
+    }
+    const phone = subMatch[1] ? decodeURIComponent(subMatch[1]) : null;
+    if (method === 'PUT' && phone) {
+      const pwd = body.newPassword;
+      if (!pwd || pwd.length < 6) return R({ ok: false, error: '新密码至少6位' });
+      let res;
+      await dbMutate(db => {
+        if (!db.subadmins[phone]) { res = { ok: false, error: '子管理员不存在' }; return; }
+        db.subadmins[phone].hash = sha256Hex(phone + ':' + pwd);
+        res = { ok: true };
+      });
+      return R(res);
+    }
+    if (method === 'DELETE' && phone) {
+      let res;
+      await dbMutate(db => {
+        if (!db.subadmins[phone]) { res = { ok: false, error: '子管理员不存在' }; return; }
+        delete db.subadmins[phone];
+        res = { ok: true };
+      });
+      return R(res);
+    }
+  }
+
+  // 会员 CRUD（最高权限管理员）—— 直接创建/删除/改密（含已激活会员）
+  const memMatch = path.match(/^\/api\/admin\/accounts(?:\/([^\/]+))?$/);
+  if (memMatch && isSuperAdmin) {
+    if (method === 'GET') {
+      const db = await dbRead();
+      const activated = (db.activated_phones || []).map(p => p.phone);
+      return R(Object.keys(db.accounts).map(p => ({ phone: p, name: db.accounts[p].name, activated: activated.includes(p), createdBy: db.accounts[p].createdBy || null })));
+    }
+    if (method === 'POST') {
+      const phone = body.phone;
+      const pwd = body.password;
+      if (!phone || !/^1[3-9]\d{9}$/.test(phone)) return R({ ok: false, error: '无效的手机号' });
+      if (!pwd || pwd.length < 6) return R({ ok: false, error: '密码至少6位' });
+      let res;
+      await dbMutate(db => {
+        if (db.accounts[phone]) { res = { ok: false, error: '该会员已存在' }; return; }
+        const now = Date.now();
+        db.accounts[phone] = { hash: sha256Hex(phone + ':' + pwd), name: body.name || '会员', registeredAt: now, createdBy: 'admin' };
+        db.activated_phones.push({ phone: phone, activatedAt: now, byAdmin: true });
+        res = { ok: true };
+      });
+      return R(res);
+    }
+    const phone = memMatch[1] ? decodeURIComponent(memMatch[1]) : null;
+    if (method === 'PUT' && phone) {
+      const pwd = body.newPassword;
+      if (!pwd || pwd.length < 6) return R({ ok: false, error: '新密码至少6位' });
+      let res;
+      await dbMutate(db => {
+        if (!db.accounts[phone]) { res = { ok: false, error: '会员不存在' }; return; }
+        db.accounts[phone].hash = sha256Hex(phone + ':' + pwd);
+        res = { ok: true };
+      });
+      return R(res);
+    }
+    if (method === 'DELETE' && phone) {
+      let res;
+      await dbMutate(db => {
+        if (!db.accounts[phone]) { res = { ok: false, error: '会员不存在' }; return; }
+        delete db.accounts[phone];
+        db.activated_phones = (db.activated_phones || []).filter(p => p.phone !== phone);
+        res = { ok: true };
+      });
+      return R(res);
+    }
   }
 
   // ===== USED CODES =====
@@ -1643,7 +1759,7 @@ function loadAuth() {
     const raw = localStorage.getItem(AUTH_KEY);
     if (raw) {
       currentUser = JSON.parse(raw);
-      isAdmin = currentUser.role === 'admin';
+      isAdmin = (currentUser.role === 'admin' || currentUser.role === 'subadmin');
       if (isAdmin) adminMode = true;
       if (!isAdmin && currentUser.role !== 'trial') {
         if (Date.now() > currentUser.expiresAt) {
@@ -2160,7 +2276,7 @@ document.getElementById('regBtn').addEventListener('click', async function() {
         // 该手机号已在其它设备注册 → 用本密码尝试直接登录（跨设备）
         const lr = await loginViaAPI(phone, pwd);
         if (lr && lr.ok) {
-          currentUser = lr.user; isAdmin = currentUser.role === 'admin';
+          currentUser = lr.user; isAdmin = (currentUser.role === 'admin' || currentUser.role === 'subadmin');
           if (isAdmin) adminMode = true;
           saveAuth();
           msg.className = 'form-msg success'; msg.textContent = '该账号已存在，已自动登录！';
@@ -2239,7 +2355,7 @@ document.getElementById('loginBtn').addEventListener('click', async function() {
     if (apiResult && apiResult.ok) {
       // Server knows this user — use server's auth state (cross-device!)
       currentUser = apiResult.user;
-      isAdmin = currentUser.role === 'admin';
+      isAdmin = (currentUser.role === 'admin' || currentUser.role === 'subadmin');
       if (isAdmin) adminMode = true;
       saveAuth();
     } else if (localOk) {
@@ -2248,7 +2364,7 @@ document.getElementById('loginBtn').addEventListener('click', async function() {
       if (savedAuth) {
         try {
           currentUser = JSON.parse(savedAuth);
-          isAdmin = currentUser.role === 'admin';
+          isAdmin = (currentUser.role === 'admin' || currentUser.role === 'subadmin');
           if (isAdmin) adminMode = true;
           if (!isAdmin && currentUser.role !== 'trial' && Date.now() > currentUser.expiresAt) {
             document.getElementById('expiredOverlay').classList.remove('hidden');
@@ -2351,30 +2467,33 @@ document.getElementById('adminLoginBtn').addEventListener('click', async functio
   const pwd = document.getElementById('adminPassword').value;
   const msg = document.getElementById('adminLoginMsg');
 
-  if (phone !== ADMIN_PHONE) {
-    msg.className = 'form-msg error'; msg.textContent = '管理员账号错误';
+  // 最高权限管理员：本地优先校验（离线可用）
+  if (phone === ADMIN_PHONE) {
+    const hash = await sha256(pwd);
+    if (hash !== ADMIN_PASSWORD_HASH) { msg.className = 'form-msg error'; msg.textContent = '密码错误'; return; }
+    currentUser = { phone: ADMIN_PHONE, userName: '管理员', role: 'admin', registeredAt: Date.now() };
+    isAdmin = true; adminMode = true; saveAuth();
+    msg.className = 'form-msg success'; msg.textContent = '管理员登录成功！';
+    syncAllAdminDataBackground();
+    setTimeout(() => { enterApp(); }, 400);
     return;
   }
 
-  const hash = await sha256(pwd);
-  if (hash !== ADMIN_PASSWORD_HASH) {
-    msg.className = 'form-msg error'; msg.textContent = '密码错误';
-    return;
+  // 子管理员：经 Gitee 校验后进入后台
+  if (_apiProbeDone && API_OK) {
+    try {
+      const r = await loginViaAPI(phone, pwd);
+      if (r && r.ok && r.user.role === 'subadmin') {
+        currentUser = r.user; isAdmin = true; adminMode = true; saveAuth();
+        msg.className = 'form-msg success'; msg.textContent = '子管理员登录成功！';
+        syncAllAdminDataBackground();
+        setTimeout(() => { enterApp(); }, 400);
+        return;
+      }
+      if (r && r.ok) { msg.className = 'form-msg error'; msg.textContent = '该账号不是管理员'; return; }
+    } catch(e) {}
   }
-
-  currentUser = {
-    phone: ADMIN_PHONE,
-    userName: '管理员',
-    role: 'admin',
-    registeredAt: Date.now()
-  };
-  isAdmin = true;
-  adminMode = true;
-  saveAuth();
-
-  msg.className = 'form-msg success'; msg.textContent = '登录成功！';
-
-  setTimeout(() => { enterApp(); }, 400);
+  msg.className = 'form-msg error'; msg.textContent = '账号或密码错误';
 });
 
 // ===== WECHAT SEND =====
@@ -2816,6 +2935,19 @@ function showUserSettings() {
   html += '<button class="btn btn-outline btn-sm-block" id="btnOpenChat" style="margin-top:10px">💬 在线客服</button>';
   html += '<button class="btn btn-danger btn-sm-block" id="btnLogoutUser" style="margin-top:6px">🚪 退出登录</button>';
   html += '<button class="btn btn-ghost btn-sm-block" id="btnSettingsBack" style="margin-top:6px">↩ 返回学习</button>';
+
+  // 修改密码（仅学员账号；管理员/子管理员在后台管理）
+  if (currentUser.role !== 'admin' && currentUser.role !== 'subadmin') {
+    html += '<div style="margin-top:14px;border-top:1px dashed #e2e8f0;padding-top:12px">';
+    html += '<div style="font-size:13px;font-weight:600;margin-bottom:8px">🔒 修改密码</div>';
+    html += '<input type="password" id="curPwd" placeholder="当前密码" style="width:100%;padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;margin-bottom:8px">';
+    html += '<input type="password" id="newPwd" placeholder="新密码（至少6位）" style="width:100%;padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;margin-bottom:8px">';
+    html += '<input type="password" id="newPwd2" placeholder="确认新密码" style="width:100%;padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;margin-bottom:8px">';
+    html += '<button class="btn btn-primary btn-sm-block" id="btnChangePwd">修改密码</button>';
+    html += '<div class="form-msg" id="changePwdMsg" style="margin-top:6px"></div>';
+    html += '</div>';
+  }
+
   html += '</div>';
 
   area.innerHTML = html;
@@ -2833,6 +2965,32 @@ function showUserSettings() {
   });
   const btnSetAct = document.getElementById('btnSettingsActivate');
   if (btnSetAct) btnSetAct.addEventListener('click', function() { openScanPayOverlay(); });
+
+  const btnChg = document.getElementById('btnChangePwd');
+  if (btnChg) btnChg.addEventListener('click', async function() {
+    const cur = document.getElementById('curPwd').value;
+    const nw = document.getElementById('newPwd').value;
+    const nw2 = document.getElementById('newPwd2').value;
+    const msg = document.getElementById('changePwdMsg');
+    if (!cur) { msg.className = 'form-msg error'; msg.textContent = '请输入当前密码'; return; }
+    if (!nw || nw.length < 6) { msg.className = 'form-msg error'; msg.textContent = '新密码至少6位'; return; }
+    if (nw !== nw2) { msg.className = 'form-msg error'; msg.textContent = '两次新密码不一致'; return; }
+    this.disabled = true; this.textContent = '⏳ 提交中...';
+    let r = null;
+    if (API_OK) {
+      r = await apiPut('/api/accounts/' + encodeURIComponent(currentUser.phone) + '/password', { currentPassword: cur, newPassword: nw });
+    }
+    if (r && r.ok) {
+      const newHash = await sha256(currentUser.phone + ':' + nw);
+      saveAccount(currentUser.phone, newHash);
+      msg.className = 'form-msg success'; msg.textContent = '✓ 密码修改成功，下次请用新密码登录';
+      document.getElementById('curPwd').value = ''; document.getElementById('newPwd').value = ''; document.getElementById('newPwd2').value = '';
+      this.textContent = '修改密码'; this.disabled = false;
+    } else {
+      msg.className = 'form-msg error'; msg.textContent = (r && r.error) ? r.error : (API_OK ? '修改失败，请重试' : '网络未连接，请联网后重试');
+      this.disabled = false; this.textContent = '修改密码';
+    }
+  });
 }
 
 // ===== ADMIN DASHBOARD =====
@@ -2958,6 +3116,53 @@ async function renderAdminDashboard() {
   }
   html += '</div>';
 
+  // ===== 账号管理（仅最高权限管理员 ' + ADMIN_PHONE + ' 可见）=====
+  if (currentUser.phone === ADMIN_PHONE) {
+    // 子管理员
+    let subList = [];
+    try { const r = await apiGet('/api/subadmins?superPhone=' + ADMIN_PHONE); if (r) subList = r; } catch(e) {}
+    html += '<div class="admin-section" style="border-top:2px solid #2563eb;margin-top:8px"><h4>🛡 子管理员账号管理</h4>';
+    html += '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">';
+    html += '<input type="text" id="subPhone" placeholder="子管理员手机号" style="flex:1;min-width:110px;padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit">';
+    html += '<input type="text" id="subName" placeholder="昵称" style="width:80px;padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit">';
+    html += '<input type="password" id="subPwd" placeholder="密码" style="width:80px;padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit">';
+    html += '<button class="btn btn-primary btn-sm" id="btnAddSub">➕ 添加</button>';
+    html += '</div><div id="subListWrap">';
+    if (subList.length === 0) html += '<p style="font-size:12px;color:#94a3b8">暂无子管理员</p>';
+    else subList.forEach(s => {
+      html += '<div class="request-item" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px">';
+      html += '<div><b>' + escapeHtml(s.phone) + '</b> · ' + escapeHtml(s.name || '子管理员') + '</div>';
+      html += '<div style="display:flex;gap:6px">';
+      html += '<button class="btn btn-outline btn-sm sub-pwd" data-phone="' + escapeHtml(s.phone) + '" style="color:#2563eb;border-color:#2563eb">🔑 改密</button>';
+      html += '<button class="btn btn-outline btn-sm sub-del" data-phone="' + escapeHtml(s.phone) + '" style="color:#dc2626;border-color:#dc2626">🗑 删除</button>';
+      html += '</div></div>';
+    });
+    html += '</div></div>';
+
+    // 会员
+    let memList = [];
+    try { const r = await apiGet('/api/admin/accounts?superPhone=' + ADMIN_PHONE); if (r) memList = r; } catch(e) {}
+    html += '<div class="admin-section" style="border-top:2px solid #2563eb;margin-top:8px"><h4>👥 会员账号管理（' + memList.length + '）</h4>';
+    html += '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">';
+    html += '<input type="text" id="memPhone" placeholder="会员手机号" style="flex:1;min-width:110px;padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit">';
+    html += '<input type="text" id="memName" placeholder="昵称" style="width:80px;padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit">';
+    html += '<input type="password" id="memPwd" placeholder="密码" style="width:80px;padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit">';
+    html += '<button class="btn btn-primary btn-sm" id="btnAddMem">➕ 添加已激活会员</button>';
+    html += '</div><div id="memListWrap">';
+    if (memList.length === 0) html += '<p style="font-size:12px;color:#94a3b8">暂无会员</p>';
+    else memList.forEach(m => {
+      const act = m.activated ? '<span style="color:#16a34a;font-size:11px">●已激活</span>' : '<span style="color:#94a3b8;font-size:11px">○试用</span>';
+      const tag = m.createdBy === 'admin' ? '<span style="color:#2563eb;font-size:11px">后台创建</span>' : '';
+      html += '<div class="request-item" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px">';
+      html += '<div><b>' + escapeHtml(m.phone) + '</b> · ' + escapeHtml(m.name || '会员') + ' ' + act + ' ' + tag + '</div>';
+      html += '<div style="display:flex;gap:6px">';
+      html += '<button class="btn btn-outline btn-sm mem-pwd" data-phone="' + escapeHtml(m.phone) + '" style="color:#2563eb;border-color:#2563eb">🔑 改密</button>';
+      html += '<button class="btn btn-outline btn-sm mem-del" data-phone="' + escapeHtml(m.phone) + '" style="color:#dc2626;border-color:#dc2626">🗑 删除</button>';
+      html += '</div></div>';
+    });
+    html += '</div></div>';
+  }
+
   html += '<button class="btn btn-ghost btn-sm-block" id="btnAdminBackToPractice">📝 切换到练习模式</button>';
   html += '<button class="btn btn-danger btn-sm-block" id="btnAdminLogout" style="margin-top:6px">🚪 退出管理后台</button>';
   html += '</div></div>';
@@ -3050,7 +3255,69 @@ async function renderAdminDashboard() {
     stopAdminPolling();
     logout();
   });
-  
+
+  // ===== 账号管理：子管理员 / 会员 增删改（仅最高权限管理员界面存在这些按钮）=====
+  if (document.getElementById('btnAddSub')) {
+    document.getElementById('btnAddSub').addEventListener('click', async function() {
+      const phone = document.getElementById('subPhone').value.trim();
+      const name = document.getElementById('subName').value.trim();
+      const pwd = document.getElementById('subPwd').value;
+      if (!/^1[3-9]\d{9}$/.test(phone)) { alert('请输入有效的手机号'); return; }
+      if (!pwd || pwd.length < 6) { alert('密码至少6位'); return; }
+      this.disabled = true;
+      const r = await apiPost('/api/subadmins?superPhone=' + ADMIN_PHONE, { phone: phone, name: name, password: pwd });
+      if (r && r.ok) renderAdminDashboard();
+      else { alert((r && r.error) || '添加失败'); this.disabled = false; }
+    });
+    document.getElementById('btnAddMem').addEventListener('click', async function() {
+      const phone = document.getElementById('memPhone').value.trim();
+      const name = document.getElementById('memName').value.trim();
+      const pwd = document.getElementById('memPwd').value;
+      if (!/^1[3-9]\d{9}$/.test(phone)) { alert('请输入有效的手机号'); return; }
+      if (!pwd || pwd.length < 6) { alert('密码至少6位'); return; }
+      this.disabled = true;
+      const r = await apiPost('/api/admin/accounts?superPhone=' + ADMIN_PHONE, { phone: phone, name: name, password: pwd });
+      if (r && r.ok) renderAdminDashboard();
+      else { alert((r && r.error) || '添加失败'); this.disabled = false; }
+    });
+    document.querySelectorAll('.sub-del').forEach(function(btn) {
+      btn.addEventListener('click', async function() {
+        const phone = this.getAttribute('data-phone');
+        if (!confirm('确定删除子管理员 ' + phone + '？')) return;
+        const r = await apiDelete('/api/subadmins/' + encodeURIComponent(phone) + '?superPhone=' + ADMIN_PHONE);
+        if (r && r.ok) renderAdminDashboard(); else alert((r && r.error) || '删除失败');
+      });
+    });
+    document.querySelectorAll('.sub-pwd').forEach(function(btn) {
+      btn.addEventListener('click', async function() {
+        const phone = this.getAttribute('data-phone');
+        const np = prompt('为子管理员 ' + phone + ' 设置新密码（至少6位）');
+        if (np === null) return;
+        if (np.length < 6) { alert('密码至少6位'); return; }
+        const r = await apiPut('/api/subadmins/' + encodeURIComponent(phone) + '?superPhone=' + ADMIN_PHONE, { newPassword: np });
+        if (r && r.ok) alert('✅ 密码已更新'); else alert((r && r.error) || '修改失败');
+      });
+    });
+    document.querySelectorAll('.mem-del').forEach(function(btn) {
+      btn.addEventListener('click', async function() {
+        const phone = this.getAttribute('data-phone');
+        if (!confirm('确定删除会员 ' + phone + '？该账号将不能再登录（答题数据保留）。')) return;
+        const r = await apiDelete('/api/admin/accounts/' + encodeURIComponent(phone) + '?superPhone=' + ADMIN_PHONE);
+        if (r && r.ok) renderAdminDashboard(); else alert((r && r.error) || '删除失败');
+      });
+    });
+    document.querySelectorAll('.mem-pwd').forEach(function(btn) {
+      btn.addEventListener('click', async function() {
+        const phone = this.getAttribute('data-phone');
+        const np = prompt('为会员 ' + phone + ' 设置新密码（至少6位）');
+        if (np === null) return;
+        if (np.length < 6) { alert('密码至少6位'); return; }
+        const r = await apiPut('/api/admin/accounts/' + encodeURIComponent(phone) + '?superPhone=' + ADMIN_PHONE, { newPassword: np });
+        if (r && r.ok) alert('✅ 密码已更新'); else alert((r && r.error) || '修改失败');
+      });
+    });
+  }
+
   _renderingAdmin = false;
 }
 
