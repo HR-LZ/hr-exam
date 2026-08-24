@@ -3892,13 +3892,14 @@ function buildExamCases(source, count, points) {
 function startExam() {
   if (currentUser.role === 'trial' && getTrialCount() >= TRIAL_LIMIT) { showUpgradePrompt(); return; }
   const isTrial = currentUser.role === 'trial';
-  const cfg = (EXAM_REGISTRY[currentExamId] && EXAM_REGISTRY[currentExamId].exam) || { single: 75, multi: 25, case: 0, minutes: 120, passRate: 0.6, points: { single: 1, multi: 1, case: 1 } };
+  const entry = EXAM_REGISTRY[currentExamId] || {};
+  const cfg = entry.exam || { single: 75, multi: 25, case: 0, minutes: 120, passRate: 0.6, points: { single: 1, multi: 1, case: 1 } };
   const singles = shuffle(ALL_CHOICE.filter(q => q.type === 'single')).slice(0, isTrial ? 6 : cfg.single);
   const multis = shuffle(ALL_CHOICE.filter(q => q.type === 'multi')).slice(0, isTrial ? 4 : cfg.multi);
   // 先全部单选、再全部多选、最后案例分析（不整体打乱），符合真实考卷顺序
   let examQ = [...singles, ...multis];
   const casePts = (cfg.points && cfg.points.case !== undefined) ? cfg.points.case : 2;
-  if (!isTrial && cfg.case && cfg.caseSource) examQ = examQ.concat(buildExamCases(cfg.caseSource, cfg.case, casePts));
+  if (!isTrial && cfg.case && entry.caseSource) examQ = examQ.concat(buildExamCases(entry.caseSource, cfg.case, casePts));
   examQuestions = examQ;
   examIdx = 0; examAnswers = {}; examActive = true; examSubmitted = false;
   const minutes = isTrial ? 10 : cfg.minutes;
