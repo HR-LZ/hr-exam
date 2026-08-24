@@ -3223,8 +3223,17 @@ async function renderAdminDashboard() {
   html += '<button class="btn btn-danger btn-sm-block" id="btnAdminLogout" style="margin-top:6px">🚪 退出管理后台</button>';
   html += '</div></div>';
 
+  // 重渲染前保留账号表单输入，避免管理端 5 秒轮询清空正在输入的内容（含中文输入法组词被打断）
+  var _ACCT_IDS = ['subPhone','subName','subPwd','memPhone','memName','memPwd'];
+  var _acctSaved = { vals:{}, focused:null };
+  _ACCT_IDS.forEach(function(id){ var el = document.getElementById(id); if (el){ _acctSaved.vals[id] = el.value; if (document.activeElement === el) _acctSaved.focused = id; } });
   const area = document.getElementById('contentArea');
   area.innerHTML = html;
+  // 重渲染后恢复账号表单输入与焦点（聚焦输入框在轮询时已被跳过，此处为其他调用点的兜底恢复）
+  _ACCT_IDS.forEach(function(id){
+    if (_acctSaved.vals[id]) { var el = document.getElementById(id); if (el) el.value = _acctSaved.vals[id]; }
+  });
+  if (_acctSaved.focused) { var fel = document.getElementById(_acctSaved.focused); if (fel) { fel.value = _acctSaved.vals[_acctSaved.focused]; fel.focus(); } }
 
   if (document.getElementById('btnClearRequests')) {
     document.getElementById('btnClearRequests').addEventListener('click', function() {
@@ -4417,6 +4426,15 @@ document.addEventListener('click', function(e) {
 
 // ===== ADMIN DASHBOARD AUTO-REFRESH (polling) =====
 let adminPollTimer = null;
+// 账号表单是否正在输入（聚焦或有内容）——轮询时跳过重渲染，避免清空/打断中文输入
+function _accountFormBusy() {
+  var ids = ['subPhone','subName','subPwd','memPhone','memName','memPwd'];
+  for (var i = 0; i < ids.length; i++) {
+    var el = document.getElementById(ids[i]);
+    if (el && (document.activeElement === el || (el.value && el.value.trim() !== ''))) return true;
+  }
+  return false;
+}
 function startAdminPolling() {
   if (adminPollTimer) clearInterval(adminPollTimer);
   adminPollTimer = setInterval(async function() {
@@ -4432,7 +4450,7 @@ function startAdminPolling() {
       updateBadge();
       // Also refresh dashboard if chat overlay is not open and not already rendering
       if (!_renderingAdmin && document.getElementById('chatOverlay').classList.contains('hidden')) {
-        renderAdminDashboard();
+        if (!_accountFormBusy()) renderAdminDashboard();
       }
     }
   }, 5000);
