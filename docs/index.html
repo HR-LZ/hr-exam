@@ -308,22 +308,27 @@ body {
 /* ===== Type Filter Chips ===== */
 /* ===== Exam Switcher ===== */
 .exam-switch {
-  display: inline-flex;
-  gap: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
   margin-top: 12px;
-  padding: 4px;
-  background: rgba(255,255,255,0.14);
-  border-radius: 999px;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  padding: 8px;
+  background: rgba(255,255,255,0.12);
+  border-radius: 18px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   box-shadow: inset 0 1px 3px rgba(0,0,0,0.12), 0 1px 0 rgba(255,255,255,0.08);
   border: 1px solid rgba(255,255,255,0.08);
   max-width: 100%;
-  overflow-x: auto;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
 }
-.exam-switch::-webkit-scrollbar { display: none; }
+.exam-group-row,
+.exam-sub-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.exam-sub-row.hidden { display: none; }
+.exam-group-btn,
 .exam-switch-btn {
   display: inline-flex;
   align-items: center;
@@ -341,15 +346,24 @@ body {
   -webkit-tap-highlight-color: transparent;
   position: relative;
 }
+.exam-switch-btn { padding: 6px 12px; font-size: 11.5px; }
+.exam-group-btn .es-icon,
 .exam-switch-btn .es-icon { font-size: 13px; filter: grayscale(0.25); transition: all 0.25s; }
+.exam-group-btn:hover,
 .exam-switch-btn:hover { color: #fff; background: rgba(255,255,255,0.1); }
+.exam-group-btn.active,
 .exam-switch-btn.active {
   background: linear-gradient(135deg, #ffffff 0%, #eef2ff 100%);
   color: #1e40af;
   box-shadow: 0 4px 12px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.6);
   transform: translateY(-1px);
 }
+.exam-group-btn.active .es-icon,
 .exam-switch-btn.active .es-icon { filter: grayscale(0); transform: scale(1.08); }
+.exam-sub-row {
+  padding-top: 6px;
+  border-top: 1px dashed rgba(255,255,255,0.15);
+}
 
 .chip-row { display: flex; gap: 6px; flex-wrap: wrap; padding: 0 12px 12px; }
 .chip {
@@ -956,10 +970,18 @@ body {
           </div>
         </div>
         <div class="exam-switch" id="examSwitch">
-          <button class="exam-switch-btn active" data-exam="hrm3"><span class="es-icon">📋</span><span>企业HR(三级)</span></button>
-          <button class="exam-switch-btn" data-exam="hrm3_pro"><span class="es-icon">🎯</span><span>企业HR(专业)</span></button>
-          <button class="exam-switch-btn" data-exam="economist"><span class="es-icon">📈</span><span>中级经济师(人力)</span></button>
-          <button class="exam-switch-btn" data-exam="economist_base"><span class="es-icon">📚</span><span>中级经济师(基础)</span></button>
+          <div class="exam-group-row">
+            <button class="exam-group-btn active" data-group="hrm3_group"><span class="es-icon">🏢</span><span>企业人力资源管理师三级</span></button>
+            <button class="exam-group-btn" data-group="eco_group"><span class="es-icon">📈</span><span>中级经济师人力资源管理</span></button>
+          </div>
+          <div class="exam-sub-row" id="hrm3_group_subs">
+            <button class="exam-switch-btn active" data-exam="hrm3"><span>理论知识</span></button>
+            <button class="exam-switch-btn" data-exam="hrm3_pro"><span>专业技能</span></button>
+          </div>
+          <div class="exam-sub-row hidden" id="eco_group_subs">
+            <button class="exam-switch-btn" data-exam="economist_base"><span>经济基础知识</span></button>
+            <button class="exam-switch-btn" data-exam="economist"><span>专业知识和实务</span></button>
+          </div>
         </div>
       </div>
     </div>
@@ -4590,30 +4612,38 @@ const EXAM_REGISTRY = {
   hrm3: {
     questions: HRM3_QUESTIONS, choice: ALL_CHOICE, chapters: GD_CHAPTERS,
     title: '📋 企业人力资源管理师 · 三级', subtitle: '2026预测考试题库（单选/多选）',
-    shortName: '企业HR(三级)',
+    shortName: '企业人力资源管理师三级·理论知识',
     exam: { single: 75, multi: 25, case: 0, minutes: 120, passRate: 0.6, points: { single: 1, multi: 1, case: 1 }, scoring: 'strict' }
   },
   hrm3_pro: {
     questions: HRM3_PRO_QUESTIONS, choice: HRM3_PRO_CHOICE, chapters: HRM3_PRO_CHAPTERS,
     title: '📋 企业人力资源管理师 · 专业技能', subtitle: '简答题 / 计算题 / 案例分析题',
-    shortName: '企业HR(专业)',
+    shortName: '企业人力资源管理师三级·专业技能',
     exam: { single: 0, multi: 0, calc: 15, case: 10, minutes: 120, passRate: 0.6, points: { single: 0, multi: 0, calc: 4, case: 6 }, scoring: 'strict' }
   },
   economist: {
     questions: ECO_QUESTIONS, choice: ECO_CHOICE, chapters: ECO_CHAPTERS,
     title: '📈 中级经济师 · 人力资源管理', subtitle: '人力资源管理专业知识和实务',
-    shortName: '中级经济师(人力资源管理)',
+    shortName: '中级经济师人力资源管理·专业知识和实务',
     caseSource: ECO_CASE,
     exam: { single: 60, multi: 20, case: 20, minutes: 90, passRate: 0.6, points: { single: 1, multi: 2, case: 2 }, scoring: 'partial' }
   },
   economist_base: {
     questions: BASE_QUESTIONS, choice: BASE_CHOICE, chapters: BASE_CHAPTERS,
     title: '📚 中级经济师 · 经济基础知识', subtitle: '公共科目（经济学基础/财政/货币与金融/统计/会计/法律）',
-    shortName: '中级经济师(经济基础知识)',
+    shortName: '中级经济师人力资源管理·经济基础知识',
     exam: { single: 70, multi: 35, case: 0, minutes: 90, passRate: 0.6, points: { single: 1, multi: 2, case: 0 }, scoring: 'partial' }
   }
 };
 let currentExamId = 'hrm3';
+
+// 考试分组：大选项 -> 子选项映射
+const EXAM_GROUP_MAP = {
+  hrm3: 'hrm3_group',
+  hrm3_pro: 'hrm3_group',
+  economist_base: 'eco_group',
+  economist: 'eco_group'
+};
 
 // 每考试独立的错题/收藏/统计（切换时暂存，hrm3 原数据不动）
 const EXAM_STATE_KEYS = ['wrongBook','favorites','practiceIdx','stats','practiceOrder','_shuffleCache'];
@@ -4633,9 +4663,20 @@ function loadExamState(id) {
   });
 }
 function updateExamSwitchUI(id) {
+  const group = EXAM_GROUP_MAP[id];
+  document.querySelectorAll('#examSwitch .exam-group-btn').forEach(function(b) {
+    b.classList.toggle('active', b.dataset.group === group);
+  });
+  document.querySelectorAll('#examSwitch .exam-sub-row').forEach(function(row) {
+    row.classList.toggle('hidden', row.id !== group + '_subs');
+  });
   document.querySelectorAll('#examSwitch .exam-switch-btn').forEach(function(b) {
     b.classList.toggle('active', b.dataset.exam === id);
   });
+}
+function switchGroup(group) {
+  const firstSub = document.querySelector('#examSwitch .exam-sub-row#' + group + '_subs .exam-switch-btn');
+  if (firstSub) switchExam(firstSub.dataset.exam);
 }
 function applyExam(id) {
   const reg = EXAM_REGISTRY[id];
@@ -4689,6 +4730,9 @@ function buildChapterMap() {
   function bindExamSwitch() {
     const es = document.getElementById('examSwitch');
     if (!es) return;
+    es.querySelectorAll('.exam-group-btn').forEach(function(b) {
+      b.addEventListener('click', function() { switchGroup(b.dataset.group); });
+    });
     es.querySelectorAll('.exam-switch-btn').forEach(function(b) {
       b.addEventListener('click', function() { switchExam(b.dataset.exam); });
     });
