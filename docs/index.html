@@ -153,15 +153,15 @@ body {
 /* ===== Header ===== */
 .header {
   background: linear-gradient(135deg, #0f2e8a 0%, #1e40af 35%, #3b82f6 100%);
-  color: #fff; padding: 18px 20px 16px;
+  color: #fff; padding: 18px 26px 16px;
   position: sticky; top: 0; z-index: 100;
   box-shadow: 0 4px 20px rgba(30,64,175,0.28);
   border-bottom: 1px solid rgba(255,255,255,0.08);
 }
-.header-row { display: flex; justify-content: space-between; align-items: flex-start; }
+.header-row { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; }
 .header-title { font-size: 19px; font-weight: 800; letter-spacing: 0.3px; text-shadow: 0 1px 2px rgba(0,0,0,0.12); }
 .header-sub { font-size: 12px; font-weight: 500; opacity: 0.86; margin-top: 3px; }
-.header-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.header-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; margin-right: 4px; }
 .user-info { display: flex; align-items: center; gap: 8px; }
 .user-avatar {
   width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.2);
@@ -3665,8 +3665,11 @@ function renderExam() {
     const isTrial = currentUser.role === 'trial';
     const cfg = (EXAM_REGISTRY[currentExamId] && EXAM_REGISTRY[currentExamId].exam) || { single: 75, multi: 25, case: 0, minutes: 120, passRate: 0.6, points: { single: 1, multi: 1, case: 1 } };
     let desc;
+    const multiRule = cfg.scoring === 'partial'
+      ? '错选不得分，少选每选对1项得0.5分，全对得满分'
+      : '全部选对才得分，错选/少选均不得分';
     if (isTrial) {
-      desc = '<div class="exam-desc">试用体验版<br>6道单选题 + 4道多选题 = 共10题 · 满分10分</div><ul class="exam-rules"><li>⏱️ 考试时间：<b>10分钟</b>，倒计时结束自动交卷</li><li>📋 可随时查看答题卡，了解作答进度</li><li>🔢 每题1分，多选题全部选对才得分</li><li>🎯 题目从全部选择题中随机抽取</li><li>🔓 激活后解锁完整' + cfg.minutes + '分钟/' + (cfg.single + cfg.multi + cfg.case) + '题全真模拟考试</li></ul>';
+      desc = '<div class="exam-desc">试用体验版<br>6道单选题 + 4道多选题 = 共10题 · 满分10分</div><ul class="exam-rules"><li>⏱️ 考试时间：<b>10分钟</b>，倒计时结束自动交卷</li><li>📋 可随时查看答题卡，了解作答进度</li><li>🔢 每题1分，多选题' + multiRule + '</li><li>🎯 题目从全部选择题中随机抽取</li><li>🔓 激活后解锁完整' + cfg.minutes + '分钟/' + (cfg.single + cfg.multi + cfg.case) + '题全真模拟考试</li></ul>';
     } else {
       const parts = [];
       if (cfg.single) parts.push(cfg.single + '道单选题');
@@ -3677,8 +3680,8 @@ function renderExam() {
       const passLine = Math.round(maxScore * cfg.passRate);
       const scoreParts = [];
       if (cfg.single) scoreParts.push('单选题每题' + cfg.points.single + '分');
-      if (cfg.multi) scoreParts.push('多选题每题' + cfg.points.multi + '分（全部选对才得分）');
-      if (cfg.case) scoreParts.push('案例分析题每题' + cfg.points.case + '分');
+      if (cfg.multi) scoreParts.push('多选题每题' + cfg.points.multi + '分（' + multiRule + '）');
+      if (cfg.case) scoreParts.push('案例分析题每题' + cfg.points.case + '分（' + multiRule + '）');
       const scoreRule = scoreParts.join('、');
       desc = '<div class="exam-desc">全真模拟理论考试环境<br>' + parts.join(' + ') + ' = 共' + totalQ + '题 · 满分' + maxScore + '分 · 合格线' + passLine + '分</div><ul class="exam-rules"><li>⏱️ 考试时间：<b>' + cfg.minutes + '分钟</b>，倒计时结束自动交卷</li><li>📋 可随时查看答题卡，了解作答进度</li><li>🔢 ' + scoreRule + '</li><li>✅ 单选题选完自动跳转；多选题与案例分析题点击「下一题」继续（均不显示对错）</li><li>⚠️ 最后5分钟计时器变红提醒</li></ul>';
     }
@@ -3777,7 +3780,10 @@ function renderExamScore() {
   html += '<div class="score-item"><div class="si-val" style="color:#7c3aed">' + multisScore + '/' + multisTotal + '</div><div class="si-lbl">多选题</div></div>';
   if (casesTotal > 0) html += '<div class="score-item"><div class="si-val" style="color:#ea580c">' + casesScore + '/' + casesTotal + '</div><div class="si-lbl">案例分析</div></div>';
   html += '</div>';
-  html += '<div style="font-size:12px;color:#94a3b8;margin-top:10px;text-align:center">评分规则：多选题 / 案例分析题 错选得 0 分，少选每选对 1 项正确项得 0.5 分，全对得满分</div>';
+  const ruleText = cfg.scoring === 'partial'
+    ? '评分规则：多选题' + (casesTotal > 0 ? ' / 案例分析题' : '') + ' 错选得 0 分，少选每选对 1 项正确项得 0.5 分，全对得满分'
+    : '评分规则：多选题全部选对才得分，错选 / 少选均不得分';
+  html += '<div style="font-size:12px;color:#94a3b8;margin-top:10px;text-align:center">' + ruleText + '</div>';
   html += '<div style="margin-top:16px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">';
   html += '<button class="btn btn-primary" id="btnReview">📋 查看答题详情</button>';
   html += '<button class="btn btn-outline" id="btnRedo">🔄 重新模考</button>';
@@ -3962,7 +3968,9 @@ function examPointOf(q) {
 }
 // 按官方评分规则计算本题实得分数：
 // 单选：选对得满分，否则 0
-// 多选 / 案例分析(不定项)：错选(含任一错误项)得 0；少选且无误选，每选对一个正确项得 0.5 分；全对得满分
+// 多选 / 案例分析(不定项)：
+//   - strict（企业人力资源管理师三级）：全部选对才得分，否则 0
+//   - partial（中级经济师）：错选(含任一错误项)得 0；少选且无误选，每选对一个正确项得 0.5 分；全对得满分
 function questionScore(q, selected) {
   const t = (q.type === 'case') ? q.subType : q.type;
   const pts = examPointOf(q);
@@ -3970,11 +3978,14 @@ function questionScore(q, selected) {
   if (t === 'single') {
     return (sel.length === 1 && sel[0] === q.ans) ? pts : 0;
   }
+  const cfg = (EXAM_REGISTRY[currentExamId] && EXAM_REGISTRY[currentExamId].exam) || {};
+  const mode = cfg.scoring || 'strict';
   const correct = (q.ans || '').split('');
   if (sel.length === 0) return 0;
   if (sel.some(s => !correct.includes(s))) return 0;   // 含错选
   if (sel.length === correct.length) return pts;        // 全对
-  return 0.5 * sel.length;                              // 少选（每正确项 0.5 分）
+  if (mode === 'strict') return 0;                       // 少选不得分（strict）
+  return 0.5 * sel.length;                              // 少选按正确项计 0.5（partial）
 }
 function selectExamOption(label) {
   if (!examActive || examSubmitted) return;
@@ -4549,20 +4560,20 @@ const EXAM_REGISTRY = {
     questions: ALL_QUESTIONS, choice: ALL_CHOICE, chapters: GD_CHAPTERS,
     title: '📋 企业人力资源管理师 · 三级', subtitle: '2026预测考试题库',
     shortName: '企业人力资源管理师(三级)',
-    exam: { single: 75, multi: 25, case: 0, minutes: 120, passRate: 0.6, points: { single: 1, multi: 1, case: 1 } }
+    exam: { single: 75, multi: 25, case: 0, minutes: 120, passRate: 0.6, points: { single: 1, multi: 1, case: 1 }, scoring: 'strict' }
   },
   economist: {
     questions: ECO_QUESTIONS, choice: ECO_CHOICE, chapters: ECO_CHAPTERS,
     title: '📈 中级经济师 · 人力资源管理', subtitle: '人力资源管理专业知识和实务',
     shortName: '中级经济师(人力资源管理)',
     caseSource: ECO_CASE,
-    exam: { single: 60, multi: 20, case: 20, minutes: 90, passRate: 0.6, points: { single: 1, multi: 2, case: 2 } }
+    exam: { single: 60, multi: 20, case: 20, minutes: 90, passRate: 0.6, points: { single: 1, multi: 2, case: 2 }, scoring: 'partial' }
   },
   economist_base: {
     questions: BASE_QUESTIONS, choice: BASE_CHOICE, chapters: BASE_CHAPTERS,
     title: '📚 中级经济师 · 经济基础知识', subtitle: '公共科目（经济学基础/财政/货币与金融/统计/会计/法律）',
     shortName: '中级经济师(经济基础知识)',
-    exam: { single: 70, multi: 35, case: 0, minutes: 90, passRate: 0.6, points: { single: 1, multi: 2, case: 0 } }
+    exam: { single: 70, multi: 35, case: 0, minutes: 90, passRate: 0.6, points: { single: 1, multi: 2, case: 0 }, scoring: 'partial' }
   }
 };
 let currentExamId = 'hrm3';
