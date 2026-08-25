@@ -4678,6 +4678,20 @@ function switchGroup(group) {
   const firstSub = document.querySelector('#examSwitch .exam-sub-row#' + group + '_subs .exam-switch-btn');
   if (firstSub) switchExam(firstSub.dataset.exam);
 }
+// ===== GD STATE (must be declared before applyExam because applyExam resets these) =====
+let gdCurrentChapter = null;
+let gdCurrentType = "all";
+let gdCurrentOrder = "seq";
+let gdCurrentQuestions = [];
+let gdCurrentIndex = 0;
+let gdExamMode = false;
+let gdExamTimerId = null;
+let gdExamSeconds = 0;
+let gdExamPaused = false;
+let gdCorrectCount = 0;
+let gdWrongCount = 0;
+let gdUserAnswers = {}; // index -> {userAns, correctAns, isCorrect}
+
 function applyExam(id) {
   const reg = EXAM_REGISTRY[id];
   if (!reg) return;
@@ -4761,20 +4775,6 @@ buildChapterMap();
     showScreen('welcomeScreen');
   }
 })();
-
-// ===== GD STATE =====
-let gdCurrentChapter = null;
-let gdCurrentType = "all";
-let gdCurrentOrder = "seq";
-let gdCurrentQuestions = [];
-let gdCurrentIndex = 0;
-let gdExamMode = false;
-let gdExamTimerId = null;
-let gdExamSeconds = 0;
-let gdExamPaused = false;
-let gdCorrectCount = 0;
-let gdWrongCount = 0;
-let gdUserAnswers = {}; // index -> {userAns, correctAns, isCorrect}
 
 // ===== GD EVENT HANDLERS =====
 document.addEventListener("DOMContentLoaded", function() {
