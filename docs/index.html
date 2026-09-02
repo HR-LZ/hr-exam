@@ -4171,9 +4171,14 @@ document.addEventListener('click', function(e) {
     const opt = e.target.closest('.opt-btn');
     if (opt && opt.dataset.opt && opt.dataset.qid) {
       const card = opt.closest('.card');
-      // Only handle if not yet answered (no .show on answer-box)
+      // Only handle if not yet answered (no .show on answer-box) — 单选/判断等已核对后拦截重答
       const ab = card ? card.querySelector('#answerBox') : null;
-      if (ab && ab.classList.contains('show')) return;
+      if (ab && ab.classList.contains('show')) {
+        // 多选 / 案例分析多选：核对面板已显示后仍允许继续点选其它选项，不拦截
+        const qq = getCurrentQuestion();
+        const isMulti = !!(qq && (qq.type === 'multi' || (qq.type === 'case' && qq.subType === 'multi')));
+        if (!isMulti) return;
+      }
       handlePracticeClick(opt);
       return;
     }
@@ -4213,19 +4218,23 @@ function handlePracticeClick(opt) {
     const box = card.querySelector('#answerBox'); box.classList.add('show');
     if (selLabels.length > 0) {
       const correct = selLabels === sortedAns;
-      var explainHtml_m1 = q.explain ? '<div class="ans-explain">📖 ' + escapeHtml(q.explain) + '</div>' : '';
-      box.innerHTML = '<div class="ans-title">' + (correct ? '✓ 正确' : '继续选择...') + '</div><div>你的选择：<b>' + selLabels + '</b> | 正确答案：<b>' + q.ans + '</b></div>' + explainHtml_m1;
-      if (correct) {
+      const eh = q.explain ? '<div class="ans-explain">📖 ' + escapeHtml(q.explain) + '</div>' : '';
+      if (box.dataset.verdict) {
+        // 已出过结论（统计已计入），仅刷新选项高亮，不再重复计数
+        box.innerHTML = '<div class="ans-title">' + (correct ? '✓ 正确' : '✗ 回答错误') + '</div><div>你的选择：<b>' + selLabels + '</b> | 正确答案：<b>' + q.ans + '</b></div>' + eh;
+      } else if (correct) {
         q.opts.forEach((_, oi) => { const l = String.fromCharCode(65 + oi); if (sortedAns.includes(l)) card.querySelector('.opt-btn[data-opt="' + l + '"]')?.classList.add('correct'); });
+        box.innerHTML = '<div class="ans-title">✓ 正确</div><div>你的选择：<b>' + selLabels + '</b> | 正确答案：<b>' + q.ans + '</b></div>' + eh;
         DB.stats.totalAnswered++; DB.stats.totalCorrect++; if (DB.wrongBook[q.id]) delete DB.wrongBook[q.id];
-        savePracticeIdx();
+        box.dataset.verdict = '1'; savePracticeIdx();
         if (currentUser.role === 'trial') trackTrialAnswer();
       } else if (selLabels.length >= q.ans.length) {
         q.opts.forEach((_, oi) => { const l = String.fromCharCode(65 + oi); if (sortedAns.includes(l)) card.querySelector('.opt-btn[data-opt="' + l + '"]')?.classList.add('correct'); });
-        var explainHtml_m2 = q.explain ? '<div class="ans-explain">📖 ' + escapeHtml(q.explain) + '</div>' : '';
-        box.innerHTML = '<div class="ans-title">✗ 回答错误</div><div>你的选择：<b>' + selLabels + '</b> | 正确答案：<b>' + q.ans + '</b></div>' + explainHtml_m2;
-        DB.stats.totalAnswered++; DB.wrongBook[q.id] = true; savePracticeIdx();
+        box.innerHTML = '<div class="ans-title">✗ 回答错误</div><div>你的选择：<b>' + selLabels + '</b> | 正确答案：<b>' + q.ans + '</b></div>' + eh;
+        DB.stats.totalAnswered++; DB.wrongBook[q.id] = true; box.dataset.verdict = '1'; savePracticeIdx();
         if (currentUser.role === 'trial') trackTrialAnswer();
+      } else {
+        box.innerHTML = '<div class="ans-title">继续选择...</div><div>你的选择：<b>' + selLabels + '</b> | 正确答案：<b>' + q.ans + '</b></div>' + eh;
       }
     }
   }
