@@ -22,7 +22,24 @@
   --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
   --radius: 12px; --radius-sm: 8px;
   --safe-bottom: env(safe-area-inset-bottom, 16px);
+  --header-bg: linear-gradient(135deg, #0c1e5e 0%, #1238a8 35%, #2563eb 100%);
+  --overlay-bg: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #1e40af 100%);
+  --grad-primary: linear-gradient(135deg, #1e40af, #2563eb);
+  --accent-dark: #1e40af;
+  --accent-soft: #eef2ff;
 }
+/* ===== 双版本色系：企业HR三级（蓝） / 中级经济师（青绿） ===== */
+body.theme-hrm3 { --primary: #2563eb; --primary-light: #eff6ff; --success: #16a34a; }
+body.theme-economist {
+  --primary: #0d9488; --primary-light: #ccfbf1; --success: #0d9488; --warning: #d97706;
+  --accent-dark: #0f766e; --accent-soft: #f0fdfa;
+  --header-bg: linear-gradient(135deg, #073b3a 0%, #0b6e6a 35%, #0d9488 100%);
+  --overlay-bg: linear-gradient(135deg, #062b2a 0%, #0b4f4c 50%, #0f766e 100%);
+  --grad-primary: linear-gradient(135deg, #0f766e, #14b8a6);
+}
+body.theme-economist .header { box-shadow: 0 6px 24px rgba(13,148,136,0.32), 0 2px 8px rgba(0,0,0,0.12); }
+body.theme-economist .btn-primary, body.theme-economist .chip.active { box-shadow: 0 4px 12px rgba(13,148,136,0.28); }
+body.theme-economist .va-head, body.theme-economist .link-text { color: #0f766e; }
 * { margin: 0; padding: 0; box-sizing: border-box; }
 .conn-status {
   font-size: 12px; text-align: center; margin: 8px 0 4px; padding: 7px 10px;
@@ -41,7 +58,7 @@ body {
 /* ===== Fullscreen Overlays ===== */
 .full-overlay {
   position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-  background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #1e40af 100%);
+  background: var(--overlay-bg);
   z-index: 9999; display: flex; align-items: center; justify-content: center;
   padding: 20px; overflow-y: auto;
 }
@@ -53,6 +70,27 @@ body {
 .overlay-logo { font-size: 48px; margin-bottom: 8px; }
 .overlay-title { font-size: 22px; font-weight: 800; color: var(--text); margin-bottom: 4px; }
 .overlay-sub { font-size: 13px; color: var(--text-secondary); margin-bottom: 24px; line-height: 1.6; }
+
+/* ===== 欢迎页：版本选择卡片 ===== */
+.version-cards { display: flex; gap: 12px; margin: 6px 0 4px; }
+.version-card {
+  flex: 1; border: 2px solid var(--border); border-radius: 14px; padding: 16px 8px;
+  cursor: pointer; background: #f8fafc; transition: all .18s ease; text-align: center;
+}
+.version-card .vc-icon { font-size: 30px; margin-bottom: 6px; }
+.version-card .vc-title { font-size: 14px; font-weight: 800; color: var(--text); line-height: 1.35; margin-bottom: 6px; }
+.version-card .vc-desc { font-size: 11px; color: var(--text-secondary); }
+.version-card.vc-hrm3.active { border-color: #2563eb; background: #eff6ff; box-shadow: 0 0 0 3px rgba(37,99,235,.15); }
+.version-card.vc-economist.active { border-color: #0d9488; background: #ccfbf1; box-shadow: 0 0 0 3px rgba(13,148,136,.15); }
+.version-actions { margin-top: 10px; }
+.va-head { font-size: 13px; font-weight: 700; color: var(--primary); margin: 12px 0 14px; }
+.welcome-qr { margin-top: 18px; text-align: center; }
+.welcome-qr .qr-title { font-size: 11px; color: #94a3b8; margin-bottom: 8px; }
+.welcome-qr .qr-img { width: 140px; height: 140px; border-radius: 10px; border: 2px solid #e2e8f0; }
+.welcome-admin { margin-top: 18px; font-size: 11px; color: #94a3b8; cursor: pointer; text-align: center; }
+.welcome-admin:hover { color: var(--text-secondary); }
+#switchVersionBtn { cursor: pointer; font-size: 12px; color: var(--text-secondary); }
+#switchVersionBtn:hover { color: var(--primary); }
 
 /* ===== Form Inputs ===== */
 .form-group { margin-bottom: 16px; text-align: left; }
@@ -87,7 +125,7 @@ body {
 .btn { padding: 14px 24px; border: none; border-radius: var(--radius-sm); font-size: 16px; font-weight: 700; cursor: pointer; font-family: inherit; transition: all 0.2s; user-select: none; -webkit-user-select: none; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
 .btn:active { transform: scale(0.97); }
 .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
-.btn-primary { background: linear-gradient(135deg, #1e40af, #2563eb); color: #fff; box-shadow: 0 4px 12px rgba(37,99,235,0.28); }
+.btn-primary { background: var(--grad-primary); color: #fff; box-shadow: 0 4px 12px rgba(13,148,136,0.28); }
 .btn-success { background: linear-gradient(135deg, #15803d, #16a34a); color: #fff; box-shadow: 0 4px 12px rgba(22,163,74,0.22); }
 .btn-danger { background: linear-gradient(135deg, #b91c1c, #dc2626); color: #fff; box-shadow: 0 4px 12px rgba(220,38,38,0.22); }
 .btn-warning { background: linear-gradient(135deg, #c2410c, #ea580c); color: #fff; box-shadow: 0 4px 12px rgba(234,88,12,0.22); }
@@ -152,7 +190,7 @@ body {
 
 /* ===== Header ===== */
 .header {
-  background: linear-gradient(135deg, #0c1e5e 0%, #1238a8 35%, #2563eb 100%);
+  background: var(--header-bg);
   color: #fff; padding: 18px 22px 16px;
   position: sticky; top: 0; z-index: 100;
   box-shadow: 0 6px 24px rgba(18,56,168,0.32), 0 2px 8px rgba(0,0,0,0.12);
@@ -219,7 +257,7 @@ body {
   padding: 12px 16px; border-bottom: 1px solid #f1f5f9; cursor: default;
   font-size: 13px; color: #334155; line-height: 1.5;
 }
-.notif-item.unread { background: #eff6ff; }
+.notif-item.unread { background: var(--primary-light); }
 .notif-item .notif-time {
   font-size: 11px; color: #94a3b8; margin-top: 4px;
 }
@@ -353,8 +391,8 @@ body {
 .exam-switch-btn:hover { color: #fff; background: rgba(255,255,255,0.1); }
 .exam-group-btn.active,
 .exam-switch-btn.active {
-  background: linear-gradient(135deg, #ffffff 0%, #eef2ff 100%);
-  color: #1e40af;
+  background: linear-gradient(135deg, #ffffff 0%, var(--accent-soft) 100%);
+  color: var(--accent-dark);
   box-shadow: 0 4px 12px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.6);
   transform: translateY(-1px);
 }
@@ -373,12 +411,12 @@ body {
   -webkit-tap-highlight-color: transparent; box-shadow: 0 1px 2px rgba(0,0,0,0.04);
 }
 .chip:hover { border-color: #bfdbfe; background: #f8fafc; }
-.chip.active { background: linear-gradient(135deg, #1e40af, #2563eb); color: #fff; border-color: transparent; font-weight: 600; box-shadow: 0 3px 10px rgba(37,99,235,0.28); }
+.chip.active { background: var(--grad-primary); color: #fff; border-color: transparent; font-weight: 600; box-shadow: 0 3px 10px rgba(13,148,136,0.28); }
 .chip .count { font-size: 11px; opacity: 0.8; margin-left: 3px; font-weight: 500; }
 
 /* ===== Progress Bar ===== */
 .progress-bar { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; margin-bottom: 16px; }
-.progress-fill { height: 100%; background: linear-gradient(90deg, var(--primary), #60a5fa); border-radius: 2px; transition: width 0.3s ease; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, var(--primary), var(--primary-light)); border-radius: 2px; transition: width 0.3s ease; }
 
 /* ===== Question Meta ===== */
 .q-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-size: 12px; color: var(--text-secondary); }
@@ -416,9 +454,9 @@ body {
 .answer-box.show { display: block; }
 .ans-title { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
 .subj-ans { margin-top: 12px; }
-.subj-tip { background:#eff6ff; padding:10px 12px; border-radius:6px; font-size:13px; color:#2563eb; margin-bottom:12px; line-height:1.6 }
+.subj-tip { background:var(--primary-light); padding:10px 12px; border-radius:6px; font-size:13px; color:var(--primary); margin-bottom:12px; line-height:1.6 }
 .subj-input { width:100%; min-height:150px; padding:12px; border:1px solid var(--border); border-radius:var(--radius-sm); font-size:14px; line-height:1.7; resize:vertical; font-family:inherit; box-sizing:border-box; -webkit-user-select:text; user-select:text }
-.subj-input:focus { outline:none; border-color:var(--primary); box-shadow:0 0 0 3px rgba(37,99,235,.12) }
+.subj-input:focus { outline:none; border-color:var(--primary); box-shadow:0 0 0 3px rgba(13,148,136,.12) }
 .ans-ref { white-space:pre-wrap; font-size:14px; line-height:1.8; color:#1e293b; margin-bottom:4px }
 .ans-explain { margin-top: 8px; padding-top: 8px; border-top: 1px dashed #ddd; font-size: 13px; color: #555; line-height: 1.75; }
 
@@ -428,7 +466,7 @@ body {
 
 /* ===== Timer Bar ===== */
 .timer-bar {
-  background: linear-gradient(135deg, #1e40af, #2563eb); color: #fff;
+  background: var(--grad-primary); color: #fff;
   padding: 10px 20px; display: flex; align-items: center; gap: 8px;
   font-size: 14px; position: sticky; top: 70px; z-index: 99;
 }
@@ -567,7 +605,7 @@ body {
   overflow: hidden; position: relative; cursor: pointer;
   transition: border-color 0.2s, box-shadow 0.2s;
 }
-.qr-placeholder:hover { box-shadow: 0 0 0 3px rgba(37,99,235,0.15); }
+.qr-placeholder:hover { box-shadow: 0 0 0 3px rgba(13,148,136,0.15); }
 .qr-placeholder img { width: 100%; height: 100%; object-fit: cover; }
 .qr-placeholder.qr-scanned { border-color: #16a34a; border-style: solid; }
 .qr-placeholder.qr-scanned::after {
@@ -609,7 +647,7 @@ body {
 #gdPracticingScreen { background: var(--bg, #f8fafc) !important; }
 #gdPracticingScreen .btn-ghost { background: transparent; border: none; cursor: pointer; }
 .gd-option { transition: all 0.15s; }
-.gd-option:hover { border-color: #93c5fd; background: #eff6ff; }
+.gd-option:hover { border-color: var(--primary); background: var(--primary-light); }
 </style>
 <script src="https://beacon.cdn.qq.com/sdk/4.5.9/beacon_web.min.js"></script>
 <script>
@@ -640,15 +678,35 @@ body {
   <div class="overlay-card" data-page-node-id="aEunW3WWFpfrWrLqc5Ewus">
     <div class="overlay-logo" data-page-node-id="uqL5gLDTp8yxRKIDjMW9iK">📋</div>
     <div class="overlay-title" data-page-node-id="M3mPuJGbfGMCt2QgHlZdGP">人力资源考试刷题平台</div>
-    <div class="overlay-sub" data-page-node-id="Sc51amAMucCCUEgAAAnZCa">企业人力资源管理师三级 · 中级经济师人力资源管理</div>
-    <button class="btn btn-primary btn-block" id="linkToRegisterFromWelcomeBtn" data-page-node-id="9RJqUYVp5OgWXpWvmuDsil">📝 新用户注册</button>
-    <div class="text-divider" data-page-node-id="UNewWXHDxRLeYdweSLvycr">或</div>
-    <button class="btn btn-outline btn-block" id="linkToLoginFromWelcomeBtn" data-page-node-id="fMgcHKygmk9cLlN7erTSgf">👤 已有账号，立即登录</button>
-    <div style="margin-top:10px;font-size:11px;color:#94a3b8;cursor:pointer" id="linkToAdmin" data-page-node-id="3PEmLmDkbZdOTGwcbLJoG7">⚙ 管理员入口</div>
+    <div class="overlay-sub" data-page-node-id="Sc51amAMucCCUEgAAAnZCa">请选择要进入的考试版本</div>
+
+    <div class="version-cards" id="versionCards">
+      <button class="version-card vc-hrm3 active" id="vcHrm3" data-version="hrm3" type="button">
+        <div class="vc-icon">🏢</div>
+        <div class="vc-title">企业人力资源管理师<br>（三级）</div>
+        <div class="vc-desc">理论知识 · 专业技能</div>
+      </button>
+      <button class="version-card vc-economist" id="vcEconomist" data-version="economist" type="button">
+        <div class="vc-icon">📈</div>
+        <div class="vc-title">中级经济师<br>（人力资源管理）</div>
+        <div class="vc-desc">经济基础 · 专业实务</div>
+      </button>
+    </div>
+
+    <div class="version-actions" id="versionActions">
+      <div class="va-head" id="vaHead">当前版本：企业人力资源管理师（三级）</div>
+      <div id="welcomeQuick"></div>
+      <div id="welcomeAuthForms">
+        <button class="btn btn-primary btn-block" id="linkToRegisterFromWelcomeBtn" data-page-node-id="9RJqUYVp5OgWXpWvmuDsil">📝 新用户注册</button>
+        <div class="text-divider" data-page-node-id="UNewWXHDxRLeYdweSLvycr">或</div>
+        <button class="btn btn-outline btn-block" id="linkToLoginFromWelcomeBtn" data-page-node-id="fMgcHKygmk9cLlN7erTSgf">👤 已有账号，立即登录</button>
+      </div>
+    </div>
     <div style="margin-top:20px;text-align:center" data-page-node-id="oJsP9knKTDRtKDEPRwpap0">
       <div style="font-size:11px;color:#94a3b8;margin-bottom:8px" data-page-node-id="NsfxfbKAFeyfZ8wYH5hyu2">📱 微信扫码打开</div>
       <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAAAEsAQMAAABDsxw2AAAABlBMVEX///8AAABVwtN+AAAACXBIWXMAAA7EAAAOxAGVKw4bAAACNklEQVRoge2aPZKDMAyFxVBQ5ggchaOFo3EUjkBJwUTrpx9DstmZILKdVGQ99pctJI38JIfoM7uzGtEw152F2gcxT70dzolFsQlHDZfT+cYbkewqP/WLLhKLY8XVW4MoMK9E5vxNzvulQ4ASu44hCqu6v+e1JHli38R000rH6kme2FXMawgqRlt2R2y0zH+UmsROYX4Dis+35nnx+6JM7BT2ZEhyFBPqNklyem+JfYxJFIrPYer8Yjct0cMsC6R9YkFsIr347lW2gddwQHI0bPI4sQi2R0HlsXzRF5L2L8FK7ARWVPHSadPhPrcSXRYIkKZ9YjEM19wqumJweTzUbC9x4QclFsdgmskIB0NpsMVlJNVvLjASO49JoUBKj3A+VLFYq7MgiYvdgInFMB34jNbc7bmt3YfXkMRCGB+cr/qt1pD9PyQWxGSe1loNwSGr+Y7Mh+fEwhhSGjcg9Vxlmw+KD/otsRBWWjlVEVKQG95N42IyL7EYNsDVqivY7rteclusqzUksQjmvTN6DeWplg628nJosRM7jT3Ltr2n06M6+UksiPlbRh34+OsGBEaVeYkFsfqE0R2fPm0gjy/OiQWxanA+/uLis9IxWVVJLIypq1kflO2ZHlYnbN6kJBbCJt3E522fW2rvrFFI7ArW+88hrHQI35qi035kTuwL2KI+H2qJnt9GIbEIhmy3caULuZ6PjxqJRTB8+q8gWJuOxScSt8QuYqz2ot9M0TEfH0YT+y/sM/sBD9AnsPpbJtoAAAAASUVORK5CYII=" alt="扫码访问" style="width:140px;height:140px;border-radius:10px;border:2px solid #e2e8f0" onerror="this.parentElement.style.display='none'" data-page-node-id="kwiyDZtKKVkGaUfuxOuU2r">
     </div>
+    <div class="welcome-admin" id="linkToAdmin" data-page-node-id="3PEmLmDkbZdOTGwcbLJoG7">⚙ 管理员入口（通用）</div>
   </div>
 </div>
 
@@ -967,6 +1025,7 @@ body {
               🔔<span class="notif-badge hidden" id="notifBadge" data-page-node-id="73Df9Ucd0fKPGqLF363RtS">0</span>
             </div>
             <button class="header-btn" id="headerAdminBtn" title="设置" data-page-node-id="8HX8mnNzorodHCddLUXDiM">⚙ <span data-page-node-id="OUNkpaoQaVnAhldC4F6MF4">设置</span></button>
+            <button class="header-btn" id="switchVersionBtn" title="切换版本">🔄 <span>切换版本</span></button>
           </div>
         </div>
         <div class="exam-switch" id="examSwitch" data-page-node-id="STpdQZYMjpNIMXHtWEQ1JB">
@@ -1097,19 +1156,62 @@ let API_OK = false;
 let _apiProbeDone = false;
 let _apiProbePromise = null;
 
+// 账号体系按「考试版本」彻底拆分：现有全局账号整体迁移进 hrm3（企业HR三级），
+// 经济师版本拥有完全独立的账号池、试用计数与激活名单。管理账号（admin / 子管理员）
+// 与系统级集合保持全局。
 const DB_DEFAULT = {
-  accounts: {},          // { phone: { hash, name, registeredAt } }
-  trials: {},            // { phone: count }
+  versions: {
+    hrm3:      { accounts: {}, trials: {}, activated_phones: [] },  // 企业人力资源管理师三级
+    economist: { accounts: {}, trials: {}, activated_phones: [] }   // 中级经济师人力资源管理
+  },
   admin_codes: [],
   used_codes: {},
   requests: [],
   transactions: [],
   payment_claims: [],
-  activated_phones: [],
   notifications: [],
   messages: [],
-  subadmins: {}           // { phone: { hash, name, createdAt } }  子管理员账号（仅最高权限管理员可管理）
+  subadmins: {}           // { phone: { hash, name, createdAt } }  子管理员账号（全局，仅最高权限管理员可管理）
 };
+
+// 一次性迁移：把旧版全局 accounts/trials/activated_phones 合并进 hrm3 版本。
+// 幂等：迁移完成后这些顶层字段被删除，后续读取不再重复迁移。
+function ensureVersions(db) {
+  if (!db || typeof db !== 'object') return db;
+  if (!db.versions) {
+    db.versions = {
+      hrm3:      { accounts: {}, trials: {}, activated_phones: [] },
+      economist: { accounts: {}, trials: {}, activated_phones: [] }
+    };
+  }
+  if (db.versions) {
+    // 补齐历史数据里可能缺失的子字段，避免 .push / 下标访问报错
+    ['hrm3', 'economist'].forEach(function(v) {
+      const vs = db.versions[v] || {};
+      if (!vs.accounts || typeof vs.accounts !== 'object') vs.accounts = {};
+      if (!vs.trials || typeof vs.trials !== 'object') vs.trials = {};
+      if (!Array.isArray(vs.activated_phones)) vs.activated_phones = [];
+      db.versions[v] = vs;
+    });
+  }
+  if (db.accounts) {
+    Object.keys(db.accounts).forEach(function(p) { db.versions.hrm3.accounts[p] = db.accounts[p]; });
+    delete db.accounts;
+  }
+  if (db.trials) {
+    Object.keys(db.trials).forEach(function(p) { db.versions.hrm3.trials[p] = db.trials[p]; });
+    delete db.trials;
+  }
+  if (db.activated_phones) {
+    db.activated_phones.forEach(function(a) {
+      if (!db.versions.hrm3.activated_phones.some(function(x) { return x.phone === a.phone; })) {
+        db.versions.hrm3.activated_phones.push({ phone: a.phone, activatedAt: a.activatedAt || Date.now() });
+      }
+    });
+    delete db.activated_phones;
+  }
+  return db;
+}
 
 // ============================ 工具函数 ============================
 
@@ -1293,7 +1395,7 @@ async function dbRead(force) {
   _dbReadInFlight = (async () => {
     try {
       const got = await giteeReadFile(DB_PATH);
-      const merged = Object.assign({}, DB_DEFAULT, (got.value && typeof got.value === 'object') ? got.value : {});
+      const merged = ensureVersions(Object.assign({}, DB_DEFAULT, (got.value && typeof got.value === 'object') ? got.value : {}));
       _dbCache = { value: merged, sha: got.sha, at: Date.now() };
       return merged;
     } finally {
@@ -1312,7 +1414,7 @@ async function dbMutate(fn) {
     const fresh = await dbRead(attempt > 0);          // 重试时强制拉最新
     const sha = _dbCache ? _dbCache.sha : null;
     const before = JSON.stringify(fresh);
-    const draft = JSON.parse(before);
+    const draft = ensureVersions(JSON.parse(before));
     const result = await fn(draft);
     const after = JSON.stringify(draft);
 
@@ -1380,6 +1482,11 @@ async function giteeRoute(rawPath, method, body) {
   const query = new URLSearchParams(qi === -1 ? '' : rawPath.slice(qi + 1));
   const R = (data, status) => ({ status: status || 200, data: data });
 
+  // ===== 版本作用域：账号/试用/激活按考试版本完全独立 =====
+  const reqVersion = (body && typeof body.version !== 'undefined') ? body.version : (query.get('version') || 'hrm3');
+  const apiVersion = (reqVersion === 'hrm3' || reqVersion === 'economist') ? reqVersion : 'hrm3';
+  const vstore = (db2) => (db2.versions[apiVersion] || db2.versions.hrm3);
+
   // ===== AUTH =====
   if (path === '/api/auth/register' && method === 'POST') {
     const phone = body.phone, password = body.password, name = body.name;
@@ -1387,10 +1494,11 @@ async function giteeRoute(rawPath, method, body) {
     if (!password || password.length < 6) return R({ ok: false, error: '密码至少6位' });
     let out;
     await dbMutate(db => {
-      if (db.accounts[phone]) { out = { ok: false, error: '该手机号已注册' }; return; }
+      const VS = vstore(db);
+      if (VS.accounts[phone]) { out = { ok: false, error: '该手机号已注册' }; return; }
       const now = Date.now();
-      db.accounts[phone] = { hash: sha256Hex(phone + ':' + password), name: name || '学员', registeredAt: now };
-      out = { ok: true, user: { phone: phone, userName: name || '学员', role: 'trial', registeredAt: now } };
+      VS.accounts[phone] = { hash: sha256Hex(phone + ':' + password), name: name || '学员', registeredAt: now, version: apiVersion };
+      out = { ok: true, user: { phone: phone, userName: name || '学员', role: 'trial', version: apiVersion, registeredAt: now } };
     });
     return R(out);
   }
@@ -1402,20 +1510,21 @@ async function giteeRoute(rawPath, method, body) {
       return R({ ok: true, user: { phone: phone, userName: '管理员', role: 'admin' } });
     }
     const db = await dbRead();
-    // 子管理员登录（账号独立于学员 accounts，由最高权限管理员创建）
+    // 子管理员登录（全局，独立于学员 accounts，由最高权限管理员创建）
     if (db.subadmins[phone]) {
       if (db.subadmins[phone].hash !== sha256Hex(phone + ':' + password)) return R({ ok: false, error: '密码错误' });
       return R({ ok: true, user: { phone: phone, userName: db.subadmins[phone].name || '子管理员', role: 'subadmin' } });
     }
-    const acc = db.accounts[phone];
+    const VS = vstore(db);
+    const acc = VS.accounts[phone];
     if (!acc) return R({ ok: false, error: '账号不存在，请先注册' });
     if (acc.hash !== sha256Hex(phone + ':' + password)) return R({ ok: false, error: '密码错误' });
-    const isActivated = Array.isArray(db.activated_phones) && db.activated_phones.some(p => p.phone === phone);
+    const isActivated = Array.isArray(VS.activated_phones) && VS.activated_phones.some(p => p.phone === phone);
     if (isActivated) {
-      return R({ ok: true, user: { phone: phone, userName: acc.name || '学员', role: 'activated',
+      return R({ ok: true, user: { phone: phone, userName: acc.name || '学员', role: 'activated', version: apiVersion,
         expiresAt: Date.now() + 365 * 24 * 60 * 60 * 1000, activatedAt: Date.now() } });
     }
-    return R({ ok: true, user: { phone: phone, userName: acc.name || '学员', role: 'trial', registeredAt: acc.registeredAt } });
+    return R({ ok: true, user: { phone: phone, userName: acc.name || '学员', role: 'trial', version: apiVersion, registeredAt: acc.registeredAt } });
   }
 
   // 前端遗留调用：原后端并无此路由（返回404被忽略）。
@@ -1428,11 +1537,11 @@ async function giteeRoute(rawPath, method, body) {
     const phone = trialMatch[1];
     if (method === 'GET') {
       const db = await dbRead();
-      return R({ count: db.trials[phone] || 0 });
+      return R({ count: vstore(db).trials[phone] || 0 });
     }
     if (method === 'POST') {
       let count = 0;
-      await dbMutate(db => { db.trials[phone] = (db.trials[phone] || 0) + 1; count = db.trials[phone]; });
+      await dbMutate(db => { const VS = vstore(db); VS.trials[phone] = (VS.trials[phone] || 0) + 1; count = VS.trials[phone]; });
       return R({ count: count });
     }
   }
@@ -1454,7 +1563,7 @@ async function giteeRoute(rawPath, method, body) {
     if (!nw || nw.length < 6) return R({ ok: false, error: '新密码至少6位' });
     let res;
     await dbMutate(db => {
-      const acc = db.accounts[phone];
+      const acc = vstore(db).accounts[phone];
       if (!acc) { res = { ok: false, error: '账号不存在' }; return; }
       if (sha256Hex(phone + ':' + cur) !== acc.hash) { res = { ok: false, error: '当前密码错误' }; return; }
       acc.hash = sha256Hex(phone + ':' + nw); acc.updatedAt = Date.now();
@@ -1511,8 +1620,9 @@ async function giteeRoute(rawPath, method, body) {
   if (memMatch && isSuperAdmin) {
     if (method === 'GET') {
       const db = await dbRead();
-      const activated = (db.activated_phones || []).map(p => p.phone);
-      return R(Object.keys(db.accounts).map(p => ({ phone: p, name: db.accounts[p].name, activated: activated.includes(p), createdBy: db.accounts[p].createdBy || null })));
+      const VS = vstore(db);
+      const activated = (VS.activated_phones || []).map(p => p.phone);
+      return R(Object.keys(VS.accounts).map(p => ({ phone: p, name: VS.accounts[p].name, activated: activated.includes(p), createdBy: VS.accounts[p].createdBy || null, version: apiVersion })));
     }
     if (method === 'POST') {
       const phone = body.phone;
@@ -1521,10 +1631,11 @@ async function giteeRoute(rawPath, method, body) {
       if (!pwd || pwd.length < 6) return R({ ok: false, error: '密码至少6位' });
       let res;
       await dbMutate(db => {
-        if (db.accounts[phone]) { res = { ok: false, error: '该会员已存在' }; return; }
+        const VS = vstore(db);
+        if (VS.accounts[phone]) { res = { ok: false, error: '该会员已存在' }; return; }
         const now = Date.now();
-        db.accounts[phone] = { hash: sha256Hex(phone + ':' + pwd), name: body.name || '会员', registeredAt: now, createdBy: 'admin' };
-        db.activated_phones.push({ phone: phone, activatedAt: now, byAdmin: true });
+        VS.accounts[phone] = { hash: sha256Hex(phone + ':' + pwd), name: body.name || '会员', registeredAt: now, createdBy: 'admin', version: apiVersion };
+        VS.activated_phones.push({ phone: phone, activatedAt: now, byAdmin: true });
         res = { ok: true };
       });
       return R(res);
@@ -1535,8 +1646,9 @@ async function giteeRoute(rawPath, method, body) {
       if (!pwd || pwd.length < 6) return R({ ok: false, error: '新密码至少6位' });
       let res;
       await dbMutate(db => {
-        if (!db.accounts[phone]) { res = { ok: false, error: '会员不存在' }; return; }
-        db.accounts[phone].hash = sha256Hex(phone + ':' + pwd);
+        const VS = vstore(db);
+        if (!VS.accounts[phone]) { res = { ok: false, error: '会员不存在' }; return; }
+        VS.accounts[phone].hash = sha256Hex(phone + ':' + pwd);
         res = { ok: true };
       });
       return R(res);
@@ -1544,9 +1656,10 @@ async function giteeRoute(rawPath, method, body) {
     if (method === 'DELETE' && phone) {
       let res;
       await dbMutate(db => {
-        if (!db.accounts[phone]) { res = { ok: false, error: '会员不存在' }; return; }
-        delete db.accounts[phone];
-        db.activated_phones = (db.activated_phones || []).filter(p => p.phone !== phone);
+        const VS = vstore(db);
+        if (!VS.accounts[phone]) { res = { ok: false, error: '会员不存在' }; return; }
+        delete VS.accounts[phone];
+        VS.activated_phones = (VS.activated_phones || []).filter(p => p.phone !== phone);
         res = { ok: true };
       });
       return R(res);
@@ -1563,7 +1676,7 @@ async function giteeRoute(rawPath, method, body) {
   if (path === '/api/requests') {
     if (method === 'GET') return R((await dbRead()).requests);
     if (method === 'POST') {
-      await dbMutate(db => { db.requests.push({ phone: body.phone, wechatId: body.wechatId, createdAt: Date.now() }); });
+      await dbMutate(db => { db.requests.push({ phone: body.phone, wechatId: body.wechatId, version: body.version || 'hrm3', createdAt: Date.now() }); });
       return R({ ok: true });
     }
   }
@@ -1601,6 +1714,7 @@ async function giteeRoute(rawPath, method, body) {
         }
         claim = {
           id: Date.now().toString(36) + Math.random().toString(36).substr(2, 4),
+          version: body.version || 'hrm3',
           phone: body.phone, wechat: body.wechat,
           createdAt: Date.now(), status: 'pending', code: null
         };
@@ -1624,11 +1738,12 @@ async function giteeRoute(rawPath, method, body) {
 
   // ===== ACTIVATED PHONES =====
   if (path === '/api/activated-phones') {
-    if (method === 'GET') return R((await dbRead()).activated_phones);
+    if (method === 'GET') return R(vstore(await dbRead()).activated_phones);
     if (method === 'POST') {
       await dbMutate(db => {
-        if (!db.activated_phones.some(p => p.phone === body.phone)) {
-          db.activated_phones.push({ phone: body.phone, activatedAt: Date.now() });
+        const VS = vstore(db);
+        if (!VS.activated_phones.some(p => p.phone === body.phone)) {
+          VS.activated_phones.push({ phone: body.phone, activatedAt: Date.now() });
         }
       });
       return R({ ok: true });
@@ -1795,14 +1910,20 @@ async function syncDelete(key) { await waitForApiProbe(); if (!API_OK) return; t
 
 async function syncAuthToServer() {
   if (!API_OK || !currentUser) return;
-  try { await sfetch('/api/data/' + encodeURIComponent(currentUser.phone), { method: 'PUT', body: JSON.stringify({ auth: currentUser }) }); } catch (e) {}
+  // 同一手机号可能同时拥有两个版本账号：按版本分别存键，避免互相覆盖。
+  // hrm3 额外写回旧键 auth，兼容升级前已存的数据。
+  const v = currentUser.version || getVersion();
+  const patch = {};
+  patch['auth_' + v] = currentUser;
+  if (v === 'hrm3') patch.auth = currentUser;
+  try { await sfetch('/api/data/' + encodeURIComponent(currentUser.phone), { method: 'PUT', body: JSON.stringify(patch) }); } catch (e) {}
 }
 async function syncAuthFromServer(phone) {
   if (!API_OK) return null;
   try {
     const r = await sfetch('/api/data/' + encodeURIComponent(phone));
     const j = await r.json();
-    return j.auth || null;
+    return j['auth_' + getVersion()] || j.auth || null;
   } catch (e) { return null; }
 }
 
@@ -1824,6 +1945,23 @@ const TYPE_TAG_CLASS = { single: 'single', multi: 'multi', short: 'short', calc:
 let currentUser = null;
 let isAdmin = false;
 let adminMode = true;
+
+// ===== 考试版本（账号体系 / 主题 按版本彻底拆分）=====
+// hrm3 = 企业人力资源管理师（三级）；economist = 中级经济师（人力资源管理）
+let currentVersion = 'hrm3';
+const VERSION_LABELS = {
+  hrm3: '企业人力资源管理师（三级）',
+  economist: '中级经济师（人力资源管理）'
+};
+const VERSION_DEFAULT_EXAM = { hrm3: 'hrm3', economist: 'economist_base' };
+const VERSION_KEY = 'hr_exam_v7_version';
+function getVersion() { return currentVersion || 'hrm3'; }
+function applyVersionTheme(v) {
+  document.body.classList.remove('theme-hrm3', 'theme-economist');
+  document.body.classList.add('theme-' + (v || 'hrm3'));
+}
+// 管理员后台：当前正在查看哪个版本的会员账号
+let adminMemVersion = 'hrm3';
 
 async function sha256(message) {
   const msgBuffer = new TextEncoder().encode(message);
@@ -1852,6 +1990,13 @@ function loadAuth() {
       currentUser = JSON.parse(raw);
       isAdmin = (currentUser.role === 'admin' || currentUser.role === 'subadmin');
       if (isAdmin) adminMode = true;
+      // 账号归属版本：升级前的老会话无 version 字段，整体归入 HR 三级。
+      if (!isAdmin) {
+        currentVersion = currentUser.version || 'hrm3';
+        currentUser.version = currentVersion;
+        try { localStorage.setItem(VERSION_KEY, currentVersion); } catch(e) {}
+      }
+      applyVersionTheme(currentVersion);
       if (!isAdmin && currentUser.role !== 'trial') {
         if (Date.now() > currentUser.expiresAt) {
           document.getElementById('expiredOverlay').classList.remove('hidden');
@@ -1903,9 +2048,9 @@ async function getRequestsFromServer() {
 
 function addRequest(phone, wechatId) {
   const reqs = getRequests();
-  reqs.push({ phone, wechatId, createdAt: Date.now() });
+  reqs.push({ phone, wechatId, version: getVersion(), createdAt: Date.now() });
   localStorage.setItem(REQUESTS_KEY, JSON.stringify(reqs));
-  apiPost('/api/requests', { phone, wechatId });
+  apiPost('/api/requests', { phone, wechatId, version: getVersion() });
 }
 
 function getTransactions() {
@@ -1948,11 +2093,11 @@ function addPaymentClaim(phone, wechat) {
   }
   const claim = {
     id: Date.now().toString(36) + Math.random().toString(36).substr(2, 4),
-    phone, wechat, createdAt: Date.now(), status: 'pending', code: null
+    phone, wechat, version: getVersion(), createdAt: Date.now(), status: 'pending', code: null
   };
   claims.push(claim);
   localStorage.setItem(PAYMENT_CLAIMS_KEY, JSON.stringify(claims));
-  apiPost('/api/payment-claims', { phone, wechat });
+  apiPost('/api/payment-claims', { phone, wechat, version: getVersion() });
   return claim;
 }
 
@@ -1970,40 +2115,49 @@ function getPendingClaims() {
   return getPaymentClaims().filter(c => c.status === 'pending');
 }
 
-// ===== DIRECT ACTIVATION (no activation codes needed) =====
-function getActivatedPhones() {
-  try { const r = localStorage.getItem(ACTIVATED_PHONES_KEY); return r ? JSON.parse(r) : []; }
+// ===== DIRECT ACTIVATION（按考试版本完全独立）=====
+function activatedKey(v) { return ACTIVATED_PHONES_KEY + '_' + (v || getVersion()); }
+function getActivatedPhones(v) {
+  try { const r = localStorage.getItem(activatedKey(v)); return r ? JSON.parse(r) : []; }
   catch(e) { return []; }
 }
-
-async function getActivatedPhonesFromServer() {
-  try { const r = await apiGet('/api/activated-phones'); if (r) { localStorage.setItem(ACTIVATED_PHONES_KEY, JSON.stringify(r)); return r; } }
-  catch(e) { return null; }
+async function getActivatedPhonesFromServer(v) {
+  const ver = v || getVersion();
+  try {
+    const r = await apiGet('/api/activated-phones?version=' + ver);
+    if (Array.isArray(r)) { localStorage.setItem(activatedKey(ver), JSON.stringify(r)); return r; }
+  } catch(e) {}
+  return null;
 }
-
-function markPhoneActivated(phone) {
-  const phones = getActivatedPhones();
+// 管理员需同时看到两个版本名单（分别写入各自本地键）
+async function getAllActivatedPhonesFromServer() {
+  for (const v of ['hrm3', 'economist']) { await getActivatedPhonesFromServer(v); }
+}
+function markPhoneActivated(phone, v) {
+  const ver = v || getVersion();
+  const phones = getActivatedPhones(ver);
   if (!phones.some(p => p.phone === phone)) {
-    phones.push({ phone, activatedAt: Date.now() });
-    localStorage.setItem(ACTIVATED_PHONES_KEY, JSON.stringify(phones));
-    apiPost('/api/activated-phones', { phone });
+    phones.push({ phone: phone, activatedAt: Date.now() });
+    localStorage.setItem(activatedKey(ver), JSON.stringify(phones));
   }
+  apiPost('/api/activated-phones', { phone: phone, version: ver });
 }
-function isPhoneActivated(phone) {
-  return getActivatedPhones().some(p => p.phone === phone);
+function isPhoneActivated(phone, v) {
+  return getActivatedPhones(v).some(p => p.phone === phone);
 }
 function activateCurrentUser() {
   if (!currentUser || currentUser.role === 'activated') return;
   currentUser.role = 'activated';
+  currentUser.version = currentUser.version || getVersion();
   currentUser.expiresAt = Date.now() + ACTIVATION_VALIDITY_DAYS * 24 * 60 * 60 * 1000;
   currentUser.activatedAt = Date.now();
   saveAuth();
 }
-function activateUserByPhone(phone) {
-  // Mark phone as activated so next login auto-activates
-  markPhoneActivated(phone);
-  // If user is currently logged in, also activate their current session
-  if (currentUser && currentUser.phone === phone && currentUser.role !== 'admin') {
+function activateUserByPhone(phone, v) {
+  const ver = v || (typeof adminMemVersion !== 'undefined' ? adminMemVersion : getVersion());
+  markPhoneActivated(phone, ver);
+  if (currentUser && currentUser.phone === phone && currentUser.role !== 'admin'
+      && (currentUser.version || 'hrm3') === ver) {
     activateCurrentUser();
   }
 }
@@ -2186,19 +2340,22 @@ function markCodeUsed(hash) {
 }
 
 function getTrialCount() {
-  try { const r = localStorage.getItem(TRIAL_KEY); const n = parseInt(r); return isNaN(n) ? 0 : n; }
+  const k = TRIAL_KEY + '_' + getVersion();
+  try { const r = localStorage.getItem(k); const n = parseInt(r); return isNaN(n) ? 0 : n; }
   catch(e) { return 0; }
 }
 
 async function getTrialCountFromServer(phone) {
-  try { const r = await apiGet('/api/trial/' + encodeURIComponent(phone)); if (r !== null) { localStorage.setItem(TRIAL_KEY, String(r.count)); return r.count; } }
+  const v = getVersion();
+  try { const r = await apiGet('/api/trial/' + encodeURIComponent(phone) + '?version=' + v); if (r !== null) { localStorage.setItem(TRIAL_KEY + '_' + v, String(r.count)); return r.count; } }
   catch(e) { return null; }
 }
 
 function incrementTrialCount() {
+  const v = getVersion();
   let n = getTrialCount() + 1;
-  localStorage.setItem(TRIAL_KEY, String(n));
-  if (currentUser && currentUser.phone) apiPost('/api/trial/' + encodeURIComponent(currentUser.phone), {});
+  localStorage.setItem(TRIAL_KEY + '_' + v, String(n));
+  if (currentUser && currentUser.phone) apiPost('/api/trial/' + encodeURIComponent(currentUser.phone), { version: v });
   return n;
 }
 
@@ -2212,17 +2369,81 @@ function showScreen(screenId) {
   });
   document.getElementById(screenId).classList.remove('hidden');
   if (typeof updateConnStatus === 'function') updateConnStatus();
+  if (screenId === 'welcomeScreen' && typeof prepareWelcome === 'function') prepareWelcome();
 }
 
-// ===== ACCOUNT STORAGE (phone -> password hash, for login) =====
+// ===== 版本选择（欢迎页）=====
+function selectVersion(v) {
+  if (v !== 'hrm3' && v !== 'economist') return;
+  currentVersion = v;
+  try { localStorage.setItem(VERSION_KEY, v); } catch(e) {}
+  applyVersionTheme(v);
+  document.querySelectorAll('#versionCards .version-card').forEach(function(c) {
+    c.classList.toggle('active', c.dataset.version === v);
+  });
+  renderWelcomeActions();
+}
+
+function renderWelcomeActions() {
+  const v = currentVersion;
+  const quick = document.getElementById('welcomeQuick');
+  const forms = document.getElementById('welcomeAuthForms');
+  const head = document.getElementById('vaHead');
+  if (head) head.textContent = '当前版本：' + (VERSION_LABELS[v] || '');
+  if (!quick || !forms) return;
+  const adminU = currentUser && isAdmin;
+  const loggedV = currentUser && !isAdmin && currentUser.version === v;
+  if (adminU) {
+    quick.innerHTML = '<button class="btn btn-warning btn-block" id="welcomeEnterAdmin">⚙ 进入管理后台</button>';
+    document.getElementById('welcomeEnterAdmin').onclick = function() { enterApp(); };
+    forms.style.display = 'none';
+  } else if (loggedV) {
+    quick.innerHTML = '<button class="btn btn-primary btn-block" id="welcomeEnterApp">✅ 进入学习（已登录）</button>'
+      + '<button class="btn btn-ghost btn-sm-block" id="welcomeLogout" style="margin-top:8px">🚪 退出该账号</button>';
+    document.getElementById('welcomeEnterApp').onclick = function() { enterApp(); };
+    document.getElementById('welcomeLogout').onclick = function() { logout(); };
+    forms.style.display = 'none';
+  } else {
+    quick.innerHTML = '';
+    forms.style.display = '';
+  }
+}
+
+function prepareWelcome() {
+  let saved = null;
+  try { saved = localStorage.getItem(VERSION_KEY); } catch(e) {}
+  if (saved === 'hrm3' || saved === 'economist') currentVersion = saved;
+  if (!currentVersion) currentVersion = 'hrm3';
+  selectVersion(currentVersion);
+}
+
+(function bindVersionCards() {
+  function bind() {
+    document.querySelectorAll('#versionCards .version-card').forEach(function(c) {
+      c.addEventListener('click', function() { selectVersion(c.dataset.version); });
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bind);
+  else bind();
+})();
+
+// ===== ACCOUNT STORAGE（按版本隔离，旧全局账号一次性迁入 hrm3）=====
+function accountStoreKey() { return 'hr_exam_v6_accounts_' + getVersion(); }
 function getAccounts() {
-  try { const r = localStorage.getItem('hr_exam_v6_accounts'); return r ? JSON.parse(r) : {}; }
-  catch(e) { return {}; }
+  const key = accountStoreKey();
+  try {
+    let r = localStorage.getItem(key);
+    if (!r && getVersion() === 'hrm3') {
+      const legacy = localStorage.getItem('hr_exam_v6_accounts');
+      if (legacy) { localStorage.setItem(key, legacy); r = legacy; }
+    }
+    return r ? JSON.parse(r) : {};
+  } catch(e) { return {}; }
 }
 function saveAccount(phone, pwdHash) {
   const accounts = getAccounts();
   accounts[phone] = pwdHash;
-  localStorage.setItem('hr_exam_v6_accounts', JSON.stringify(accounts));
+  localStorage.setItem(accountStoreKey(), JSON.stringify(accounts));
   apiPost('/api/accounts', { phone, pwdHash });
 }
 function verifyAccount(phone, pwdHash) {
@@ -2233,7 +2454,7 @@ function verifyAccount(phone, pwdHash) {
 // ===== REGISTRATION via API =====
 async function registerViaAPI(phone, pwd, name) {
   try {
-    const r = await apiPost('/api/auth/register', { phone, password: pwd, name });
+    const r = await apiPost('/api/auth/register', { phone, password: pwd, name, version: getVersion() });
     return r;
   } catch(e) { return null; }
 }
@@ -2246,7 +2467,7 @@ function registerViaAPIBackground(phone, pwd, name) {
 }
 async function loginViaAPI(phone, pwd) {
   try {
-    const r = await apiPost('/api/auth/login', { phone, password: pwd });
+    const r = await apiPost('/api/auth/login', { phone, password: pwd, version: getVersion() });
     return r;
   } catch(e) { return null; }
 }
@@ -2257,7 +2478,7 @@ async function syncUserDataFromServer(phone) {
   if (!API_OK) return;
   // Pull trial count from server
   const trialCount = await getTrialCountFromServer(phone);
-  if (trialCount !== null) localStorage.setItem(TRIAL_KEY, String(trialCount));
+  if (trialCount !== null) localStorage.setItem(TRIAL_KEY + '_' + getVersion(), String(trialCount));
   // Pull activated phones
   await getActivatedPhonesFromServer();
   // Pull exam data (wrong book, favorites, stats) from server
@@ -2288,7 +2509,7 @@ async function syncAllAdminData() {
   await getRequestsFromServer();
   await getTransactionsFromServer();
   await getPaymentClaimsFromServer();
-  await getActivatedPhonesFromServer();
+  await getAllActivatedPhonesFromServer();
   await getMessagesFromServer();
   await getNotificationsFromServer(null, true);
 }
@@ -2306,7 +2527,7 @@ function syncUserDataBackground(phone) {
     if (API_OK && currentUser) {
       // Cross-device sync: pull latest auth
       const serverAuth = await syncAuthFromServer(phone);
-      if (serverAuth && serverAuth.role === 'activated' && currentUser.role !== 'activated') {
+      if (serverAuth && serverAuth.role === 'activated' && (!serverAuth.version || serverAuth.version === getVersion()) && currentUser.role !== 'activated') {
         currentUser = serverAuth;
         isAdmin = false;
         saveAuth();
@@ -2357,8 +2578,8 @@ document.getElementById('regBtn').addEventListener('click', async function() {
         // 服务器注册成功
         const pwdHash = await sha256(phone + ':' + pwd);
         saveAccount(phone, pwdHash);
-        currentUser = { phone: phone, userName: name, role: 'trial', registeredAt: Date.now() };
-        isAdmin = false; saveAuth(); localStorage.setItem(TRIAL_KEY, '0');
+        currentUser = { phone: phone, userName: name, role: 'trial', version: getVersion(), registeredAt: Date.now() };
+        isAdmin = false; saveAuth(); localStorage.setItem(TRIAL_KEY + '_' + getVersion(), '0');
         msg.className = 'form-msg success'; msg.textContent = '注册成功！进入试用模式...';
         setTimeout(() => { enterApp(); }, 500);
         return;
@@ -2391,8 +2612,8 @@ document.getElementById('regBtn').addEventListener('click', async function() {
   }
   const pwdHash = await sha256(phone + ':' + pwd);
   saveAccount(phone, pwdHash);
-  currentUser = { phone: phone, userName: name, role: 'trial', registeredAt: Date.now() };
-  isAdmin = false; saveAuth(); localStorage.setItem(TRIAL_KEY, '0');
+  currentUser = { phone: phone, userName: name, role: 'trial', version: getVersion(), registeredAt: Date.now() };
+  isAdmin = false; saveAuth(); localStorage.setItem(TRIAL_KEY + '_' + getVersion(), '0');
   registerViaAPIBackground(phone, pwd, name);
   msg.className = 'form-msg success';
   msg.textContent = API_OK ? '注册成功！进入试用模式...' : '已在本机注册（离线，联网后自动同步）';
@@ -2448,6 +2669,7 @@ document.getElementById('loginBtn').addEventListener('click', async function() {
       currentUser = apiResult.user;
       isAdmin = (currentUser.role === 'admin' || currentUser.role === 'subadmin');
       if (isAdmin) adminMode = true;
+      else currentUser.version = currentUser.version || getVersion();
       saveAuth();
     } else if (localOk) {
       // Restore user data from local storage
@@ -2466,7 +2688,7 @@ document.getElementById('loginBtn').addEventListener('click', async function() {
         } catch(e) { currentUser = null; }
       }
       if (!currentUser) {
-        currentUser = { phone, userName: '学员', role: 'trial', registeredAt: Date.now() };
+        currentUser = { phone, userName: '学员', role: 'trial', version: getVersion(), registeredAt: Date.now() };
         isAdmin = false;
         saveAuth();
       }
@@ -2530,11 +2752,11 @@ document.getElementById('activateBtn').addEventListener('click', async function(
     const userName = currentUser ? currentUser.userName : '学员';
 
     // Mark phone as activated so other devices auto-activate on login
-    if (phone) markPhoneActivated(phone);
+    if (phone) markPhoneActivated(phone, getVersion());
 
     currentUser = {
       phone, userName,
-      role: 'activated', codeHash: hash,
+      role: 'activated', codeHash: hash, version: getVersion(),
       activatedAt: now,
       expiresAt: now + ACTIVATION_VALIDITY_DAYS * 24 * 60 * 60 * 1000
     };
@@ -2781,6 +3003,11 @@ document.getElementById('backToWelcome').addEventListener('click', function() {
 document.getElementById('backToWelcomeFromLogin').addEventListener('click', function() {
   showScreen('welcomeScreen');
 });
+// 顶栏「切换版本」：回到欢迎页重新选择版本（不清空登录态，另一版本需另行登录）
+document.getElementById('switchVersionBtn').addEventListener('click', function() {
+  document.getElementById('mainApp').classList.add('hidden');
+  showScreen('welcomeScreen');
+});
 // Welcome -> Admin
 document.getElementById('linkToAdmin').addEventListener('click', function() {
   showScreen('adminLoginScreen');
@@ -2847,14 +3074,26 @@ async function enterApp() {
   document.getElementById('mainApp').classList.remove('hidden');
   loadDB();
 
+  // 应用当前版本色系；非管理员强制停留在本版本的子考试（管理员可跨版本查看）
+  applyVersionTheme(getVersion());
+  const ownGroup = getVersion() === 'economist' ? 'eco_group' : 'hrm3_group';
+  const forceOwn = !isAdmin;
+
   // Restore last selected exam (must happen after EXAM_REGISTRY is defined)
   try {
     const le = localStorage.getItem(LAST_EXAM_KEY);
-    if (le && EXAM_REGISTRY[le] && le !== currentExamId) {
+    if (forceOwn && le && EXAM_REGISTRY[le] && EXAM_GROUP_MAP[le] !== ownGroup) {
+      currentExamId = VERSION_DEFAULT_EXAM[getVersion()];
+      applyExam(currentExamId);
+      localStorage.setItem(LAST_EXAM_KEY, currentExamId);
+    } else if (le && EXAM_REGISTRY[le] && le !== currentExamId) {
       currentExamId = le;
       applyExam(le);
+    } else {
+      updateExamSwitchUI(currentExamId);
     }
   } catch(e) {}
+  applyVersionTheme(getVersion());
 
   updateHeaderInfo();
   updateTrialBanner();
@@ -2882,7 +3121,7 @@ async function enterApp() {
       // === CROSS-DEVICE SYNC: Pull latest auth state from server ===
       if (API_OK && currentUser && currentUser.role !== 'admin') {
         const serverAuth = await syncAuthFromServer(currentUser.phone);
-        if (serverAuth && serverAuth.role === 'activated' && currentUser.role !== 'activated') {
+        if (serverAuth && serverAuth.role === 'activated' && (!serverAuth.version || serverAuth.version === getVersion()) && currentUser.role !== 'activated') {
           currentUser = serverAuth;
           isAdmin = false;
           saveAuth();
@@ -3078,7 +3317,7 @@ function showUserSettings() {
     this.disabled = true; this.textContent = '⏳ 提交中...';
     let r = null;
     if (API_OK) {
-      r = await apiPut('/api/accounts/' + encodeURIComponent(currentUser.phone) + '/password', { currentPassword: cur, newPassword: nw });
+      r = await apiPut('/api/accounts/' + encodeURIComponent(currentUser.phone) + '/password', { currentPassword: cur, newPassword: nw, version: getVersion() });
     }
     if (r && r.ok) {
       const newHash = await sha256(currentUser.phone + ':' + nw);
@@ -3152,10 +3391,12 @@ async function renderAdminDashboard() {
       const ds = (d.getMonth()+1)+'/'+d.getDate()+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
       const wechat = escapeHtml(r.wechatId || '未提供');
       html += '<div class="request-item" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">';
-      html += '<div><b>微信号：</b>' + wechat + '<br>';
+      const rv = r.version || 'hrm3';
+      const rvTag = rv === 'economist' ? '<span style="color:#0d9488;font-size:11px">[经济师]</span> ' : '<span style="color:#2563eb;font-size:11px">[HR三级]</span> ';
+      html += '<div>' + rvTag + '<b>微信号：</b>' + wechat + '<br>';
       html += '<span style="font-size:11px;color:#94a3b8">手机：' + escapeHtml(r.phone) + ' · ' + ds + '</span></div>';
       html += '<div style="display:flex;gap:6px">';
-      html += '<button class="btn btn-success btn-sm req-approve" data-phone="' + escapeHtml(r.phone) + '" data-wechat="' + wechat + '">✅ 确认激活</button>';
+      html += '<button class="btn btn-success btn-sm req-approve" data-phone="' + escapeHtml(r.phone) + '" data-wechat="' + wechat + '" data-version="' + rv + '">✅ 确认激活</button>';
       html += '<button class="btn btn-outline btn-sm req-ignore" data-phone="' + escapeHtml(r.phone) + '" data-wechat="' + wechat + '" style="color:#94a3b8">忽略</button>';
       html += '</div></div>';
     });
@@ -3239,10 +3480,17 @@ async function renderAdminDashboard() {
     });
     html += '</div></div>';
 
+    // 版本选择：普通账号 / 会员账号按版本分两边，管理账号可管理全部
+    html += '<div class="admin-section" style="border-top:2px solid var(--primary);margin-top:8px"><h4>🎯 账号管理版本（管理员可查看全部）</h4>';
+    html += '<div style="display:flex;gap:8px;margin-bottom:6px">';
+    html += '<button class="btn btn-sm adm-ver-btn" data-ver="hrm3" style="flex:1;' + (adminMemVersion === 'hrm3' ? 'background:#2563eb;color:#fff' : 'background:#fff;color:var(--text);border:2px solid var(--border)') + '">🏢 企业HR三级</button>';
+    html += '<button class="btn btn-sm adm-ver-btn" data-ver="economist" style="flex:1;' + (adminMemVersion === 'economist' ? 'background:#0d9488;color:#fff' : 'background:#fff;color:var(--text);border:2px solid var(--border)') + '">📈 中级经济师</button>';
+    html += '</div><div style="font-size:11px;color:var(--text-secondary)">当前管理：' + (VERSION_LABELS[adminMemVersion] || '') + '　（普通账号与会员账号互不相通）</div></div>';
+
     // 会员
     let memList = [];
-    try { const r = await apiGet('/api/admin/accounts?superPhone=' + ADMIN_PHONE); if (r) memList = r; } catch(e) {}
-    html += '<div class="admin-section" style="border-top:2px solid #2563eb;margin-top:8px"><h4>👥 会员账号管理（' + memList.length + '）</h4>';
+    try { const r = await apiGet('/api/admin/accounts?superPhone=' + ADMIN_PHONE + '&version=' + adminMemVersion); if (r) memList = r; } catch(e) {}
+    html += '<div class="admin-section" style="border-top:2px solid var(--primary);margin-top:8px"><h4>👥 ' + (VERSION_LABELS[adminMemVersion] || '') + ' · 会员账号管理（' + memList.length + '）</h4>';
     html += '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">';
     html += '<input type="text" id="memPhone" placeholder="会员手机号" style="flex:1;min-width:110px;padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit">';
     html += '<input type="text" id="memName" placeholder="昵称" style="width:80px;padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit">';
@@ -3301,7 +3549,7 @@ async function renderAdminDashboard() {
         try {
           const claim = updatePaymentClaim(claimId, { status: 'approved' });
           if (claim) {
-            activateUserByPhone(claim.phone);
+            activateUserByPhone(claim.phone, claim.version || adminMemVersion);
             addNotification(claim.phone, 'claim_approved', '您的付款已核实，账户已被激活，现在可以畅享全部功能！');
           }
           alert('✅ 已核实到账！该用户账户已自动激活，无需激活码。');
@@ -3327,11 +3575,12 @@ async function renderAdminDashboard() {
       e.stopPropagation();
       const phone = this.getAttribute('data-phone');
       const wechat = this.getAttribute('data-wechat');
+      const reqVer = this.getAttribute('data-version') || adminMemVersion;
       if (!confirm('确认激活该用户（' + phone + '）的账户？')) return;
       this.disabled = true; this.textContent = '⏳ 处理中...';
       (async function() {
         try {
-          activateUserByPhone(phone);
+          activateUserByPhone(phone, reqVer);
           addNotification(phone, 'request_approved', '您的激活请求已通过，账户已被激活，现在可以畅享全部功能！');
           await apiPut('/api/requests/handle', { phone: phone, wechatId: wechat });
           alert('✅ 已激活该用户账户！');
@@ -3365,6 +3614,11 @@ async function renderAdminDashboard() {
     logout();
   });
 
+  // ===== 账号管理：版本切换 =====
+  document.querySelectorAll('.adm-ver-btn').forEach(function(b) {
+    b.addEventListener('click', function() { adminMemVersion = this.dataset.ver; renderAdminDashboard(); });
+  });
+
   // ===== 账号管理：子管理员 / 会员 增删改（仅最高权限管理员界面存在这些按钮）=====
   if (document.getElementById('btnAddSub')) {
     document.getElementById('btnAddSub').addEventListener('click', async function() {
@@ -3385,7 +3639,7 @@ async function renderAdminDashboard() {
       if (!/^1[3-9]\d{9}$/.test(phone)) { alert('请输入有效的手机号'); return; }
       if (!pwd || pwd.length < 6) { alert('密码至少6位'); return; }
       this.disabled = true;
-      const r = await apiPost('/api/admin/accounts?superPhone=' + ADMIN_PHONE, { phone: phone, name: name, password: pwd });
+      const r = await apiPost('/api/admin/accounts?superPhone=' + ADMIN_PHONE + '&version=' + adminMemVersion, { phone: phone, name: name, password: pwd, version: adminMemVersion });
       if (r && r.ok) renderAdminDashboard();
       else { alert((r && r.error) || '添加失败'); this.disabled = false; }
     });
@@ -3411,7 +3665,7 @@ async function renderAdminDashboard() {
       btn.addEventListener('click', async function() {
         const phone = this.getAttribute('data-phone');
         if (!confirm('确定删除会员 ' + phone + '？该账号将不能再登录（答题数据保留）。')) return;
-        const r = await apiDelete('/api/admin/accounts/' + encodeURIComponent(phone) + '?superPhone=' + ADMIN_PHONE);
+        const r = await apiDelete('/api/admin/accounts/' + encodeURIComponent(phone) + '?superPhone=' + ADMIN_PHONE + '&version=' + adminMemVersion);
         if (r && r.ok) renderAdminDashboard(); else alert((r && r.error) || '删除失败');
       });
     });
@@ -3421,7 +3675,7 @@ async function renderAdminDashboard() {
         const np = prompt('为会员 ' + phone + ' 设置新密码（至少6位）');
         if (np === null) return;
         if (np.length < 6) { alert('密码至少6位'); return; }
-        const r = await apiPut('/api/admin/accounts/' + encodeURIComponent(phone) + '?superPhone=' + ADMIN_PHONE, { newPassword: np });
+        const r = await apiPut('/api/admin/accounts/' + encodeURIComponent(phone) + '?superPhone=' + ADMIN_PHONE + '&version=' + adminMemVersion, { newPassword: np });
         if (r && r.ok) alert('✅ 密码已更新'); else alert((r && r.error) || '修改失败');
       });
     });
@@ -4752,8 +5006,11 @@ function loadExamState(id) {
 }
 function updateExamSwitchUI(id) {
   const group = EXAM_GROUP_MAP[id];
+  const ownGroup = getVersion() === 'economist' ? 'eco_group' : 'hrm3_group';
+  const showAll = (typeof isAdmin !== 'undefined' && isAdmin);
   document.querySelectorAll('#examSwitch .exam-group-btn').forEach(function(b) {
     b.classList.toggle('active', b.dataset.group === group);
+    b.style.display = (showAll || b.dataset.group === ownGroup) ? '' : 'none';
   });
   document.querySelectorAll('#examSwitch .exam-sub-row').forEach(function(row) {
     row.classList.toggle('hidden', row.id !== group + '_subs');
@@ -4763,6 +5020,13 @@ function updateExamSwitchUI(id) {
   });
 }
 function switchGroup(group) {
+  const showAll = (typeof isAdmin !== 'undefined' && isAdmin);
+  const ownGroup = getVersion() === 'economist' ? 'eco_group' : 'hrm3_group';
+  if (!showAll && group !== ownGroup) {
+    document.getElementById('mainApp').classList.add('hidden');
+    showScreen('welcomeScreen');
+    return;
+  }
   const firstSub = document.querySelector('#examSwitch .exam-sub-row#' + group + '_subs .exam-switch-btn');
   if (firstSub) switchExam(firstSub.dataset.exam);
 }
@@ -4790,7 +5054,7 @@ function applyExam(id) {
   qType = 'single'; currentIdx = 0;
   examActive = false; examSubmitted = false; examQuestions = [];
   gdCurrentChapter = null; gdCurrentQuestions = []; gdCurrentIndex = 0; gdExamMode = false;
-  const ht = document.getElementById('headerTitle'); if (ht) ht.textContent = '人力资源考试刷题平台';
+  const ht = document.getElementById('headerTitle'); if (ht) ht.textContent = VERSION_LABELS[getVersion()] || '人力资源考试刷题平台';
   const hs = document.getElementById('headerSubtitle'); if (hs) hs.textContent = reg.title;
   const g = document.getElementById('gdChapterSubDesc'); if (g) g.textContent = reg.shortName + ' · 共' + GD_CHAPTERS.length + '个章节';
   updateExamSwitchUI(id);
@@ -4849,6 +5113,7 @@ buildChapterMap();
 
 // ===== INIT =====
 (function() {
+  applyVersionTheme(currentVersion);
   if (loadAuth()) {
     enterApp();
     if (!isAdmin) {
