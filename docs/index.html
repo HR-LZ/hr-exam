@@ -4949,6 +4949,36 @@ const BASE_QUESTIONS = [{"id": 20001, "q": "在市场经济中，资源配置主
 const BASE_CHOICE = BASE_QUESTIONS.filter(function(q){ return q.type==='single'||q.type==='multi'; });
 const BASE_CHAPTERS = [{"key": "jb1", "name": "经济学基础", "order": 1, "color": "#2563eb"}, {"key": "jb2", "name": "财政", "order": 2, "color": "#7c3aed"}, {"key": "jb3", "name": "货币与金融", "order": 3, "color": "#0891b2"}, {"key": "jb4", "name": "统计", "order": 4, "color": "#059669"}, {"key": "jb5", "name": "会计", "order": 5, "color": "#dc2626"}, {"key": "jb6", "name": "法律", "order": 6, "color": "#c026d3"}];
 
+// ===== 选项前缀归一化（根治「A. A.选项」重复）=====
+// 题库数据里部分选项文本自带 "A." / "A、" 等字母前缀，而各渲染点又会
+// 用 String.fromCharCode(65+i) 再加一次字母 → 出现 "A. A.市…"。
+// 这里在数据定义完成后一次性剥掉所有选项的字母前缀，让所有渲染
+// （刷题/模考/答案回顾/GD章节/GD模考/案例小题）统一拿到干净文本。
+function stripOptPrefix(text) {
+  if (typeof text !== 'string') return text;
+  return text.replace(/^\s*[A-Da-d]\s*[.．)）]\s*/, '');
+}
+function normalizeQuestionOpts(list) {
+  if (!Array.isArray(list)) return;
+  for (let i = 0; i < list.length; i++) {
+    const q = list[i];
+    if (q && Array.isArray(q.opts)) {
+      for (let j = 0; j < q.opts.length; j++) q.opts[j] = stripOptPrefix(q.opts[j]);
+    }
+    // 案例分析题：scenario.subs 里还有一层带 opts 的小题
+    if (q && Array.isArray(q.subs)) {
+      for (let k = 0; k < q.subs.length; k++) {
+        const sub = q.subs[k];
+        if (sub && Array.isArray(sub.opts)) {
+          for (let j = 0; j < sub.opts.length; j++) sub.opts[j] = stripOptPrefix(sub.opts[j]);
+        }
+      }
+    }
+  }
+}
+[ALL_QUESTIONS, ALL_CHOICE, ECO_QUESTIONS, ECO_CHOICE, BASE_QUESTIONS, BASE_CHOICE, ECO_CASE]
+  .forEach(normalizeQuestionOpts);
+
 // ===== 多考试切换注册表 =====
 const EXAM_REGISTRY = {
   hrm3: {
@@ -5498,7 +5528,7 @@ function renderGDPracticeCurrent() {
           : 'checkGDAnswer(\'' + label + '\', \'' + q.ans + '\', \'single\')';
         attrs = ' onclick="' + clickHandler + '"';
       }
-      html += '<div class="gd-option' + (isSel ? ' selected' : '') + '"' + attrs + ' style="' + style + '"><b>' + label + '.</b> ' + opt + '</div>';
+      html += '<div class="gd-option' + (isSel ? ' selected' : '') + '"' + attrs + ' style="' + style + '"><b>' + label + '.</b> ' + escapeHtml(stripOptPrefix(opt)) + '</div>';
     });
     html += '</div><div class="nav-row">';
     html += '<button class="btn btn-ghost" id="gdPrevBtn"' + (gdCurrentIndex === 0 ? ' disabled' : '') + '>◀ 上一题</button>';
@@ -5529,7 +5559,7 @@ function renderGDPracticeCurrent() {
       : 'checkGDAnswer(\'' + label + '\', \'' + q.ans + '\', \'single\')';
     html += '<div class="gd-option" onclick="' + clickHandler + '" ' +
       'style="padding:14px 16px;border:2px solid #e2e8f0;border-radius:12px;cursor:pointer;font-size:15px;transition:all 0.2s">' +
-      '<b>' + label + '.</b> ' + opt + '</div>';
+      '<b>' + label + '.</b> ' + escapeHtml(stripOptPrefix(opt)) + '</div>';
   });
   html += '</div>';
   if (isMulti) {
