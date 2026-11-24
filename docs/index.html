@@ -153,7 +153,7 @@ body {
   display: flex; align-items: center; justify-content: space-between; gap: 8px;
 }
 .trial-banner .trial-left { display: flex; align-items: center; gap: 6px; }
-.trial-banner .trial-count { font-weight: 700; color: var(--warning); }
+.trial-banner .trial-count { font-weight: 700; color: var(--warning); font-size: 11px; white-space: nowrap; }
 
 /* ===== Upgrade Prompt Overlay ===== */
 .upgrade-overlay {
@@ -708,7 +708,7 @@ body {
   <div class="overlay-card" data-page-node-id="QpC9NyxOCawjyq7G9Et5WZ">
     <div class="overlay-logo" data-page-node-id="v9t2tfKAwyrW1oWHVB41PB">📝</div>
     <div class="overlay-title" data-page-node-id="w2KIC23lXfY7d0EAxlpqKZ">注册新账号</div>
-    <div class="overlay-sub" data-page-node-id="1F8HUWLRy6QelqhZOEByTK">注册后即可免费试用30道题</div>
+    <div class="overlay-sub" data-page-node-id="1F8HUWLRy6QelqhZOEByTK" id="regTrialSub">注册后即可免费试用（按题型赠送额度）</div>
     <div class="js-conn-status conn-pending" data-page-node-id="daFe1IlaarxKbgxFom4fJV">⏳ 连接中…</div>
     <div class="form-group" data-page-node-id="30DkZST11idQz0oYoH4qvb">
       <label data-page-node-id="IYsXJucdTJK51p5rMttmpl">📱 手机号</label>
@@ -800,7 +800,7 @@ body {
     <button class="overlay-close-btn" id="closeUpgradeBtn" title="关闭" data-page-node-id="4GZn0M8hpFCcLPLF4dCuLA">✕</button>
     <div class="upg-icon" data-page-node-id="hwGJyBJgniEjIGvirDhY3F">🔒</div>
     <h3 id="upgradeTitle" data-page-node-id="4TsWrU1Ht0Ad3Re8Ea1YQe">试用次数已用完</h3>
-    <p data-page-node-id="RvIYo1Yzqjxm72EJ79f0Gy">您的30道免费试用名额已用完<br data-page-node-id="jnHh81WH3zAAwBuVvSKqNS">扫码激活后即可继续学习全部题库</p>
+    <p data-page-node-id="RvIYo1Yzqjxm72EJ79f0Gy" id="upgradeDesc">当前题型的免费试用名额已用完<br data-page-node-id="jnHh81WH3zAAwBuVvSKqNS">扫码激活后即可继续学习全部题库</p>
     <button class="btn btn-warning btn-block" id="btnScanPay" data-page-node-id="BRKCffGbzeKvQ4aFqDO3Bu">📱 扫码激活</button>
   </div>
 </div>
@@ -921,6 +921,11 @@ body {
     <button class="version-panel-close" id="versionPanelClose" data-page-node-id="Xa1Xz8m9TKbIhDcYL9QmFq">✕</button>
   </div>
   <div class="version-panel-body" id="versionPanelBody" data-page-node-id="ip8iR3IaL6LwFUYsDyRcmV">
+    <div class="version-item">
+      <span class="version-tag" style="background:#0d9488">V29</span>
+      <div class="version-date">2026-11-24</div>
+      <div class="version-desc">🎁 非会员试用改为按题型分别赠送额度：企业HR三级=30单选+10多选+3简答+1案例，中级经济师=30单选+10多选<br>📝 练习页按当前题型额度独立限制；某题型用尽只锁该题型，其余题型仍可继续<br>🏆 试用模考按上述题型结构出卷，时长按题量放宽（HR三级90分钟/经济师60分钟）<br>📷 修复点击收款码后绿色对勾遮挡二维码导致微信长按无「识别图中二维码」的问题</div>
+    </div>
     <div class="version-item">
       <span class="version-tag" style="background:#0d9488">V28</span>
       <div class="version-date">2026-11-24</div>
@@ -1065,7 +1070,7 @@ body {
 
   <div class="trial-banner hidden" id="trialBanner" data-page-node-id="1g8mLJPADVzbbkRr3RriJJ">
     <div class="trial-left" data-page-node-id="O2fiuWBTGIy5hbZYqCZRj5">🎁 <b data-page-node-id="ZJVIFHAnBHhk0DBzBhOhmF">试用模式</b></div>
-    <div class="trial-count" data-page-node-id="BGDS23NZAhUu9guD4BhJY0">剩余 <span id="trialRemaining" data-page-node-id="prBcgaWUiq2cSXsHJa6r9Y">30</span>/30 题</div>
+    <div class="trial-count" data-page-node-id="BGDS23NZAhUu9guD4BhJY0">剩余 <span id="trialRemaining" data-page-node-id="prBcgaWUiq2cSXsHJa6r9Y">单选30 · 多选10 · 简答3 · 案例1</span></div>
     <button class="btn btn-sm btn-warning" id="btnUpgradeNow" data-page-node-id="GBADXyhB0DcP7YZcKbUJvO">🔓 激活全部</button>
   </div>
 
@@ -1114,6 +1119,15 @@ const ADMIN_PHONE = "13760449307";
 const ADMIN_PASSWORD_HASH = "aaffebecec560fec66e75f24062224ffa4e07696d2ae9a1fee3707c3f8fd9373";
 const EMBEDDED_HASHES = ["3ff6aac90cedfcb0879087adea662d2b2d1a268fc4df8d67cd2811d2c3f30a03", "80751e9e1a13a72911c51c0a99685161d115703d8bdd7878fd47d0cfa25c743d", "a60bfe291d8a52111d19cbdc992ccf88a0f46ac795db912a374c05dd8c568d99", "64c76e51b66ee0e236341895c20595351c45fbb13cdbd7906e0b21ac14cfd79d", "6c1df43b606ab74e55ab58d7c7ee7258bdace7604cfd12bada44fa4f2a62e8a1", "2b796c76d0e0afa0188c3b76c7269e738a13a3525297defb3ed8f0f822fc43f5", "866b3b12df470e48112f365b998772a47c691915d95353230edfd2a319b35350", "936cd948bcc85bc5db5388efa0bcc7c8d83dec278904825694272ade95d00a52", "e7fef3e670346dcc17891bd1ad5d145b4160be58366c172fa325e71d759f08af", "c437bb54b96c46172a90a7d6c73f27d9c51bc476c115a819f133064a48eea901", "0bda9dd58f552ba57ceac80cb1d790d0e28f964429e57ea84971db4b7f6f723d", "dcf56d17239c302036d352ed4d6f38ee05fe1509a152d4abff754417f633a709", "3bdde4c8d6d6d880efd0bb3ece72c6de898b9b18f8f2b5c0dd560c0a1360403f", "587c26c3403407193ce0c9321ef45733edd3e72a7657906d5db4498f4bbb8ab9", "ccaf84ca528346751cefd69c0b184e8d0454cf1a8bdb028652ef00b26727c151", "cef76fe88162f69665c3c1726c2c34c77413432a643a97fcac073181da3dbfc7", "fd6a8d85c1f84cd96d2293d7c13057f711ab95753f1ff234f8fda0a0a403995b", "ee9ecc724fdde055a61969915f066555064ee361e2187cc6d18c15cbf9cd27b9", "07408f1d915926277bbd4069a23b7033b6109a2164bed84be3efb9f42ba5929a", "8e3ea995b603434004204848184171016ee8df8030905c44bf00f0bfb7b98ab8"];
 const ACTIVATION_VALIDITY_DAYS = 365;
+// 试用额度：按版本×题型分别限制
+// hrm3: 30单选 + 10多选 + 3简答 + 1案例；economist: 30单选 + 10多选
+const TRIAL_QUOTA = {
+  hrm3: { single: 30, multi: 10, short: 3, case: 1 },
+  economist: { single: 30, multi: 10 }
+};
+const TRIAL_TYPES = ['single','multi','short','case'];
+const TRIAL_TYPE_LABEL = { single:'单选', multi:'多选', short:'简答', case:'案例' };
+// 兼容旧代码：TRIAL_LIMIT 表示该版本所有题型额度之和，动态计算
 const TRIAL_LIMIT = 30;
 const AUTH_KEY = 'hr_exam_v5_auth';
 const ADMIN_CODES_KEY = 'hr_exam_v5_admin_codes';
@@ -1186,8 +1200,8 @@ function ensureVersions(db) {
   if (!db || typeof db !== 'object') return db;
   if (!db.versions) {
     db.versions = {
-      hrm3:      { accounts: {}, trials: {}, activated_phones: [] },
-      economist: { accounts: {}, trials: {}, activated_phones: [] }
+      hrm3:      { accounts: {}, trials: {}, trial_counts: {}, activated_phones: [] },
+      economist: { accounts: {}, trials: {}, trial_counts: {}, activated_phones: [] }
     };
   }
   if (db.versions) {
@@ -1196,6 +1210,7 @@ function ensureVersions(db) {
       const vs = db.versions[v] || {};
       if (!vs.accounts || typeof vs.accounts !== 'object') vs.accounts = {};
       if (!vs.trials || typeof vs.trials !== 'object') vs.trials = {};
+      if (!vs.trial_counts || typeof vs.trial_counts !== 'object') vs.trial_counts = {};
       if (!Array.isArray(vs.activated_phones)) vs.activated_phones = [];
       db.versions[v] = vs;
     });
@@ -1537,18 +1552,32 @@ async function giteeRoute(rawPath, method, body) {
   // 这里显式接受并忽略，避免污染 accounts（其数据结构与注册流程不同）。
   if (path === '/api/accounts' && method === 'POST') return R({ ok: true, ignored: true });
 
-  // ===== TRIAL =====
+  // ===== TRIAL（按题型计数）=====
   const trialMatch = path.match(/^\/api\/trial\/(\d+)$/);
   if (trialMatch) {
     const phone = trialMatch[1];
     if (method === 'GET') {
       const db = await dbRead();
-      return R({ count: vstore(db).trials[phone] || 0 });
+      const VS = vstore(db);
+      const counts = VS.trial_counts && VS.trial_counts[phone] ? VS.trial_counts[phone] : null;
+      const total = counts ? ['single','multi','short','case'].reduce((s,t) => s + (counts[t]||0), 0) : (VS.trials[phone] || 0);
+      return R({ count: total, counts: counts || null });
     }
     if (method === 'POST') {
-      let count = 0;
-      await dbMutate(db => { const VS = vstore(db); VS.trials[phone] = (VS.trials[phone] || 0) + 1; count = VS.trials[phone]; });
-      return R({ count: count });
+      let count = 0, counts = null;
+      const type = (body && ['single','multi','short','case'].indexOf(body.type) >= 0) ? body.type : 'single';
+      await dbMutate(db => {
+        const VS = vstore(db);
+        if (!VS.trial_counts) VS.trial_counts = {};
+        const cur = VS.trial_counts[phone] || { single:0, multi:0, short:0, case:0 };
+        // 首次从旧数字迁移：旧总数计入 single
+        if (!VS.trial_counts[phone] && VS.trials && VS.trials[phone]) cur.single = VS.trials[phone];
+        cur[type] = (cur[type] || 0) + 1;
+        VS.trial_counts[phone] = cur;
+        VS.trials[phone] = ['single','multi','short','case'].reduce((s,t) => s + (cur[t]||0), 0);
+        counts = cur; count = VS.trials[phone];
+      });
+      return R({ count: count, counts: counts });
     }
   }
 
@@ -2345,24 +2374,56 @@ function markCodeUsed(hash) {
   } catch(e) {}
 }
 
-function getTrialCount() {
-  const k = TRIAL_KEY + '_' + getVersion();
-  try { const r = localStorage.getItem(k); const n = parseInt(r); return isNaN(n) ? 0 : n; }
-  catch(e) { return 0; }
+// 按题型分别计数（存 localStorage 一个对象：{single,multi,short,case}）
+const TRIAL_TYPES_KEY = 'hr_exam_v7_trial_types';
+function getTrialQuota(v) { return TRIAL_QUOTA[v || getVersion()] || TRIAL_QUOTA.hrm3; }
+function emptyTrialCounts() { return { single:0, multi:0, short:0, case:0 }; }
+function getTrialCounts() {
+  const k = TRIAL_TYPES_KEY + '_' + getVersion();
+  try {
+    const r = localStorage.getItem(k);
+    if (r) { const o = JSON.parse(r); return Object.assign(emptyTrialCounts(), o); }
+  } catch(e) {}
+  return emptyTrialCounts();
 }
-
+function getTrialTypeCount(type) { return getTrialCounts()[type] || 0; }
+// 某题型是否已用尽额度；额度未配置(0/未列出)视为不允许
+function isTrialTypeExhausted(type) {
+  const quota = getTrialQuota(getVersion());
+  const limit = quota[type] || 0;
+  if (limit <= 0) return true;
+  return getTrialTypeCount(type) >= limit;
+}
+function trialTotalUsed() {
+  const c = getTrialCounts();
+  return TRIAL_TYPES.reduce((s,t) => s + (c[t]||0), 0);
+}
+function getTrialCount() { return trialTotalUsed(); }
+function saveTrialCounts(c) {
+  localStorage.setItem(TRIAL_TYPES_KEY + '_' + getVersion(), JSON.stringify(c));
+}
 async function getTrialCountFromServer(phone) {
   const v = getVersion();
-  try { const r = await apiGet('/api/trial/' + encodeURIComponent(phone) + '?version=' + v); if (r !== null) { localStorage.setItem(TRIAL_KEY + '_' + v, String(r.count)); return r.count; } }
-  catch(e) { return null; }
+  try {
+    const r = await apiGet('/api/trial/' + encodeURIComponent(phone) + '?version=' + v);
+    if (r !== null) {
+      if (r.counts) saveTrialCounts(Object.assign(emptyTrialCounts(), r.counts));
+      else localStorage.setItem(TRIAL_KEY + '_' + v, String(r.count || 0));
+      return r.count !== undefined ? r.count : trialTotalUsed();
+    }
+  } catch(e) {}
+  return null;
 }
-
-function incrementTrialCount() {
+function incrementTrialCount(type) {
   const v = getVersion();
-  let n = getTrialCount() + 1;
-  localStorage.setItem(TRIAL_KEY + '_' + v, String(n));
-  if (currentUser && currentUser.phone) apiPost('/api/trial/' + encodeURIComponent(currentUser.phone), { version: v });
-  return n;
+  const c = getTrialCounts();
+  const t = TRIAL_TYPES.indexOf(type) >= 0 ? type : 'single';
+  c[t] = (c[t] || 0) + 1;
+  saveTrialCounts(c);
+  if (currentUser && currentUser.phone) {
+    apiPost('/api/trial/' + encodeURIComponent(currentUser.phone), { version: v, type: t, counts: c });
+  }
+  return trialTotalUsed();
 }
 
 // ===== SCREEN NAVIGATION =====
@@ -2376,6 +2437,13 @@ function showScreen(screenId) {
   document.getElementById(screenId).classList.remove('hidden');
   if (typeof updateConnStatus === 'function') updateConnStatus();
   if (screenId === 'welcomeScreen' && typeof prepareWelcome === 'function') prepareWelcome();
+  // 注册页免费试用描述跟随当前版本额度
+  const regSub = document.getElementById('regTrialSub');
+  if (regSub && typeof getTrialQuota === 'function') {
+    const q = getTrialQuota(getVersion());
+    const parts = TRIAL_TYPES.filter(t => (q[t]||0) > 0).map(t => (q[t]||0) + '道' + (TYPE_LABELS[t] || TRIAL_TYPE_LABEL[t]));
+    regSub.textContent = '注册后即可免费试用：' + parts.join('、');
+  }
 }
 
 // ===== 版本选择（欢迎页）=====
@@ -2844,6 +2912,13 @@ document.getElementById('btnSendWechat').addEventListener('click', function() {
 
 // ===== CONTACT ADMIN FLOW =====
 function showUpgradePrompt() {
+  // 描述按当前版本实际试用额度动态生成
+  const d = document.getElementById('upgradeDesc');
+  if (d) {
+    const q = getTrialQuota(getVersion());
+    const parts = TRIAL_TYPES.filter(t => (q[t]||0) > 0).map(t => (q[t]||0) + '道' + (TYPE_LABELS[t] || TRIAL_TYPE_LABEL[t]));
+    d.innerHTML = parts.join('、') + '免费试用名额已用完<br>扫码激活后即可继续学习全部题库';
+  }
   showScreen('upgradeOverlay');
 }
 document.getElementById('btnContactAdmin2').addEventListener('click', function() {
@@ -3225,11 +3300,16 @@ function updateTrialBanner() {
     }
     return;
   }
-  const used = getTrialCount();
-  const remaining = Math.max(0, TRIAL_LIMIT - used);
-  document.getElementById('trialRemaining').textContent = remaining;
+  const quota = getTrialQuota(getVersion());
+  const counts = getTrialCounts();
+  const details = TRIAL_TYPES.filter(t => (quota[t] || 0) > 0).map(t => {
+    const left = Math.max(0, (quota[t]||0) - (counts[t]||0));
+    return TRIAL_TYPE_LABEL[t] + left;
+  });
+  const allDone = details.every(d => /0$/.test(d));
+  document.getElementById('trialRemaining').textContent = details.join(' · ');
   banner.classList.remove('hidden');
-  if (remaining <= 0) {
+  if (allDone) {
     banner.querySelector('.trial-left').innerHTML = '🔒 <b>试用结束</b>';
   } else {
     banner.querySelector('.trial-left').innerHTML = '🎁 <b>试用模式</b>';
@@ -3265,7 +3345,9 @@ function showUserSettings() {
   html += '手机号：' + (currentUser.phone || '-') + '<br>';
   html += '昵称：' + (currentUser.userName || '学员') + '<br>';
   if (currentUser.role === 'trial') {
-    html += '状态：<b style="color:#ea580c">试用中</b>（已用' + getTrialCount() + '/' + TRIAL_LIMIT + '题）<br>';
+    const _q = getTrialQuota(getVersion()), _c = getTrialCounts();
+    const _usedDesc = TRIAL_TYPES.filter(t => (_q[t]||0) > 0).map(t => TRIAL_TYPE_LABEL[t] + (_c[t]||0) + '/' + _q[t]).join('、');
+    html += '状态：<b style="color:#ea580c">试用中</b>（' + _usedDesc + '）<br>';
     // Show payment claim status
     if (myPendingClaim) {
       html += '<div style="margin-top:6px;background:#fef9c3;border:1px solid #fde047;border-radius:6px;padding:8px 10px;font-size:12px;color:#854d0e">⏳ 您的付款申请正在等待管理员核实</div>';
@@ -3872,13 +3954,10 @@ function renderPractice() {
     return;
   }
 
-  // Trial check (with null safety)
-  if (currentUser && currentUser.role === 'trial') {
-    const used = getTrialCount();
-    if (used >= TRIAL_LIMIT) {
-      showUpgradePrompt();
-      return;
-    }
+  // 试用按题型限额：当前题目题型额度用尽则拦截
+  if (currentUser && currentUser.role === 'trial' && q && isTrialTypeExhausted(q.type)) {
+    showUpgradePrompt();
+    return;
   }
 
   const isFav = DB.favorites[q.id];
@@ -3953,7 +4032,7 @@ function renderPractice() {
     }
     box.innerHTML = out;
     box.classList.add('show');
-    if (currentUser.role === 'trial') trackTrialAnswer();
+    if (currentUser.role === 'trial') trackTrialAnswer(q.type);
   });
   document.getElementById('btnCaseSubmit')?.addEventListener('click', function() {
     const box = document.getElementById('answerBox');
@@ -3965,7 +4044,7 @@ function renderPractice() {
     });
     box.innerHTML = out;
     box.classList.add('show');
-    if (currentUser.role === 'trial') trackTrialAnswer();
+    if (currentUser.role === 'trial') trackTrialAnswer(q.type);
   });
   document.getElementById('btnClearWrong')?.addEventListener('click', clearWrongBook);
   document.getElementById('btnClearFav')?.addEventListener('click', clearFavorites);
@@ -3977,10 +4056,10 @@ function renderPractice() {
   });
 }
 
-function trackTrialAnswer() {
-  const used = incrementTrialCount();
+function trackTrialAnswer(type) {
+  incrementTrialCount(type);
   updateTrialBanner();
-  if (used >= TRIAL_LIMIT) {
+  if (isTrialTypeExhausted(type)) {
     setTimeout(() => showUpgradePrompt(), 800);
   }
 }
@@ -4002,13 +4081,16 @@ function renderExam() {
       ? '错选不得分，少选每选对1项得0.5分，全对得满分'
       : '全部选对才得分，错选/少选均不得分';
     if (isTrial) {
+      // 描述从实际试用额度动态生成，避免与实际出卷脱节
+      const q = getTrialQuota(getVersion());
       const tparts = [];
-      if (cfg.single) tparts.push(cfg.single + '道单选题');
-      if (cfg.multi) tparts.push(cfg.multi + '道多选题');
-      if (cfg.short) tparts.push(cfg.short + '道简答题');
-      if (cfg.case) tparts.push(cfg.case + '道案例分析题');
-      const ttotal = (cfg.single||0) + (cfg.multi||0) + (cfg.short||0) + (cfg.case||0);
-      desc = '<div class="exam-desc">试用体验版<br>' + (tparts.join(' + ') || '暂无题型') + ' = 共' + ttotal + '题 · 满分' + (ttotal * ((cfg.points && cfg.points.short) || 1)) + '分</div><ul class="exam-rules"><li>⏱️ 考试时间：<b>' + cfg.minutes + '分钟</b>，倒计时结束自动交卷</li><li>📋 可随时查看答题卡，了解作答进度</li><li>🔢 简答题、案例分析题为打字作答，交卷后对照参考答案自评</li><li>🎯 题目从本题库随机抽取</li><li>🔓 激活后解锁完整练习与模考</li></ul>';
+      if (q.single) tparts.push(q.single + '道单选题');
+      if (q.multi) tparts.push(q.multi + '道多选题');
+      if (q.short) tparts.push(q.short + '道简答题');
+      if (q.case) tparts.push(q.case + '道案例分析题');
+      const ttotal = (q.single||0) + (q.multi||0) + (q.short||0) + (q.case||0);
+      const tMinutes = getVersion() === 'hrm3' ? 90 : 60;
+      desc = '<div class="exam-desc">试用体验版<br>' + (tparts.join(' + ') || '暂无题型') + ' = 共' + ttotal + '题 · 满分' + (ttotal * ((cfg.points && cfg.points.short) || 1)) + '分</div><ul class="exam-rules"><li>⏱️ 考试时间：<b>' + tMinutes + '分钟</b>，倒计时结束自动交卷</li><li>📋 可随时查看答题卡，了解作答进度</li><li>🔢 简答题、案例分析题为打字作答，交卷后对照参考答案自评</li><li>🎯 题目从本题库随机抽取</li><li>🔓 激活后解锁完整练习与模考</li></ul>';
     } else {
       const parts = [];
       if (cfg.single) parts.push(cfg.single + '道单选题');
@@ -4297,27 +4379,48 @@ function buildExamCases(source, count, points) {
 }
 
 function startExam() {
-  if (currentUser.role === 'trial' && getTrialCount() >= TRIAL_LIMIT) { showUpgradePrompt(); return; }
   const isTrial = currentUser.role === 'trial';
   const entry = EXAM_REGISTRY[currentExamId] || {};
   const cfg = entry.exam || { single: 75, multi: 25, calc: 0, case: 0, minutes: 120, passRate: 0.6, points: { single: 1, multi: 1, calc: 1, case: 1 } };
-  const singles = shuffle(ALL_CHOICE.filter(q => q.type === 'single')).slice(0, isTrial ? Math.min(6, cfg.single || 0) : (cfg.single || 0));
-  const multis = shuffle(ALL_CHOICE.filter(q => q.type === 'multi')).slice(0, isTrial ? Math.min(4, cfg.multi || 0) : (cfg.multi || 0));
-  const shorts = shuffle(ALL_CHOICE.filter(q => q.type === 'short')).slice(0, cfg.short || 0);
-  // 先全部单选、再全部多选、再简答题、最后案例分析（不整体打乱），符合真实考卷顺序
-  let examQ = [...singles, ...multis, ...shorts];
-  const casePts = (cfg.points && cfg.points.case !== undefined) ? cfg.points.case : 20;
-  if (cfg.case && entry.caseSource) {
-    examQ = examQ.concat(buildExamCases(entry.caseSource, isTrial ? Math.min(cfg.case, 2) : cfg.case, casePts));
-  } else if (cfg.case) {
-    const ccount = isTrial ? Math.min(cfg.case, 2) : cfg.case;
-    const cases = shuffle(ALL_CHOICE.filter(q => q.type === 'case' && q.subQuestions)).slice(0, ccount);
-    cases.forEach(q => { q.points = casePts; });
-    examQ = examQ.concat(cases);
+  let singles, multis, shorts, examQ, casePts;
+  casePts = (cfg.points && cfg.points.case !== undefined) ? cfg.points.case : 20;
+  if (isTrial) {
+    // 试用体验卷：按版本题库 + 指定题型数量出卷
+    // hrm3: 30单选 + 10多选 + 3简答 + 1案例；economist: 30单选 + 10多选
+    const v = getVersion();
+    const q = getTrialQuota(v);
+    const vEntry = v === 'hrm3'
+      ? { choice: ALL_CHOICE, shortBank: HRM3_PRO_QUESTIONS, caseBank: HRM3_PRO_QUESTIONS }
+      : { choice: ECO_QUESTIONS, shortBank: [], caseBank: ECO_CASE };
+    const take = (bank, type, n) => shuffle((bank || []).filter(x => x.type === type)).slice(0, Math.min(n || 0, (bank || []).filter(x => x.type === type).length));
+    singles = take(vEntry.choice, 'single', q.single);
+    multis  = take(vEntry.choice, 'multi',  q.multi);
+    shorts  = take(vEntry.shortBank, 'short', q.short);
+    // 先全部单选、再全部多选、再简答题、最后案例分析（不整体打乱），符合真实考卷顺序
+    examQ = [...singles, ...multis, ...shorts];
+    if (q.case) {
+      const caseSource = v === 'hrm3' ? HRM3_PRO_QUESTIONS : (entry.caseSource || ECO_CASE);
+      const built = buildExamCases(caseSource, q.case, casePts);
+      examQ = examQ.concat(built);
+    }
+  } else {
+    singles = shuffle(ALL_CHOICE.filter(q => q.type === 'single')).slice(0, cfg.single || 0);
+    multis = shuffle(ALL_CHOICE.filter(q => q.type === 'multi')).slice(0, cfg.multi || 0);
+    shorts = shuffle(ALL_CHOICE.filter(q => q.type === 'short')).slice(0, cfg.short || 0);
+    // 先全部单选、再全部多选、再简答题、最后案例分析（不整体打乱），符合真实考卷顺序
+    examQ = [...singles, ...multis, ...shorts];
+    if (cfg.case && entry.caseSource) {
+      examQ = examQ.concat(buildExamCases(entry.caseSource, cfg.case, casePts));
+    } else if (cfg.case) {
+      const cases = shuffle(ALL_CHOICE.filter(q => q.type === 'case' && q.subQuestions)).slice(0, cfg.case);
+      cases.forEach(q => { q.points = casePts; });
+      examQ = examQ.concat(cases);
+    }
   }
   examQuestions = examQ;
   examIdx = 0; examAnswers = {}; examActive = true; examSubmitted = false;
-  const minutes = isTrial ? 10 : cfg.minutes;
+  // 试用体验卷含简答/案例打字题，给足作答时间；none-trial 用配置时长
+  const minutes = isTrial ? (getVersion() === 'hrm3' ? 90 : 60) : cfg.minutes;
   examTimeLeft = minutes * 60; examTotalTime = minutes * 60;
   examDeadline = Date.now() + examTotalTime * 1000;
   examTrialCounted = {};
@@ -4406,7 +4509,7 @@ function selectExamOption(label) {
   const t = (q.type === 'case') ? q.subType : q.type;
   if (t === 'multi') { const idx = answers.indexOf(label); if (idx >= 0) answers.splice(idx, 1); else answers.push(label); }
   else { examAnswers[examIdx] = [label]; }
-  if (currentUser.role === 'trial' && !examTrialCounted[examIdx]) { examTrialCounted[examIdx] = true; trackTrialAnswer(); }
+  if (currentUser.role === 'trial' && !examTrialCounted[examIdx]) { examTrialCounted[examIdx] = true; trackTrialAnswer(q.type); }
   render();
   // 单选题/计算题选完自动跳转下一题（不显示对错）；多选/案例分析多选不自动跳转，由用户点击「下一题」按钮
   if (t === 'single' || t === 'calc') setTimeout(examNext, 400);
@@ -4545,7 +4648,7 @@ function handlePracticeClick(opt) {
     DB.stats.totalAnswered++; if (correct) DB.stats.totalCorrect++;
     if (!correct) DB.wrongBook[q.id] = true; else if (DB.wrongBook[q.id]) delete DB.wrongBook[q.id];
     savePracticeIdx();
-    if (currentUser.role === 'trial') trackTrialAnswer();
+    if (currentUser.role === 'trial') trackTrialAnswer(q.type);
   } else {
     opt.classList.toggle('selected');
     const allSelected = card.querySelectorAll('.opt-btn.selected');
@@ -4568,7 +4671,7 @@ function handlePracticeClick(opt) {
       box.dataset.verdict = '1';
       DB.stats.totalAnswered++; if (correct) DB.stats.totalCorrect++; else DB.wrongBook[q.id] = true;
       savePracticeIdx();
-      if (currentUser.role === 'trial') trackTrialAnswer();
+      if (currentUser.role === 'trial') trackTrialAnswer(q.type);
       updateBadge();
     });
   }
@@ -5500,13 +5603,15 @@ function renderGDPracticeCurrent() {
     document.getElementById("gdPracticeContent").innerHTML = html;
     return;
   }
-  // 试用限制（仅练习模式，不含考试）：额度用尽则锁屏
-  if (!gdExamMode && currentUser && currentUser.role === 'trial' && getTrialCount() >= TRIAL_LIMIT) {
+  // 试用按题型限额（仅练习模式，不含考试）：当前题型额度用尽则锁屏
+  if (!gdExamMode && currentUser && currentUser.role === 'trial' && isTrialTypeExhausted(q.type)) {
+    const quota = getTrialQuota(getVersion());
+    const label = TYPE_LABELS[q.type] || '该题';
     document.getElementById("gdPracticeContent").innerHTML =
       '<div style="text-align:center;padding:60px 20px">' +
       '<div style="font-size:48px;margin-bottom:16px">🔒</div>' +
-      '<div style="font-size:18px;font-weight:700;margin-bottom:8px">免费试用名额已用完</div>' +
-      '<div style="font-size:14px;color:#64748b;margin-bottom:8px">您已刷完 ' + TRIAL_LIMIT + ' 道免费题</div>' +
+      '<div style="font-size:18px;font-weight:700;margin-bottom:8px">' + label + '免费试用名额已用完</div>' +
+      '<div style="font-size:14px;color:#64748b;margin-bottom:8px">您已用完 ' + (quota[q.type]||0) + ' 道免费' + label + '</div>' +
       '<div style="font-size:14px;color:#64748b;margin-bottom:20px">扫码激活后：无限刷题 + 参加模拟考试</div>' +
       '<button class="btn btn-primary" onclick="showUpgradePrompt()">📱 扫码激活</button></div>';
     return;
@@ -5659,10 +5764,10 @@ function checkGDAnswer(userAns, correctAns, qtype) {
   // Track score
   gdUserAnswers[gdCurrentIndex] = { userAns, correctAns, isCorrect };
   if (isCorrect) gdCorrectCount++; else gdWrongCount++;
-  // 练习模式消耗试用额度（考试模式不计入）
+  // 练习模式消耗当前题型试用额度（考试模式不计入）
   if (!gdExamMode && currentUser && currentUser.role === 'trial') {
-    const used = incrementTrialCount();
-    if (used >= TRIAL_LIMIT) {
+    incrementTrialCount(qtype);
+    if (isTrialTypeExhausted(qtype)) {
       setTimeout(function(){ showUpgradePrompt(); }, 700);
     }
   }
