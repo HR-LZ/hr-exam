@@ -925,6 +925,11 @@ body {
     <button class="version-panel-close" id="versionPanelClose" data-page-node-id="Xa1Xz8m9TKbIhDcYL9QmFq">✕</button>
   </div>
   <div class="version-panel-body" id="versionPanelBody" data-page-node-id="ip8iR3IaL6LwFUYsDyRcmV">
+    <div class="version-item">
+      <span class="version-tag" style="background:#0d9488">V27</span>
+      <div class="version-date">2026-11-24</div>
+      <div class="version-desc">🎨 企业HR三级（蓝）与中级经济师（青绿）拆分为两个独立版本，欢迎页选择进入，配色与账号体系各自独立<br>🔐 普通账号（试用30题）与会员账号（全功能）按版本隔离，均须管理员开通；管理员为最高权限，可跨版本管理<br>🐛 修复选项字母重复显示（如「A. A.市…」）问题<br>📝 修正章节、模考等描述文字，使其与实际题库一致</div>
+    </div>
     <div class="version-item" data-page-node-id="FuDam4ojfmN3EEmKv6IAP3">
       <span class="version-tag" style="background:#dc2626" data-page-node-id="kFINu92cFs7lXK448za88C">V26</span>
       <div class="version-date" data-page-node-id="KVtkyPiGo140iwvkBc1GX3">2026-07-17</div>
@@ -5461,7 +5466,7 @@ function renderGDPracticeCurrent() {
         '<div style="font-size:16px;font-weight:700;margin-bottom:12px;color:' + (passed ? '#16a34a' : '#dc2626') + '">' +
         (passed ? '✅ 通过（≥60分）' : '❌ 未通过（<60分）') + '</div>' +
         '<div style="background:#f8fafc;border-radius:12px;padding:16px;margin-bottom:20px;display:inline-block;text-align:left">' +
-        '<div style="margin-bottom:6px">📝 总题数：<b>' + totalQ + ' 题</b>（单选60 + 多选40）</div>' +
+        '<div style="margin-bottom:6px">📝 总题数：<b>' + totalQ + ' 题</b>（按本章实际库存抽取）</div>' +
         '<div style="margin-bottom:6px">⏱ 用时：<b>' + formatTime(7200 - gdExamSeconds) + '</b></div>' +
         '<div style="margin-bottom:6px">✅ 正确：<b style="color:#16a34a">' + gdCorrectCount + ' 题</b></div>' +
         '<div style="margin-bottom:6px">❌ 错误：<b style="color:#dc2626">' + gdWrongCount + ' 题</b></div>' +
@@ -5781,9 +5786,17 @@ window.switchTab = function(tabName) {
     document.getElementById("gdPracticeScreen").classList.add("hidden");
     document.getElementById("gdChapterScreen").classList.remove("hidden");
     // Render chapter list
+    // 描述依据实际章节数据动态生成，避免写死数字与实际题库不一致
+    const activeChapters = (GD_CHAPTERS || []).filter(ch => ch.total > 0);
+    const subDesc = document.getElementById("gdChapterSubDesc");
+    if (subDesc) {
+      subDesc.textContent = (VERSION_LABELS[getVersion()] || '企业人力资源管理师三级')
+        + ' · 共' + activeChapters.length + '个章节'
+        + (activeChapters.length ? '（' + activeChapters.map(function(c){return c.name;}).join('、') + '）' : '');
+    }
     const listEl = document.getElementById("gdChapterList");
     if (listEl) {
-      listEl.innerHTML = GD_CHAPTERS.filter(ch => ch.total > 0).map(ch =>
+      listEl.innerHTML = activeChapters.map(ch =>
         '<div onclick="selectGDChapter(GD_CHAPTERS.find(c=>c.key===\'' + ch.key + '\'))" ' +
         'style="padding:14px 16px;border:2px solid #e2e8f0;border-radius:12px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:all 0.2s"'+
         'onmouseover="this.style.borderColor=\'' + ch.color + '\';this.style.background=\'#f8fafc\'" '+
@@ -5820,7 +5833,7 @@ window.switchTab = function(tabName) {
       <button class="btn btn-ghost btn-sm" onclick="switchTab('practice')" style="font-size:20px;padding:4px 8px" data-page-node-id="7Ha8I2jCaDyUsGdEhZXsB6">&larr;</button>
       <div style="font-weight:800;font-size:18px" data-page-node-id="xujov05ShYHJZuNdpYuAmt">📚 广东题库 · 章节练习</div>
     </div>
-    <div style="font-size:12px;color:#64748b;margin-bottom:16px" data-page-node-id="jpzfauHrONknOF73WAdzvy">企业人力资源管理师三级 · 共13个章节 · 含广东教材12章 + 综合混合套题</div>
+    <div id="gdChapterSubDesc" style="font-size:12px;color:#64748b;margin-bottom:16px" data-page-node-id="jpzfauHrONknOF73WAdzvy">企业人力资源管理师三级 · 章节练习</div>
     <div id="gdChapterList" style="display:flex;flex-direction:column;gap:8px" data-page-node-id="bdRGlEn2r0iI8jVeZBMTWI"></div>
   </div>
 </div>
@@ -5843,7 +5856,7 @@ window.switchTab = function(tabName) {
       <button data-order="random" data-page-node-id="XHIILVz2E48uQm8eMdiPMB">🎲 随机练习</button>
       <button id="gdStartExam" data-page-node-id="ERFywz2MufzftpzzjDWw1x">🏆 模拟考试</button>
     </div>
-    <div id="gdExamInfo" style="display:none;font-size:11px;color:#7c3aed;text-align:center;margin-bottom:8px" data-page-node-id="Dju6l2FcWm2l0jIIJhbEzr">60道单选题 + 40道多选题 · 共100题 · 满分100分 · 合格线60分</div>
+    <div id="gdExamInfo" style="display:none;font-size:11px;color:#7c3aed;text-align:center;margin-bottom:8px" data-page-node-id="Dju6l2FcWm2l0jIIJhbEzr">模拟考试：从本章随机抽取，单选最多60题 + 多选最多40题（实际题量以本章库存为准）· 按正确率百分制计分 · 60分合格</div>
     <button class="btn btn-primary btn-block" id="gdStartBtn" style="margin-top:8px" data-page-node-id="15btafVB4KwIKNppuCwyik">▶️ 开始练习</button>
   </div>
 </div>
