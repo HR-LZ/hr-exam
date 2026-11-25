@@ -1099,7 +1099,7 @@ body.theme-economist .hero-actions .hero-main { color: #0f766e; }
       <input type="text" id="regSecurityA" placeholder="填写答案（至少2个字，请牢记）" maxlength="30" autocomplete="off" style="margin-top:8px">
       <div style="font-size:11px;color:var(--text-secondary);margin-top:4px">问题和答案都自己设定，忘记密码时凭此自助重置；忘记答案可联系管理员核实身份后重置</div>
     </div>
-    <div style="font-size:11px;color:var(--text-secondary);margin:2px 0 10px;line-height:1.6">🔒 本机已试用过，无法再注册新账号。</div>
+    <div style="font-size:11px;color:var(--text-secondary);margin:2px 0 10px;line-height:1.6">🔒 您已试用过，无法再注册。</div>
     <button class="btn btn-primary btn-block" id="regBtn" data-page-node-id="N5g5aoJUt1jJ2chLAPHTFE">✅ 注册并开始试用</button>
     <div class="form-msg" id="regMsg" data-page-node-id="nfdg7fKLqC5UWAgax9mELD"></div>
     <button class="btn btn-ghost btn-sm-block" id="backToWelcome" style="margin-top:8px" data-page-node-id="oFNDAXxVzFHqyELTuXIFlC">↩ 返回欢迎页</button>
@@ -1368,7 +1368,7 @@ body.theme-economist .hero-actions .hero-main { color: #0f766e; }
     <div class="version-item">
       <span class="version-tag" style="background:#2563eb">V38</span>
       <div class="version-date">2026-11-26</div>
-      <div class="version-desc">🗑 取消一次性注册码：保留「一机一号」设备锁，本机已试用过即无法再注册新账号<br>🏢 身份核实字段调整为「单位 / 学校 / 身份（选填）」：暂无工作单位可留空，也可填待业 / 自由职业 / 在校，不影响注册与找回密码</div>
+      <div class="version-desc">🗑 取消一次性注册码：保留「一机一号」设备锁，您已试用过，无法再注册<br>🏢 身份核实字段调整为「单位 / 学校 / 身份（选填）」：暂无工作单位可留空，也可填待业 / 自由职业 / 在校，不影响注册与找回密码</div>
     </div>
     <div class="version-item">
       <span class="version-tag" style="background:#2563eb">V37</span>
@@ -3320,7 +3320,7 @@ document.getElementById('regBtn').addEventListener('click', async function() {
   // 设备锁：本机已注册过其它手机号 → 拦截（已取消注册码放行）
   if (isDevicePhoneLocked(phone)) {
     msg.className = 'form-msg error';
-    msg.textContent = '本机已试用过，无法再注册新账号。';
+    msg.textContent = '您已试用过，无法再注册。';
     return;
   }
 
