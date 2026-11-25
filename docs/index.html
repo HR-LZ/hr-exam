@@ -1028,7 +1028,7 @@ body.theme-economist .hero-actions .hero-main { color: #0f766e; }
   <div class="overlay-card" data-page-node-id="aEunW3WWFpfrWrLqc5Ewus">
     <div class="overlay-logo" data-page-node-id="uqL5gLDTp8yxRKIDjMW9iK">📋</div>
     <div class="overlay-title" data-page-node-id="M3mPuJGbfGMCt2QgHlZdGP">人力资源考试刷题平台</div>
-    <div class="overlay-sub" data-page-node-id="Sc51amAMucCCUEgAAAnZCa">请选择要进入的考试版本 · 一个账号可进入两个板块，会员按板块分别开通</div>
+    <div class="overlay-sub" data-page-node-id="Sc51amAMucCCUEgAAAnZCa">请选择要进入的考试版本</div>
 
     <div class="version-cards" id="versionCards">
       <button class="version-card vc-hrm3 active" id="vcHrm3" data-version="hrm3" type="button">
@@ -1065,7 +1065,7 @@ body.theme-economist .hero-actions .hero-main { color: #0f766e; }
   <div class="overlay-card" data-page-node-id="QpC9NyxOCawjyq7G9Et5WZ">
     <div class="overlay-logo" data-page-node-id="v9t2tfKAwyrW1oWHVB41PB">📝</div>
     <div class="overlay-title" data-page-node-id="w2KIC23lXfY7d0EAxlpqKZ">注册新账号</div>
-    <div class="overlay-sub" data-page-node-id="1F8HUWLRy6QelqhZOEByTK" id="regTrialSub">一个账号可进入两个板块，会员按板块开通</div>
+    <div class="overlay-sub" data-page-node-id="1F8HUWLRy6QelqhZOEByTK" id="regTrialSub">注册后即可开始本板块试用</div>
     <div class="js-conn-status conn-pending" data-page-node-id="daFe1IlaarxKbgxFom4fJV">⏳ 连接中…</div>
     <div class="form-group" data-page-node-id="30DkZST11idQz0oYoH4qvb">
       <label data-page-node-id="IYsXJucdTJK51p5rMttmpl">📱 手机号</label>
@@ -3034,7 +3034,7 @@ function showScreen(screenId) {
   // 注册页免费试用描述跟随当前版本额度
   const regSub = document.getElementById('regTrialSub');
   if (regSub && typeof getTrialQuota === 'function') {
-    regSub.textContent = '注册后本板块可试用 ' + getTrialTotalLimit(getVersion()) + ' 道题 · 账号通用，会员按板块开通';
+    regSub.textContent = '注册后本板块可试用 ' + getTrialTotalLimit(getVersion()) + ' 道题';
   }
 }
 
@@ -3077,7 +3077,7 @@ function renderWelcomeActions() {
   const actInThisV = !!(loggedV && isPhoneActivated(currentUser.phone, v));
   if (head) {
     head.textContent = '当前版本：' + (VERSION_LABELS[v] || '')
-      + (adminU ? ' · 管理视角' : (loggedV ? (actInThisV ? ' · 本板块会员已开通' : ' · 本板块试用中') : ' · 一个账号可进入两个板块'));
+      + (adminU ? ' · 管理视角' : (loggedV ? (actInThisV ? ' · 本板块会员已开通' : ' · 本板块试用中') : ''));
   }
   if (!quick || !forms) return;
   if (adminU) {
