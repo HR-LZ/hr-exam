@@ -1140,9 +1140,10 @@ body.theme-economist .hero-actions .hero-main { color: #0f766e; }
       <label>📱 注册手机号</label>
       <input type="tel" id="fpPhone" placeholder="请输入注册手机号" maxlength="11" autocomplete="tel">
     </div>
-    <div id="fpAnswerBox" style="display:none">
+    <div id="fpAnswerBox">
       <div class="form-group" style="margin-top:12px">
         <label id="fpQuestionLabel">🛡️ 密保问题</label>
+        <div id="fpQuestionHint" style="font-size:12px;color:var(--text-secondary);line-height:1.6;margin:2px 0 8px">输入注册手机号后，这里会自动显示你的密保问题</div>
         <input type="text" id="fpAnswer" placeholder="请输入密保答案" maxlength="30" autocomplete="off">
       </div>
       <button class="btn btn-primary btn-block" id="fpVerifyBtn">提交</button>
@@ -1368,6 +1369,11 @@ body.theme-economist .hero-actions .hero-main { color: #0f766e; }
     <button class="version-panel-close" id="versionPanelClose" data-page-node-id="Xa1Xz8m9TKbIhDcYL9QmFq">✕</button>
   </div>
   <div class="version-panel-body" id="versionPanelBody" data-page-node-id="ip8iR3IaL6LwFUYsDyRcmV">
+    <div class="version-item">
+      <span class="version-tag" style="background:#2563eb">V41</span>
+      <div class="version-date">2026-11-26</div>
+      <div class="version-desc">🔑 找回密码页打开即显示密保问题与答案框，输入手机号后问题自动填入<br>🔢 注册编号前缀改为 HRKS（HRKS+8位字符），请截图保存作为找回凭证</div>
+    </div>
     <div class="version-item">
       <span class="version-tag" style="background:#2563eb">V40</span>
       <div class="version-date">2026-11-26</div>
@@ -3276,12 +3282,12 @@ function genRegNo() {
   else for (let i = 0; i < 8; i++) nums[i] = Math.floor(Math.random() * 4294967296);
   let s = '';
   for (let i = 0; i < 8; i++) s += chars[nums[i] % chars.length];
-  return 'LZ' + s;
+  return 'HRKS' + s;
 }
 function getPendingRegNo() {
   let n = '';
   try { n = String(localStorage.getItem(REG_NO_KEY) || '').trim().toUpperCase(); } catch(e) {}
-  if (!/^LZ[ABCDEFGHJKLMNPQRSTUVWXYZ23456789]{8}$/.test(n)) {
+  if (!/^HRKS[ABCDEFGHJKLMNPQRSTUVWXYZ23456789]{8}$/.test(n)) {
     n = genRegNo();
     try { localStorage.setItem(REG_NO_KEY, n); } catch(e) {}
   }
@@ -3568,12 +3574,19 @@ let _fpVerifiedAnswer = null;  // 已验证通过的密保答案（用于第二�
   const contactBtn = document.getElementById('fpContactAdmin');
   if (!link || !phoneInput || !verifyBtn || !resetBtn) return;
 
+  function restoreQuestionPlaceholder() {
+    document.getElementById('fpQuestionLabel').textContent = '🛡️ 密保问题';
+    const hint = document.getElementById('fpQuestionHint');
+    if (hint) hint.style.display = '';
+  }
   function resetFpState() {
     _fpQuestion = null;
     _fpVerifiedAnswer = null;
-    document.getElementById('fpAnswerBox').style.display = 'none';
+    _fpQueriedPhone = '';
+    document.getElementById('fpAnswerBox').style.display = '';
     document.getElementById('fpResetBox').style.display = 'none';
     document.getElementById('fpMsg').textContent = '';
+    restoreQuestionPlaceholder();
   }
   link.addEventListener('click', function() {
     showScreen('forgotPwdScreen');
@@ -3661,6 +3674,8 @@ let _fpVerifiedAnswer = null;  // 已验证通过的密保答案（用于第二�
       return false;
     }
     document.getElementById('fpQuestionLabel').textContent = '🛡️ ' + _fpQuestion.question;
+    const hint = document.getElementById('fpQuestionHint');
+    if (hint) hint.style.display = 'none';
     document.getElementById('fpAnswerBox').style.display = '';
     document.getElementById('fpResetBox').style.display = 'none';
     msgInfo('请输入密保答案，验证通过后再设置新密码');
@@ -3669,11 +3684,11 @@ let _fpVerifiedAnswer = null;  // 已验证通过的密保答案（用于第二�
   phoneInput.addEventListener('input', function() {
     const phone = this.value.trim();
     if (!/^1[3-9]\d{9}$/.test(phone)) {
-      // 号码不完整/变化 → 收起问题和重置区
+      // 号码不完整/变化 → 清空问题与结果，答案区保持显示（页面始终可见）
       _fpQuestion = null; _fpVerifiedAnswer = null; _fpQueriedPhone = '';
-      document.getElementById('fpAnswerBox').style.display = 'none';
       document.getElementById('fpResetBox').style.display = 'none';
       document.getElementById('fpMsg').textContent = '';
+      restoreQuestionPlaceholder();
       return;
     }
     if (phone === _fpQueriedPhone) return; // 同一号码不重复查询
