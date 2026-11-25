@@ -816,6 +816,135 @@ body.theme-economist .progress-fill { background: linear-gradient(90deg, #0d9488
 .exam-group-btn[data-group="hrm3_group"] .es-icon::before { -webkit-mask-image: var(--ic-building); mask-image: var(--ic-building); }
 .exam-group-btn[data-group="eco_group"] .es-icon::before { -webkit-mask-image: var(--ic-trend); mask-image: var(--ic-trend); }
 
+/* ===== V34 学习工作台：参照成熟刷题产品的首页与反馈体系 ===== */
+:root {
+  --ic-home: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1V10Z'/%3E%3C/svg%3E");
+  --ic-play: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m8 5 11 7-11 7V5Z'/%3E%3C/svg%3E");
+  --ic-grid: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='3' width='7' height='7' rx='1.5'/%3E%3Crect x='14' y='3' width='7' height='7' rx='1.5'/%3E%3Crect x='3' y='14' width='7' height='7' rx='1.5'/%3E%3Crect x='14' y='14' width='7' height='7' rx='1.5'/%3E%3C/svg%3E");
+  --ic-target: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Ccircle cx='12' cy='12' r='5'/%3E%3Ccircle cx='12' cy='12' r='1.5'/%3E%3C/svg%3E");
+  --ic-crown: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 8l4 4 5-7 5 7 4-4-2 11H5L3 8Z'/%3E%3C/svg%3E");
+  --ic-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4 12 5 5L20 6'/%3E%3C/svg%3E");
+}
+.tab-item[data-tab="home"] .tab-icon::before { -webkit-mask-image: var(--ic-home); mask-image: var(--ic-home); }
+
+/* 学习首页：沉浸式 Hero */
+.home-hero {
+  position: relative; overflow: hidden; border-radius: 22px; padding: 22px 20px 20px;
+  color: #fff; background: var(--header-bg); margin-bottom: 14px;
+  box-shadow: 0 18px 38px rgba(15,23,42,0.18), inset 0 1px 0 rgba(255,255,255,0.22);
+}
+.home-hero::before {
+  content: ''; position: absolute; width: 210px; height: 210px; right: -62px; top: -112px;
+  border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,0.28), transparent 66%);
+}
+.home-hero::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background-image: linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+  background-size: 26px 26px; -webkit-mask-image: linear-gradient(to bottom, #000, transparent 85%); mask-image: linear-gradient(to bottom, #000, transparent 85%);
+}
+.home-hero > * { position: relative; z-index: 1; }
+.hero-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+.hero-hello { font-size: 12px; opacity: 0.82; letter-spacing: 0.4px; }
+.hero-title { font-size: 20px; font-weight: 800; margin-top: 4px; line-height: 1.35; }
+.hero-badge { font-size: 11px; font-weight: 700; padding: 6px 11px; border-radius: 99px; background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.32); white-space: nowrap; }
+.hero-badge.warn { background: rgba(251,191,36,0.22); border-color: rgba(251,191,36,0.5); color: #fde68a; }
+.hero-sub { font-size: 12px; line-height: 1.7; opacity: 0.88; margin-top: 10px; }
+.hero-actions { display: flex; gap: 10px; margin-top: 18px; }
+.hero-actions .hero-main {
+  flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 12px 14px; border: none; border-radius: 13px; font-size: 14px; font-weight: 800;
+  color: var(--accent-dark); background: linear-gradient(135deg, #fff, var(--accent-soft));
+  box-shadow: 0 8px 18px rgba(0,0,0,0.18), inset 0 1px 0 #fff; cursor: pointer; font-family: inherit;
+}
+body.theme-economist .hero-actions .hero-main { color: #0f766e; }
+.hero-actions .hero-main::before { content: ''; width: 17px; height: 17px; background-color: currentColor; -webkit-mask: var(--ic-play) center/contain no-repeat; mask: var(--ic-play) center/contain no-repeat; }
+.hero-actions .hero-alt {
+  display: flex; align-items: center; justify-content: center; gap: 6px; padding: 12px 14px;
+  border-radius: 13px; border: 1px solid rgba(255,255,255,0.42); background: rgba(255,255,255,0.14);
+  color: #fff; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit;
+}
+.hero-actions .hero-alt::before { content: ''; width: 16px; height: 16px; background-color: currentColor; -webkit-mask: var(--ic-trophy) center/contain no-repeat; mask: var(--ic-trophy) center/contain no-repeat; }
+.hero-actions button:active { transform: scale(0.97); }
+
+/* 数据总览：环形正确率 + 指标 */
+.home-overview { display: flex; align-items: center; gap: 14px; }
+.progress-ring { width: 86px; height: 86px; flex: 0 0 86px; border-radius: 50%; display: grid; place-items: center; background: conic-gradient(var(--primary) calc(var(--ring-p, 0) * 1%), rgba(148,163,184,0.18) 0); box-shadow: 0 6px 18px rgba(15,23,42,0.08); }
+.progress-ring .ring-inner { width: 68px; height: 68px; border-radius: 50%; background: var(--card); display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: inset 0 1px 4px rgba(15,23,42,0.06); }
+.ring-num { font-size: 20px; font-weight: 800; line-height: 1.1; color: var(--text); font-variant-numeric: tabular-nums; }
+.ring-lbl { font-size: 10px; color: var(--text-secondary); margin-top: 2px; }
+.mini-stats { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; min-width: 0; }
+.mini-stat { background: rgba(255,255,255,0.9); border: 1px solid rgba(226,232,240,0.9); border-radius: 13px; padding: 9px 10px; }
+.mini-stat .ms-num { font-size: 17px; font-weight: 800; color: var(--text); font-variant-numeric: tabular-nums; }
+.mini-stat .ms-lbl { font-size: 10px; color: var(--text-secondary); margin-top: 1px; }
+
+/* 区块标题与快捷入口 */
+.section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin: 18px 4px 10px; }
+.section-head h3 { font-size: 15px; font-weight: 800; color: var(--text); }
+.section-head span { font-size: 11px; color: var(--text-secondary); }
+.quick-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.quick-tile { background: var(--card); border: 1px solid rgba(226,232,240,0.9); border-radius: 16px; padding: 13px 3px 11px; text-align: center; cursor: pointer; box-shadow: var(--shadow-modern); transition: transform 0.18s, box-shadow 0.18s; }
+.quick-tile:active { transform: scale(0.95); box-shadow: 0 2px 8px rgba(15,23,42,0.08); }
+.quick-icon { width: 38px; height: 38px; margin: 0 auto 8px; border-radius: 12px; display: grid; place-items: center; background: var(--grad-primary); box-shadow: 0 6px 14px rgba(37,99,235,0.22); }
+.quick-icon::before { content: ''; width: 21px; height: 21px; background-color: #fff; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-position: center; mask-position: center; -webkit-mask-size: contain; mask-size: contain; }
+.quick-tile[data-go="practice"] .quick-icon::before { -webkit-mask-image: var(--ic-book); mask-image: var(--ic-book); }
+.quick-tile[data-go="gd"] .quick-icon::before { -webkit-mask-image: var(--ic-layers); mask-image: var(--ic-layers); }
+.quick-tile[data-go="exam"] .quick-icon::before { -webkit-mask-image: var(--ic-trophy); mask-image: var(--ic-trophy); }
+.quick-tile[data-go="wrong"] .quick-icon::before { -webkit-mask-image: var(--ic-alert); mask-image: var(--ic-alert); }
+.quick-tile:nth-child(3) .quick-icon { background: linear-gradient(135deg, #d97706, #f59e0b); box-shadow: 0 6px 14px rgba(245,158,11,0.24); }
+.quick-tile:nth-child(4) .quick-icon { background: linear-gradient(135deg, #be123c, #f43f5e); box-shadow: 0 6px 14px rgba(244,63,94,0.22); }
+.quick-label { font-size: 11px; font-weight: 700; color: var(--text); white-space: nowrap; }
+.quick-sub { font-size: 10px; color: var(--text-secondary); margin-top: 2px; white-space: nowrap; }
+.insight-card { display: flex; align-items: flex-start; gap: 11px; padding: 14px 15px; border-radius: 15px; background: linear-gradient(135deg, var(--primary-light), rgba(255,255,255,0.92)); border: 1px solid rgba(226,232,240,0.9); }
+.insight-icon { flex: 0 0 30px; height: 30px; border-radius: 10px; display: grid; place-items: center; background: var(--grad-primary); }
+.insight-icon::before { content: ''; width: 17px; height: 17px; background-color: #fff; -webkit-mask: var(--ic-target) center/contain no-repeat; mask: var(--ic-target) center/contain no-repeat; }
+.insight-text { font-size: 12px; line-height: 1.7; color: var(--text-secondary); }
+.insight-text b { color: var(--text); }
+
+/* 答题页：选项徽章与反馈层级 */
+.opt-btn { position: relative; padding-right: 40px; min-height: 52px; }
+.opt-label { flex: 0 0 26px; width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1.5px solid var(--hairline); background: rgba(255,255,255,0.92); font-size: 12px; color: var(--text-secondary); }
+.opt-btn.selected .opt-label { background: var(--primary); border-color: var(--primary); color: #fff; }
+.opt-btn.correct .opt-label { background: var(--success); border-color: var(--success); color: #fff; }
+.opt-btn.wrong .opt-label { background: var(--danger); border-color: var(--danger); color: #fff; }
+.opt-btn.correct::after, .opt-btn.wrong::after { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); font-size: 15px; font-weight: 800; }
+.opt-btn.correct::after { content: '✓'; color: var(--success); }
+.opt-btn.wrong::after { content: '✕'; color: var(--danger); }
+.answer-box { background: rgba(248,250,252,0.92); border: 1px solid var(--hairline); padding: 14px; }
+.answer-box.show { animation: ansIn 0.24s ease-out; }
+@keyframes ansIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.ans-head { display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 800; padding-bottom: 10px; margin-bottom: 10px; border-bottom: 1px solid var(--hairline); }
+.ans-head::before { content: ''; width: 18px; height: 18px; background-color: currentColor; }
+.ans-head.ok { color: var(--success); }
+.ans-head.no { color: var(--danger); }
+.ans-head.ok::before { -webkit-mask: var(--ic-check) center/contain no-repeat; mask: var(--ic-check) center/contain no-repeat; }
+.ans-head.no::before { -webkit-mask: var(--ic-alert) center/contain no-repeat; mask: var(--ic-alert) center/contain no-repeat; }
+.ans-head.neutral { color: var(--primary); }
+.ans-head.neutral::before { -webkit-mask: var(--ic-book) center/contain no-repeat; mask: var(--ic-book) center/contain no-repeat; }
+.ans-kv { font-size: 13px; line-height: 1.8; color: var(--text-secondary); }
+.ans-kv b { color: var(--text); font-size: 15px; }
+.ans-explain { background: rgba(255,255,255,0.92); border-left: 3px solid var(--primary); border-radius: 0 10px 10px 0; padding: 10px 12px; margin-top: 10px; font-size: 13px; color: var(--text-secondary); line-height: 1.75; }
+
+/* 统计页：主控指标环 */
+.stats-hero { display: flex; align-items: center; gap: 16px; }
+.stats-hero .progress-ring { width: 96px; height: 96px; flex-basis: 96px; }
+.stats-hero .ring-inner { width: 76px; height: 76px; }
+.stats-hero .ring-num { font-size: 24px; }
+.stats-copy { flex: 1; min-width: 0; }
+.stats-copy .sc-title { font-size: 15px; font-weight: 800; }
+.stats-copy .sc-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.7; margin-top: 6px; }
+.stats-copy .sc-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px; }
+.sc-chip { font-size: 11px; font-weight: 600; padding: 4px 9px; border-radius: 99px; background: var(--primary-light); color: var(--primary); }
+.accuracy-bar .ab-track { height: 9px; background: rgba(148,163,184,0.18); }
+.accuracy-bar .ab-fill { box-shadow: 0 2px 6px rgba(37,99,235,0.22); }
+
+/* 章节卡片 */
+.chapter-card { padding: 14px 16px; border: 1px solid rgba(226,232,240,0.95); border-radius: 15px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 10px; transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s; background: rgba(255,255,255,0.88); box-shadow: var(--shadow); }
+.chapter-card:active { transform: scale(0.985); }
+.chapter-card .cc-name { font-weight: 700; font-size: 15px; }
+.chapter-card .cc-sub { font-size: 11px; color: var(--text-secondary); margin-top: 4px; }
+.chapter-card .cc-count { font-size: 17px; font-weight: 800; white-space: nowrap; }
+.chapter-card .cc-arrow { font-size: 13px; color: var(--text-secondary); margin-left: 5px; }
+
 /* ===== Responsive ===== */
 @media (max-width: 380px) {
   .q-text { font-size: 15px; }
@@ -1156,6 +1285,11 @@ body.theme-economist .progress-fill { background: linear-gradient(90deg, #0d9488
   </div>
   <div class="version-panel-body" id="versionPanelBody" data-page-node-id="ip8iR3IaL6LwFUYsDyRcmV">
     <div class="version-item">
+      <span class="version-tag" style="background:#2563eb">V34</span>
+      <div class="version-date">2026-11-25</div>
+      <div class="version-desc">🏠 新增学习首页：问候卡片、正确率环、累计数据、快捷入口与学习建议，数字均按实际数据动态生成<br>🎯 答题反馈升级：选项改为圆形字母徽章，正误状态图标与解析分层展示，核对结果更直观<br>📊 统计页改为环形正确率总览；章节列表卡片化；管理员返回前台默认进入学习首页<br>📱 手机与电脑双端适配，底部导航扩展为首页/练习/模考/错题/收藏/统计/章节七项</div>
+    </div>
+    <div class="version-item">
       <span class="version-tag" style="background:#0d9488">V33</span>
       <div class="version-date">2026-11-25</div>
       <div class="version-desc">✨ 视觉体系升级：保留蓝色/青绿原色调，加入低饱和光晕、玻璃高光、细腻网格与层次阴影，界面更有科技感但不刺眼<br>🔣 图标统一改为线性风格：消息、设置、版本切换、底部导航、考试切换、收藏、计时等，风格一致更现代<br>🎛 分段控件、筛选标签、按钮、进度条、输入框重新打磨，桌面与手机端均保持清晰顺畅</div>
@@ -1346,8 +1480,11 @@ body.theme-economist .progress-fill { background: linear-gradient(90deg, #0d9488
 </div>
 
 <div class="tab-bar" id="tabBar" data-page-node-id="s9vJqNKpTvl8biE2M2ED5d">
-  <button class="tab-item active" data-tab="practice" data-page-node-id="Gfi4YKysHKozKjhDrjAFVu">
-    <span class="tab-icon" data-page-node-id="AveYO2HRafPGHO7h1H6QN8">📝</span><span data-page-node-id="OYikA500tLVAmXqlk7hAlw">练习</span>
+  <button class="tab-item active" data-tab="home" data-page-node-id="Gfi4YKysHKozKjhDrjAFVu">
+    <span class="tab-icon" data-page-node-id="AveYO2HRafPGHO7h1H6QN8">🏠</span><span data-page-node-id="OYikA500tLVAmXqlk7hAlw">首页</span>
+  </button>
+  <button class="tab-item" data-tab="practice" data-page-node-id="Gfi4YKysHKozKjhDrjAFVu2">
+    <span class="tab-icon" data-page-node-id="AveYO2HRafPGHO7h1H6QN8b">📝</span><span data-page-node-id="OYikA500tLVAmXqlk7hAlw2">练习</span>
   </button>
   <button class="tab-item" data-tab="exam" data-page-node-id="AgnkTKTp2bGqhoFCIGufgd">
     <span class="tab-icon" data-page-node-id="xBUGwMkTp1cYi9Fxuv7peU">🏆</span><span data-page-node-id="XhNSwCjge14G48eI4wweU8">模考</span>
@@ -1363,7 +1500,7 @@ body.theme-economist .progress-fill { background: linear-gradient(90deg, #0d9488
     <span class="tab-icon" data-page-node-id="V57m5JZ8ai51qKEN7cFvFD">📊</span><span data-page-node-id="OsVgLYOZwcC8Y4c4OrLIY9">统计</span>
   </button>
   <button class="tab-item" data-tab="gd" data-page-node-id="s793tdM2lkucZKLFfbTWus">
-    <span class="tab-icon" data-page-node-id="3ellDp3Vcgu1wYSzfSFi9g">📚</span><span data-page-node-id="VDVqWiZD7zDobZUxzBox4m">章节练习</span>
+    <span class="tab-icon" data-page-node-id="3ellDp3Vcgu1wYSzfSFi9g">📚</span><span data-page-node-id="VDVqWiZD7zDobZUxzBox4m">章节</span>
   </button>
 </div>
 
@@ -3866,7 +4003,7 @@ async function renderAdminDashboard() {
     html += '</div></div>';
   }
 
-  html += '<button class="btn btn-ghost btn-sm-block" id="btnAdminBackToPractice">📝 切换到练习模式</button>';
+  html += '<button class="btn btn-ghost btn-sm-block" id="btnAdminBackToPractice">🏠 返回学习首页</button>';
   html += '<button class="btn btn-danger btn-sm-block" id="btnAdminLogout" style="margin-top:6px">🚪 退出管理后台</button>';
   html += '</div></div>';
 
@@ -3962,7 +4099,7 @@ async function renderAdminDashboard() {
     stopAdminPolling();
     document.getElementById('tabBar').classList.remove('hidden');
     document.getElementById('siteFooter').classList.remove('hidden');
-    switchTab('practice');
+    switchTab('home');
   });
   document.getElementById('btnAdminLogout').addEventListener('click', function() {
     stopAdminPolling();
@@ -4041,7 +4178,7 @@ async function renderAdminDashboard() {
 
 // ===== APP STATE =====
 let DB = {};
-let tab = 'practice';
+let tab = 'home';
 let qType = 'single';
 let currentIdx = 0;
 let shuffledList = [];
@@ -4141,6 +4278,80 @@ function getWrongCount() { return Object.keys(DB.wrongBook).length; }
 function getFavCount() { return Object.keys(DB.favorites).length; }
 
 // ===== RENDER =====
+// ===== V34 学习首页：数据全部由实际状态动态生成 =====
+function renderHome() {
+  ['chipRow', 'modeToggle', 'topActions', 'trialBanner', 'timerBar'].forEach(function(id) {
+    const el = document.getElementById(id);
+    if (el) el.classList.add('hidden');
+  });
+  const area = document.getElementById('contentArea');
+  if (!area) return;
+  const s = DB.stats || { totalAnswered: 0, totalCorrect: 0, examHistory: [] };
+  const answered = s.totalAnswered || 0;
+  const correct = s.totalCorrect || 0;
+  const acc = answered > 0 ? Math.round(correct / answered * 100) : 0;
+  const wrong = getWrongCount();
+  const fav = getFavCount();
+  const exams = (s.examHistory || []).length;
+  const hour = new Date().getHours();
+  const greet = hour < 6 ? '夜深了' : hour < 11 ? '早上好' : hour < 14 ? '中午好' : hour < 18 ? '下午好' : '晚上好';
+  const name = currentUser && currentUser.userName ? currentUser.userName : '同学';
+  const entry = EXAM_REGISTRY[currentExamId] || {};
+  const examName = entry.shortName || entry.title || (VERSION_LABELS[getVersion()] || '');
+  const isTrial = !!(currentUser && currentUser.role === 'trial');
+  const limit = getTrialTotalLimit(getVersion());
+  const left = Math.max(0, limit - trialTotalUsed());
+  const badge = isAdmin ? '管理员' : isTrial ? (left > 0 ? '试用剩余 ' + left + '/' + limit + ' 题' : '试用已用完') : '会员已开通';
+  const heroSub = isAdmin
+    ? '当前题库共 ' + ALL_QUESTIONS.length + ' 题，可跨版本查看全部考试'
+    : isTrial
+      ? (left > 0 ? '试用期累计可答 ' + limit + ' 题，还可答 ' + left + ' 题' : '试用额度已用完，激活后可解锁全部题目')
+      : '题库共 ' + ALL_QUESTIONS.length + ' 题，全部功能已解锁';
+
+  let html = '<div class="section" style="padding:12px 12px 0">';
+  html += '<div class="home-hero"><div class="hero-top"><div>';
+  html += '<div class="hero-hello">' + greet + '，' + escapeHtml(name) + '</div>';
+  html += '<div class="hero-title">' + escapeHtml(examName) + '</div></div>';
+  html += '<div class="hero-badge' + (isTrial && left <= 5 ? ' warn' : '') + '">' + badge + '</div></div>';
+  html += '<div class="hero-sub">' + heroSub + '</div>';
+  html += '<div class="hero-actions"><button class="hero-main" id="homeContinue">' + (answered === 0 ? '开始练习' : '继续练习') + '</button>';
+  html += '<button class="hero-alt" id="homeExam">开始模考</button></div></div>';
+
+  html += '<div class="card"><div class="home-overview">';
+  html += '<div class="progress-ring" style="--ring-p:' + acc + '"><div class="ring-inner"><div class="ring-num">' + acc + '%</div><div class="ring-lbl">正确率</div></div></div>';
+  html += '<div class="mini-stats">';
+  html += '<div class="mini-stat"><div class="ms-num">' + answered + '</div><div class="ms-lbl">累计答题</div></div>';
+  html += '<div class="mini-stat"><div class="ms-num">' + correct + '</div><div class="ms-lbl">答对题数</div></div>';
+  html += '<div class="mini-stat"><div class="ms-num">' + wrong + '</div><div class="ms-lbl">错题待复习</div></div>';
+  html += '<div class="mini-stat"><div class="ms-num">' + exams + '</div><div class="ms-lbl">模拟次数</div></div>';
+  html += '</div></div></div>';
+
+  html += '<div class="section-head"><h3>快捷入口</h3><span>常用功能一步直达</span></div>';
+  html += '<div class="quick-grid">';
+  const chapterCount = (GD_CHAPTERS || []).filter(function(c) { return c.total > 0; }).length;
+  html += '<div class="quick-tile" data-go="practice"><div class="quick-icon"></div><div class="quick-label">刷题练习</div><div class="quick-sub">' + escapeHtml(TYPE_LABELS[qType] || '按顺序') + '</div></div>';
+  html += '<div class="quick-tile" data-go="gd"><div class="quick-icon"></div><div class="quick-label">章节练习</div><div class="quick-sub">' + chapterCount + ' 个章节</div></div>';
+  html += '<div class="quick-tile" data-go="exam"><div class="quick-icon"></div><div class="quick-label">模拟考试</div><div class="quick-sub">限时组卷</div></div>';
+  html += '<div class="quick-tile" data-go="wrong"><div class="quick-icon"></div><div class="quick-label">错题本</div><div class="quick-sub">' + wrong + ' 题待复盘</div></div>';
+  html += '</div>';
+
+  let tip;
+  if (answered === 0) tip = '还没有答题记录，先从 <b>单选题</b> 开始，熟悉题型与作答节奏。';
+  else if (wrong > 0) tip = '当前有 <b>' + wrong + ' 道错题</b>，建议先到错题本复盘，再继续新题。';
+  else if (acc < 80) tip = '累计正确率 <b>' + acc + '%</b>，可按章节逐个巩固薄弱知识点。';
+  else tip = '累计正确率 <b>' + acc + '%</b>，保持节奏，可用模拟考检验学习成果。';
+  html += '<div class="insight-card"><div class="insight-icon"></div><div class="insight-text"><b>学习建议</b> · ' + tip + '</div></div>';
+  html += '</div>';
+  area.innerHTML = html;
+
+  const go = function(t) { return function() { switchTab(t); window.scrollTo(0, 0); }; };
+  document.getElementById('homeContinue')?.addEventListener('click', go('practice'));
+  document.getElementById('homeExam')?.addEventListener('click', go('exam'));
+  area.querySelectorAll('.quick-tile[data-go]').forEach(function(el) {
+    el.addEventListener('click', go(el.dataset.go));
+  });
+}
+
 function render() {
   try {
     updateTimerBar();
@@ -4148,7 +4359,8 @@ function render() {
     if (isAdmin && adminMode) { renderAdminDashboard(); return; }
     // Show tab bar for non-admin or admin in practice mode
     document.getElementById('tabBar').classList.remove('hidden');
-    if (tab === 'exam') renderExam();
+    if (tab === 'home') renderHome();
+    else if (tab === 'exam') renderExam();
     else if (tab === 'stats') renderStats();
     else renderPractice();
     updateTabBar();
@@ -4282,7 +4494,7 @@ function renderPractice() {
   document.getElementById('btnSubjSubmit')?.addEventListener('click', function() {
     const box = document.getElementById('answerBox');
     if (!box) return;
-    let out = '<div class="ans-title">参考答案</div>';
+    let out = '<div class="ans-head neutral">参考答案</div>';
     out += '<div class="ans-ref">' + escapeHtml(q.ans || '暂无参考答案').replace(/\n/g, '<br>') + '</div>';
     if (q.explain && String(q.explain).trim() && q.explain !== q.ans) {
       out += '<div class="ans-explain">📖 解析：' + escapeHtml(q.explain).replace(/\n/g, '<br>') + '</div>';
@@ -4296,7 +4508,7 @@ function renderPractice() {
   document.getElementById('btnCaseSubmit')?.addEventListener('click', function() {
     const box = document.getElementById('answerBox');
     if (!box) return;
-    let out = '<div class="ans-title">参考答案</div>';
+    let out = '<div class="ans-head neutral">参考答案</div>';
     (q.subQuestions || []).forEach((sq, si) => {
       out += '<div style="margin-top:10px"><b>' + (si + 1) + '. ' + escapeHtml(sq.q) + '</b></div>';
       out += '<div class="ans-ref">' + escapeHtml(sq.a || '暂无参考答案').replace(/\n/g, '<br>') + '</div>';
@@ -4585,12 +4797,16 @@ function renderStats() {
   document.getElementById('timerBar').classList.add('hidden');
   const s = DB.stats;
   const overallAcc = s.totalAnswered > 0 ? Math.round(s.totalCorrect / s.totalAnswered * 100) : 0;
-  let html = '<div class="card"><h3 style="font-size:16px;margin-bottom:14px">📊 学习统计</h3>';
-  html += '<div class="stats-grid">';
-  html += '<div class="stat-item"><div class="si-icon">📝</div><div class="si-num">' + s.totalAnswered + '</div><div class="si-lbl">总答题数</div></div>';
-  html += '<div class="stat-item"><div class="si-icon">✅</div><div class="si-num">' + overallAcc + '%</div><div class="si-lbl">总正确率</div></div>';
-  html += '<div class="stat-item"><div class="si-icon">❌</div><div class="si-num">' + getWrongCount() + '</div><div class="si-lbl">错题数</div></div>';
-  html += '<div class="stat-item"><div class="si-icon">🏆</div><div class="si-num">' + s.examHistory.length + '</div><div class="si-lbl">模拟次数</div></div></div></div>';
+  const accTip = s.totalAnswered === 0 ? '还没有答题记录，先去练习页完成第一题吧。'
+    : overallAcc >= 80 ? '整体表现稳定，可用模拟考检验真实水平。'
+    : overallAcc >= 60 ? '基础尚可，建议优先复盘错题再继续新题。'
+    : '正确率仍有提升空间，建议按章节逐项巩固。';
+  let html = '<div class="card"><div class="stats-hero">';
+  html += '<div class="progress-ring" style="--ring-p:' + overallAcc + '"><div class="ring-inner"><div class="ring-num">' + overallAcc + '%</div><div class="ring-lbl">正确率</div></div></div>';
+  html += '<div class="stats-copy"><div class="sc-title">学习总览</div>';
+  html += '<div class="sc-desc">累计答题 ' + s.totalAnswered + ' 道，答对 ' + s.totalCorrect + ' 道。' + accTip + '</div>';
+  html += '<div class="sc-chips"><span class="sc-chip">错题 ' + getWrongCount() + '</span><span class="sc-chip">收藏 ' + getFavCount() + '</span><span class="sc-chip">模考 ' + (s.examHistory || []).length + ' 次</span></div></div>';
+  html += '</div></div>';
   html += '<div class="card"><h3 style="font-size:16px;margin-bottom:14px">📈 题型正确率</h3>';
   for (const [type, label] of Object.entries(TYPE_LABELS)) {
     const total = getTypeCount(type);
@@ -4902,7 +5118,8 @@ function handlePracticeClick(opt) {
     });
     const box = card.querySelector('#answerBox');
     var explainHtml = q.explain ? '<div class="ans-explain">📖 ' + escapeHtml(q.explain) + '</div>' : '';
-    box.innerHTML = '<div class="ans-title">' + (correct ? '✓ 回答正确' : '✗ 回答错误') + '</div><div>正确答案：<b>' + q.ans + '</b></div>' + explainHtml;
+    box.innerHTML = '<div class="ans-head ' + (correct ? 'ok' : 'no') + '">' + (correct ? '回答正确' : '回答错误') + '</div>'
+      + '<div class="ans-kv">你的选择：<b>' + label + '</b>　正确答案：<b>' + q.ans + '</b></div>' + explainHtml;
     box.classList.add('show');
     DB.stats.totalAnswered++; if (correct) DB.stats.totalCorrect++;
     if (!correct) DB.wrongBook[q.id] = true; else if (DB.wrongBook[q.id]) delete DB.wrongBook[q.id];
@@ -4926,7 +5143,8 @@ function handlePracticeClick(opt) {
       const correct = selLabels === sortedAns;
       const eh = q.explain ? '<div class="ans-explain">📖 ' + escapeHtml(q.explain) + '</div>' : '';
       q.opts.forEach((_, oi) => { const l = String.fromCharCode(65 + oi); const b = card.querySelector('.opt-btn[data-opt="' + l + '"]'); if (!b) return; if (sortedAns.includes(l)) b.classList.add('correct'); else if (selLabels.includes(l)) b.classList.add('wrong'); });
-      box.innerHTML = '<div class="ans-title">' + (correct ? '✓ 回答正确' : '✗ 回答错误') + '</div><div>你的选择：<b>' + selLabels + '</b> | 正确答案：<b>' + q.ans + '</b></div>' + eh;
+      box.innerHTML = '<div class="ans-head ' + (correct ? 'ok' : 'no') + '">' + (correct ? '回答正确' : '回答错误') + '</div>'
+        + '<div class="ans-kv">你的选择：<b>' + selLabels + '</b>　正确答案：<b>' + q.ans + '</b></div>' + eh;
       box.dataset.verdict = '1';
       DB.stats.totalAnswered++; if (correct) DB.stats.totalCorrect++; else DB.wrongBook[q.id] = true;
       savePracticeIdx();
@@ -6175,16 +6393,19 @@ window.switchTab = function(tabName) {
     }
     const listEl = document.getElementById("gdChapterList");
     if (listEl) {
-      listEl.innerHTML = activeChapters.map(ch =>
-        '<div onclick="selectGDChapter(GD_CHAPTERS.find(c=>c.key===\'' + ch.key + '\'))" ' +
-        'style="padding:14px 16px;border:2px solid #e2e8f0;border-radius:12px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:all 0.2s"'+
-        'onmouseover="this.style.borderColor=\'' + ch.color + '\';this.style.background=\'#f8fafc\'" '+
-        'onmouseout="this.style.borderColor=\'#e2e8f0\';this.style.background=\'transparent\'">' +
-        '<div><div style="font-weight:600;font-size:15px">' + ch.name + '</div>' +
-        '<div style="font-size:12px;color:#64748b">单选' + (ch.singleCount||0) + ' 多选' + (ch.multiCount||0) + '</div></div>' +
-        '<div style="font-size:20px;font-weight:700;color:' + ch.color + '">' + (ch.total||0) + '题</div>' +
-        '</div>'
-      ).join("");
+      listEl.innerHTML = activeChapters.map(function(ch, i) {
+        return '<div class="chapter-card" data-key="' + escapeHtml(ch.key) + '">' +
+          '<div><div class="cc-name">' + (i + 1) + '. ' + escapeHtml(ch.name) + '</div>' +
+          '<div class="cc-sub">单选 ' + (ch.singleCount || 0) + ' · 多选 ' + (ch.multiCount || 0) + '</div></div>' +
+          '<div style="display:flex;align-items:center;color:' + (ch.color || '#2563eb') + '">' +
+          '<span class="cc-count">' + (ch.total || 0) + '题</span><span class="cc-arrow">›</span></div></div>';
+      }).join('');
+      listEl.querySelectorAll('.chapter-card').forEach(function(card) {
+        card.addEventListener('click', function() {
+          const ch = GD_CHAPTERS.find(function(c) { return c.key === card.dataset.key; });
+          if (ch) selectGDChapter(ch);
+        });
+      });
     }
     return;
   }
@@ -6209,7 +6430,7 @@ window.switchTab = function(tabName) {
 <div class="full-overlay hidden" id="gdChapterScreen" data-page-node-id="vOlUPEy6H7OMKxVZgTSzIw">
   <div class="overlay-card" style="max-width:440px;max-height:85vh;overflow-y:auto" data-page-node-id="efxAzYrFAPfUALR2zluIG5">
     <div style="text-align:left;display:flex;align-items:center;gap:12px;margin-bottom:16px" data-page-node-id="kPla1EYQFVi0X6H2JDxko2">
-      <button class="btn btn-ghost btn-sm" onclick="switchTab('practice')" style="font-size:20px;padding:4px 8px" data-page-node-id="7Ha8I2jCaDyUsGdEhZXsB6">&larr;</button>
+      <button class="btn btn-ghost btn-sm" onclick="switchTab('home')" style="font-size:20px;padding:4px 8px" data-page-node-id="7Ha8I2jCaDyUsGdEhZXsB6">&larr;</button>
       <div id="gdChapterMainTitle" style="font-weight:800;font-size:18px" data-page-node-id="xujov05ShYHJZuNdpYuAmt">📚 章节练习（第四版教材）</div>
     </div>
     <div id="gdChapterSubDesc" style="font-size:12px;color:#64748b;margin-bottom:16px" data-page-node-id="jpzfauHrONknOF73WAdzvy">企业人力资源管理师三级 · 章节练习</div>
