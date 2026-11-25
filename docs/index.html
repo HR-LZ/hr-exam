@@ -89,8 +89,8 @@ body {
 .welcome-qr .qr-img { width: 140px; height: 140px; border-radius: 10px; border: 2px solid #e2e8f0; }
 .welcome-admin { margin-top: 18px; font-size: 11px; color: #94a3b8; cursor: pointer; text-align: center; }
 .welcome-admin:hover { color: var(--text-secondary); }
-#switchVersionBtn { cursor: pointer; font-size: 12px; color: var(--text-secondary); }
-#switchVersionBtn:hover { color: var(--primary); }
+#switchVersionBtn { cursor: pointer; font-size: 12px; color: #fff; }
+#switchVersionBtn:hover { color: #fff; background: rgba(255,255,255,0.36); }
 
 /* ===== Form Inputs ===== */
 .form-group { margin-bottom: 16px; text-align: left; }
@@ -207,7 +207,7 @@ body {
 .header-sub::before { content: '✦'; opacity: 0.7; font-size: 10px; }
 .header-admin-inline { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 6px 8px; flex-shrink: 0; margin-top: 0; width: 100%; }
 .header-admin-inline .user-info { margin-right: auto; }
-.header-btn { white-space: nowrap; font-size: 11px; padding: 0 8px; width: auto; min-width: 32px; height: 32px; border-radius: 16px; gap: 3px; }
+.header-btn { white-space: nowrap; font-size: 12px; padding: 0 10px; width: auto; min-width: 34px; height: 34px; border-radius: 17px; gap: 4px; }
 .user-info { display: flex; align-items: center; gap: 8px; }
 .user-avatar {
   width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.2);
@@ -221,22 +221,23 @@ body {
 .expiry-badge.warn { background: #fef2f2; color: var(--danger); animation: pulse 1s ease-in-out infinite; }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.6} }
 .header-btn {
-  background: rgba(255,255,255,0.15); border: none; color: #fff;
-  min-width: 32px; width: auto; height: 32px; border-radius: 16px; font-size: 11px;
-  padding: 0 8px; white-space: nowrap; gap: 3px;
+  background: rgba(255,255,255,0.24); border: 1px solid rgba(255,255,255,0.42); color: #fff;
+  min-width: 34px; width: auto; height: 34px; border-radius: 17px; font-size: 12px; font-weight: 600;
+  padding: 0 10px; white-space: nowrap; gap: 4px;
   cursor: pointer; display: flex; align-items: center; justify-content: center;
-  transition: background 0.2s;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.28);
+  transition: background 0.2s, transform 0.15s;
 }
-.header-btn:active { background: rgba(255,255,255,0.3); }
+.header-btn:active { background: rgba(255,255,255,0.36); transform: scale(0.97); }
 
 /* Notification */
 .notif-btn {
-  position: relative; width: 32px; height: 32px; border-radius: 50%;
-  background: rgba(255,255,255,0.15); border: none; color: #fff;
-  font-size: 16px; cursor: pointer; display: flex; align-items: center;
-  justify-content: center; transition: background 0.2s; flex-shrink: 0;
+  position: relative; width: 34px; height: 34px; border-radius: 50%;
+  background: rgba(255,255,255,0.24); border: 1px solid rgba(255,255,255,0.42); color: #fff;
+  font-size: 17px; cursor: pointer; display: flex; align-items: center;
+  justify-content: center; transition: background 0.2s, transform 0.15s; flex-shrink: 0;
 }
-.notif-btn:active { background: rgba(255,255,255,0.3); }
+.notif-btn:active { background: rgba(255,255,255,0.36); transform: scale(0.97); }
 .notif-badge {
   position: absolute; top: -4px; right: -4px; min-width: 18px; height: 18px;
   background: #ef4444; color: #fff; font-size: 10px; font-weight: 700;
@@ -408,16 +409,18 @@ body {
   border-top: 1px dashed rgba(255,255,255,0.15);
 }
 
-.chip-row { display: flex; gap: 6px; flex-wrap: wrap; padding: 0 12px 12px; }
+.chip-row { display: flex; gap: 12px; row-gap: 10px; flex-wrap: wrap; padding: 0 14px 14px; }
 .chip {
-  padding: 8px 16px; border-radius: 20px; border: 1.5px solid var(--border);
-  background: var(--card); font-size: 13px; color: var(--text-secondary);
+  padding: 9px 18px; border-radius: 22px; border: 1.5px solid var(--border);
+  background: var(--card); font-size: 13px; line-height: 1.2; color: var(--text-secondary);
   cursor: pointer; font-family: inherit; transition: all 0.2s; white-space: nowrap;
   -webkit-tap-highlight-color: transparent; box-shadow: 0 1px 2px rgba(0,0,0,0.04);
 }
 .chip:hover { border-color: #bfdbfe; background: #f8fafc; }
 .chip.active { background: var(--grad-primary); color: #fff; border-color: transparent; font-weight: 600; box-shadow: 0 3px 10px rgba(13,148,136,0.28); }
-.chip .count { font-size: 11px; opacity: 0.8; margin-left: 3px; font-weight: 500; }
+.chip .count { font-size: 11px; opacity: 0.9; margin-left: 6px; font-weight: 600; padding: 1px 6px; border-radius: 8px; }
+.chip:not(.active) .count { background: rgba(148,163,184,0.16); }
+.chip.active .count { background: rgba(255,255,255,0.2); }
 
 /* ===== Progress Bar ===== */
 .progress-bar { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; margin-bottom: 16px; }
@@ -601,6 +604,10 @@ body {
 @media (max-width: 380px) {
   .q-text { font-size: 15px; }
   .opt-btn { font-size: 14px; padding: 12px 14px; }
+  .chip-row { gap: 8px; row-gap: 8px; padding: 0 10px 12px; }
+  .chip { padding: 8px 14px; }
+  .header-admin-inline { gap: 6px; }
+  .header-btn { font-size: 11px; padding: 0 8px; }
 }
 /* ===== Scan Pay QR ===== */
 .qr-area { margin: 16px 0; display: flex; justify-content: center; }
@@ -704,7 +711,7 @@ body {
       <div style="font-size:11px;color:#94a3b8;margin-bottom:8px" data-page-node-id="NsfxfbKAFeyfZ8wYH5hyu2">📱 微信扫码打开</div>
       <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAAAEsAQMAAABDsxw2AAAABlBMVEX///8AAABVwtN+AAAACXBIWXMAAA7EAAAOxAGVKw4bAAACNklEQVRoge2aPZKDMAyFxVBQ5ggchaOFo3EUjkBJwUTrpx9DstmZILKdVGQ99pctJI38JIfoM7uzGtEw152F2gcxT70dzolFsQlHDZfT+cYbkewqP/WLLhKLY8XVW4MoMK9E5vxNzvulQ4ASu44hCqu6v+e1JHli38R000rH6kme2FXMawgqRlt2R2y0zH+UmsROYX4Dis+35nnx+6JM7BT2ZEhyFBPqNklyem+JfYxJFIrPYer8Yjct0cMsC6R9YkFsIr347lW2gddwQHI0bPI4sQi2R0HlsXzRF5L2L8FK7ARWVPHSadPhPrcSXRYIkKZ9YjEM19wqumJweTzUbC9x4QclFsdgmskIB0NpsMVlJNVvLjASO49JoUBKj3A+VLFYq7MgiYvdgInFMB34jNbc7bmt3YfXkMRCGB+cr/qt1pD9PyQWxGSe1loNwSGr+Y7Mh+fEwhhSGjcg9Vxlmw+KD/otsRBWWjlVEVKQG95N42IyL7EYNsDVqivY7rteclusqzUksQjmvTN6DeWplg628nJosRM7jT3Ltr2n06M6+UksiPlbRh34+OsGBEaVeYkFsfqE0R2fPm0gjy/OiQWxanA+/uLis9IxWVVJLIypq1kflO2ZHlYnbN6kJBbCJt3E522fW2rvrFFI7ArW+88hrHQI35qi035kTuwL2KI+H2qJnt9GIbEIhmy3caULuZ6PjxqJRTB8+q8gWJuOxScSt8QuYqz2ot9M0TEfH0YT+y/sM/sBD9AnsPpbJtoAAAAASUVORK5CYII=" alt="扫码访问" style="width:140px;height:140px;border-radius:10px;border:2px solid #e2e8f0" onerror="this.parentElement.style.display='none'" data-page-node-id="kwiyDZtKKVkGaUfuxOuU2r">
     </div>
-    <div class="welcome-admin" id="linkToAdmin" data-page-node-id="3PEmLmDkbZdOTGwcbLJoG7">⚙ 管理员入口（通用）</div>
+    <div class="welcome-admin" id="linkToAdmin" data-page-node-id="3PEmLmDkbZdOTGwcbLJoG7">⚙️ 管理员入口（通用）</div>
   </div>
 </div>
 
@@ -933,6 +940,11 @@ body {
   </div>
   <div class="version-panel-body" id="versionPanelBody" data-page-node-id="ip8iR3IaL6LwFUYsDyRcmV">
     <div class="version-item">
+      <span class="version-tag" style="background:#0d9488">V32</span>
+      <div class="version-date">2026-11-25</div>
+      <div class="version-desc">🎯 主要按钮图标改为更贴合含义：消息用对话气泡、设置用齿轮、切换版本用双向箭头、错题用叉号<br>🔍 顶栏按钮提高对比度与点击区域，题型标签加大间距，避免文字看不清或过于紧凑<br>📝 普通练习隐藏「1/350」题数提示，章节练习与模拟考仍保留题数提醒<br>📱 同步适配电脑与手机布局，长文字可换行、按钮不挤压<br>🔁 修复切换版本后管理员仍停留在旧版本题库的问题，进入时按新版本默认考试加载</div>
+    </div>
+    <div class="version-item">
       <span class="version-tag" style="background:#0d9488">V31</span>
       <div class="version-date">2026-11-25</div>
       <div class="version-desc">📚 企业HR三级：「广东题库」更名为「章节练习（第四版教材）」，题库内容不变；中级经济师名称不变<br>🎁 非会员试用改为整体累计限额：企业HR三级累计44题、中级经济师累计40题；试用账号可进入章节练习<br>🔒 累计答满即禁止继续练习并弹窗提醒扫码购买，横幅/设置/注册/弹窗描述同步更新</div>
@@ -1054,10 +1066,10 @@ body {
               </div>
             </div>
             <div class="notif-btn" id="notifBtn" style="display:none" title="消息通知" data-page-node-id="2nILcSyCXLiPhHCNWbe6XC">
-              🔔<span class="notif-badge hidden" id="notifBadge" data-page-node-id="73Df9Ucd0fKPGqLF363RtS">0</span>
+              💬<span class="notif-badge hidden" id="notifBadge" data-page-node-id="73Df9Ucd0fKPGqLF363RtS">0</span>
             </div>
-            <button class="header-btn" id="headerAdminBtn" title="设置" data-page-node-id="8HX8mnNzorodHCddLUXDiM">⚙ <span data-page-node-id="OUNkpaoQaVnAhldC4F6MF4">设置</span></button>
-            <button class="header-btn" id="switchVersionBtn" title="切换版本">🔄 <span>切换版本</span></button>
+            <button class="header-btn" id="headerAdminBtn" title="设置" data-page-node-id="8HX8mnNzorodHCddLUXDiM">⚙️ <span data-page-node-id="OUNkpaoQaVnAhldC4F6MF4">设置</span></button>
+            <button class="header-btn" id="switchVersionBtn" title="切换版本">⇄ <span>切换版本</span></button>
           </div>
         </div>
         <div class="exam-switch" id="examSwitch" data-page-node-id="STpdQZYMjpNIMXHtWEQ1JB">
@@ -1120,7 +1132,7 @@ body {
     <span class="tab-icon" data-page-node-id="xBUGwMkTp1cYi9Fxuv7peU">🏆</span><span data-page-node-id="XhNSwCjge14G48eI4wweU8">模考</span>
   </button>
   <button class="tab-item" data-tab="wrong" data-page-node-id="R63ufn5cI1PXNjtF2Xyprz">
-    <span class="tab-icon" data-page-node-id="y8U7I21T3bf6rlG5o0zAqU">📌</span>
+    <span class="tab-icon" data-page-node-id="y8U7I21T3bf6rlG5o0zAqU">❌</span>
     <span style="position:relative" data-page-node-id="nykdxQYyjFFpMV0gsuh9n7">错题<span class="tab-badge hidden" id="wrongBadge" data-page-node-id="78z4ArLjEcKzqA4nnyv9qj">0</span></span>
   </button>
   <button class="tab-item" data-tab="fav" data-page-node-id="RNqvQl5W9KnCYMd5D1VOlc">
@@ -2465,7 +2477,10 @@ function showScreen(screenId) {
 // ===== 版本选择（欢迎页）=====
 function selectVersion(v) {
   if (v !== 'hrm3' && v !== 'economist') return;
+  const changed = currentVersion !== v;
   currentVersion = v;
+  // 切换版本后清掉上一次的考试记录，进入时按新版本默认考试加载，避免串到旧版本题库
+  if (changed) { try { localStorage.removeItem(LAST_EXAM_KEY); } catch(e) {} }
   try { localStorage.setItem(VERSION_KEY, v); } catch(e) {}
   applyVersionTheme(v);
   document.querySelectorAll('#versionCards .version-card').forEach(function(c) {
@@ -2484,7 +2499,7 @@ function renderWelcomeActions() {
   const adminU = currentUser && isAdmin;
   const loggedV = currentUser && !isAdmin && currentUser.version === v;
   if (adminU) {
-    quick.innerHTML = '<button class="btn btn-warning btn-block" id="welcomeEnterAdmin">⚙ 进入管理后台</button>';
+    quick.innerHTML = '<button class="btn btn-warning btn-block" id="welcomeEnterAdmin">⚙️ 进入管理后台</button>';
     document.getElementById('welcomeEnterAdmin').onclick = function() { enterApp(); };
     forms.style.display = 'none';
   } else if (loggedV) {
@@ -3189,18 +3204,24 @@ async function enterApp() {
   try {
     const le = localStorage.getItem(LAST_EXAM_KEY);
     const defaultExam = VERSION_DEFAULT_EXAM[getVersion()] || 'hrm3';
+    const leValid = !!(le && EXAM_REGISTRY[le] && EXAM_GROUP_MAP[le] === ownGroup);
     if (forceOwn) {
       // 非管理员：只能待在本版本，记录缺失/越界都回落到本版本默认考试
-      if (!le || !EXAM_REGISTRY[le] || EXAM_GROUP_MAP[le] !== ownGroup || le !== currentExamId) {
+      if (!leValid || le !== currentExamId) {
         currentExamId = defaultExam;
         applyExam(currentExamId);
         localStorage.setItem(LAST_EXAM_KEY, currentExamId);
       } else {
         updateExamSwitchUI(currentExamId);
       }
-    } else if (le && EXAM_REGISTRY[le] && le !== currentExamId) {
+    } else if (leValid && le !== currentExamId) {
       currentExamId = le;
       applyExam(le);
+    } else if (!leValid) {
+      // 管理员切换版本后也不应停留在旧版本题库，按新版本默认考试加载
+      currentExamId = defaultExam;
+      applyExam(currentExamId);
+      localStorage.setItem(LAST_EXAM_KEY, currentExamId);
     } else {
       applyExam(currentExamId);
     }
@@ -3277,11 +3298,11 @@ function updateHeaderInfo() {
     badge.textContent = '管理员';
     badge.className = 'expiry-badge';
     if (!adminMode) {
-      adminBtn.innerHTML = '⚡';
+      adminBtn.innerHTML = '⚙️';
       adminBtn.title = '返回管理后台';
-      adminBtn.style.color = '#7c3aed';
+      adminBtn.style.color = '';
     } else {
-      adminBtn.innerHTML = '⚙ <span>管理</span>';
+      adminBtn.innerHTML = '⚙️ <span>管理</span>';
       adminBtn.title = '管理';
       adminBtn.style.color = '';
     }
@@ -3289,7 +3310,7 @@ function updateHeaderInfo() {
     badge.textContent = '试用';
     badge.className = 'expiry-badge';
     badge.style.background = '#fef3c7'; badge.style.color = '#92400e';
-    adminBtn.innerHTML = '⚙ <span>设置</span>';
+    adminBtn.innerHTML = '⚙️ <span>设置</span>';
     adminBtn.title = '设置';
     adminBtn.style.color = '';
   } else {
@@ -3298,7 +3319,7 @@ function updateHeaderInfo() {
     badge.style.background = 'rgba(255,255,255,0.2)'; badge.style.color = '#fff';
     if (days <= 30) badge.className = 'expiry-badge warn';
     else badge.className = 'expiry-badge';
-    adminBtn.innerHTML = '⚙ <span>设置</span>';
+    adminBtn.innerHTML = '⚙️ <span>设置</span>';
     adminBtn.title = '设置';
     adminBtn.style.color = '';
   }
@@ -3964,7 +3985,7 @@ function renderPractice() {
   const q = (actualIdx < total) ? list2[actualIdx] : null;
 
   if (!q || total === 0) {
-    const msgs = { wrong: { icon:'📌',title:'错题本为空',desc:'继续练习，答错的题目会自动进入错题本'}, fav: { icon:'⭐',title:'暂无收藏',desc:'点击题目旁的⭐星标即可收藏题目'}, practice: { icon:'📝',title:'开始练习',desc:'选择上方题型开始刷题'} };
+    const msgs = { wrong: { icon:'❌',title:'错题本为空',desc:'继续练习，答错的题目会自动进入错题本'}, fav: { icon:'⭐',title:'暂无收藏',desc:'点击题目旁的⭐星标即可收藏题目'}, practice: { icon:'📝',title:'开始练习',desc:'选择上方题型开始刷题'} };
     const msg = msgs[tab] || msgs['practice'];
     area.innerHTML = '<div class="card empty-state" style="margin:12px;text-align:center;padding:56px 24px"><div class="icon" style="font-size:52px;margin-bottom:14px">'+msg.icon+'</div><div class="title" style="font-size:17px;font-weight:700;color:var(--text);margin-bottom:8px">'+msg.title+'</div><div class="desc" style="font-size:14px;color:var(--text-secondary);line-height:1.7">'+msg.desc+'</div></div>';
     return;
@@ -3980,7 +4001,8 @@ function renderPractice() {
   const progress = total > 0 ? Math.round((idx + 1) / total * 100) : 0;
   let html = '<div class="card">';
   html += '<div class="q-meta"><span class="q-tag ' + TYPE_TAG_CLASS[q.type] + '">' + TYPE_LABELS[q.type] + '</span>';
-  html += '<span style="display:flex;align-items:center;gap:10px"><span>' + (idx + 1) + '/' + total + '</span>';
+  // 普通练习不显示「第几题/共几题」，题数提醒仅保留在章节练习与模拟考
+  html += '<span style="display:flex;align-items:center;gap:10px">';
   html += '<span class="fav-star' + (isFav ? ' active' : '') + '" data-qid="' + q.id + '">★</span></span></div>';
   html += '<div class="progress-bar"><div class="progress-fill" style="width:' + progress + '%"></div></div>';
   const isMulti = (q.type === 'multi');
@@ -4346,7 +4368,7 @@ function renderStats() {
   html += '<div class="stats-grid">';
   html += '<div class="stat-item"><div class="si-icon">📝</div><div class="si-num">' + s.totalAnswered + '</div><div class="si-lbl">总答题数</div></div>';
   html += '<div class="stat-item"><div class="si-icon">✅</div><div class="si-num">' + overallAcc + '%</div><div class="si-lbl">总正确率</div></div>';
-  html += '<div class="stat-item"><div class="si-icon">📌</div><div class="si-num">' + getWrongCount() + '</div><div class="si-lbl">错题数</div></div>';
+  html += '<div class="stat-item"><div class="si-icon">❌</div><div class="si-num">' + getWrongCount() + '</div><div class="si-lbl">错题数</div></div>';
   html += '<div class="stat-item"><div class="si-icon">🏆</div><div class="si-num">' + s.examHistory.length + '</div><div class="si-lbl">模拟次数</div></div></div></div>';
   html += '<div class="card"><h3 style="font-size:16px;margin-bottom:14px">📈 题型正确率</h3>';
   for (const [type, label] of Object.entries(TYPE_LABELS)) {
