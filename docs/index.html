@@ -600,6 +600,222 @@ body {
   margin-bottom: 8px; border: 1px solid #fed7aa; font-size: 13px;
 }
 
+/* ===== V33 现代视觉系统：保留原色调，增强层次、玻璃质感与线性图标 ===== */
+:root {
+  --ic-chat: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21 11.5a8.4 8.4 0 0 1-9 8.4 9.6 9.6 0 0 1-3.6-.7L3 21l1.8-4.6A8.3 8.3 0 0 1 3.5 11.5 8.4 8.4 0 0 1 12 3a8.4 8.4 0 0 1 9 8.5Z'/%3E%3C/svg%3E");
+  --ic-gear: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3Cpath d='M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z'/%3E%3C/svg%3E");
+  --ic-switch: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 7h13m0 0-3-3m3 3-3 3M17 17H4m0 0 3 3m-3-3 3-3'/%3E%3C/svg%3E");
+  --ic-book: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 5a2 2 0 0 1 2-2h13v18H6a2 2 0 0 1-2-2V5Z M8 7h7M8 11h5'/%3E%3C/svg%3E");
+  --ic-trophy: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4Z M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3'/%3E%3C/svg%3E");
+  --ic-alert: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3 2.5 20h19L12 3Z M12 9v5M12 17.5v.01'/%3E%3C/svg%3E");
+  --ic-star: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m12 3 2.9 5.9 6.5.9-4.7 4.6 1.1 6.5-5.8-3.1-5.8 3.1 1.1-6.5L2.6 9.8l6.5-.9L12 3Z'/%3E%3C/svg%3E");
+  --ic-chart: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 20V10M10 20V4M16 20v-7M22 20H2'/%3E%3C/svg%3E");
+  --ic-layers: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m12 3 9 5-9 5-9-5 9-5Z M3 12l9 5 9-5M3 16l9 5 9-5'/%3E%3C/svg%3E");
+  --ic-building: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16M16 10h2a2 2 0 0 1 2 2v9M8 7h4M8 11h4M8 15h4M2 21h20'/%3E%3C/svg%3E");
+  --ic-trend: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 17l6-6 4 4 8-8M15 7h6v6'/%3E%3C/svg%3E");
+  --ic-user: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z'/%3E%3C/svg%3E");
+  --ic-clock: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z M12 7v5l3 2'/%3E%3C/svg%3E");
+  --ic-history: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5M12 7v5l4 2'/%3E%3C/svg%3E");
+  --hairline: rgba(148,163,184,0.24);
+  --shadow-modern: 0 18px 40px rgba(15,23,42,0.075), 0 2px 8px rgba(15,23,42,0.045);
+  --radius-lg: 20px;
+}
+
+/* 主体背景：低饱和光晕，保留清爽底色但不再“素” */
+body {
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(900px 420px at 8% -8%, rgba(37,99,235,0.13), transparent 62%),
+    radial-gradient(760px 400px at 96% 2%, rgba(13,148,136,0.09), transparent 58%),
+    radial-gradient(680px 360px at 52% 108%, rgba(37,99,235,0.07), transparent 62%);
+  background-attachment: fixed;
+}
+body.theme-economist {
+  background-image:
+    radial-gradient(900px 420px at 8% -8%, rgba(13,148,136,0.16), transparent 62%),
+    radial-gradient(760px 400px at 96% 2%, rgba(45,212,191,0.10), transparent 58%),
+    radial-gradient(680px 360px at 52% 108%, rgba(15,118,110,0.09), transparent 62%);
+}
+.app { position: relative; }
+
+/* 顶栏：玻璃高光 + 细腻网格 + 柔和辉光 */
+.header {
+  overflow: hidden;
+  border-bottom: 1px solid rgba(255,255,255,0.2);
+  box-shadow: 0 18px 40px rgba(15,23,42,0.16), inset 0 1px 0 rgba(255,255,255,0.18);
+}
+.header::before {
+  content: ''; position: absolute; width: 240px; height: 240px; right: -70px; top: -150px;
+  border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,0.22), transparent 66%);
+  pointer-events: none;
+}
+.header::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background-image: linear-gradient(rgba(255,255,255,0.045) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(255,255,255,0.045) 1px, transparent 1px);
+  background-size: 28px 28px;
+  -webkit-mask-image: linear-gradient(to bottom, #000, transparent 82%);
+  mask-image: linear-gradient(to bottom, #000, transparent 82%);
+}
+.header > * { position: relative; z-index: 1; }
+.header-title { letter-spacing: 0.6px; }
+.header-sub::before {
+  content: ''; width: 6px; height: 6px; border-radius: 50%;
+  background: #93c5fd; box-shadow: 0 0 10px rgba(147,197,253,0.9);
+}
+body.theme-economist .header-sub::before { background: #5eead4; box-shadow: 0 0 10px rgba(94,234,212,0.9); }
+.header-btn, .notif-btn {
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.28), 0 4px 12px rgba(0,0,0,0.12);
+}
+.header-btn:hover, .notif-btn:hover { background: rgba(255,255,255,0.34); }
+#headerAdminBtn, #switchVersionBtn, #notifBtn { font-size: 0; }
+#headerAdminBtn span, #switchVersionBtn span { font-size: 12px; }
+#notifBtn .notif-badge { font-size: 10px; }
+#headerAdminBtn::before, #switchVersionBtn::before, #notifBtn::before {
+  content: ''; display: inline-block; width: 17px; height: 17px; flex: 0 0 17px;
+  background-color: currentColor; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  -webkit-mask-position: center; mask-position: center; -webkit-mask-size: contain; mask-size: contain;
+}
+#headerAdminBtn::before { -webkit-mask-image: var(--ic-gear); mask-image: var(--ic-gear); }
+#switchVersionBtn::before { -webkit-mask-image: var(--ic-switch); mask-image: var(--ic-switch); }
+#notifBtn::before { -webkit-mask-image: var(--ic-chat); mask-image: var(--ic-chat); }
+.user-avatar { font-size: 0; }
+.user-avatar::before {
+  content: ''; display: block; width: 17px; height: 17px; margin: 0 auto;
+  background-color: #fff; -webkit-mask: var(--ic-user) center/contain no-repeat; mask: var(--ic-user) center/contain no-repeat;
+}
+
+/* 卡片：更细腻的层次与内高光 */
+.card {
+  border-radius: var(--radius-lg);
+  background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(248,250,252,0.96));
+  border: 1px solid rgba(226,232,240,0.85);
+  box-shadow: var(--shadow-modern), inset 0 1px 0 rgba(255,255,255,0.92);
+}
+body.theme-economist .card { background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(247,253,252,0.96)); }
+.card:hover { transform: translateY(-1px); }
+
+/* 底部导航：悬浮玻璃 + 主色激活态 */
+.tab-bar {
+  border-radius: 20px 20px 0 0;
+  background: rgba(255,255,255,0.92);
+  border-top: 1px solid rgba(255,255,255,0.9);
+  box-shadow: 0 -10px 34px rgba(15,23,42,0.10);
+}
+.tab-item { border-radius: 14px; }
+.tab-item.active {
+  background: var(--grad-primary); color: #fff;
+  box-shadow: 0 6px 16px rgba(37,99,235,0.26), inset 0 1px 0 rgba(255,255,255,0.28);
+}
+body.theme-economist .tab-item.active { box-shadow: 0 6px 16px rgba(13,148,136,0.3), inset 0 1px 0 rgba(255,255,255,0.28); }
+.tab-item .tab-icon { display: block; width: 100%; font-size: 0; }
+.tab-item .tab-icon::before {
+  content: ''; display: block; width: 21px; height: 21px; margin: 0 auto;
+  background-color: currentColor; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  -webkit-mask-position: center; mask-position: center; -webkit-mask-size: contain; mask-size: contain;
+}
+.tab-item[data-tab="practice"] .tab-icon::before { -webkit-mask-image: var(--ic-book); mask-image: var(--ic-book); }
+.tab-item[data-tab="exam"] .tab-icon::before { -webkit-mask-image: var(--ic-trophy); mask-image: var(--ic-trophy); }
+.tab-item[data-tab="wrong"] .tab-icon::before { -webkit-mask-image: var(--ic-alert); mask-image: var(--ic-alert); }
+.tab-item[data-tab="fav"] .tab-icon::before { -webkit-mask-image: var(--ic-star); mask-image: var(--ic-star); }
+.tab-item[data-tab="stats"] .tab-icon::before { -webkit-mask-image: var(--ic-chart); mask-image: var(--ic-chart); }
+.tab-item[data-tab="gd"] .tab-icon::before { -webkit-mask-image: var(--ic-layers); mask-image: var(--ic-layers); }
+
+/* 分段控件与筛选标签 */
+.mode-toggle { background: rgba(148,163,184,0.16); border-color: rgba(226,232,240,0.85); box-shadow: inset 0 1px 3px rgba(15,23,42,0.05); }
+.mode-toggle button.active { box-shadow: 0 4px 12px rgba(15,23,42,0.1); }
+.chip { background: rgba(255,255,255,0.84); border-color: var(--hairline); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+.chip.active { box-shadow: 0 8px 18px rgba(37,99,235,0.24), inset 0 1px 0 rgba(255,255,255,0.35); }
+body.theme-economist .chip.active { box-shadow: 0 8px 18px rgba(13,148,136,0.28), inset 0 1px 0 rgba(255,255,255,0.35); }
+
+/* 按钮、进度、输入框：统一现代质感 */
+.btn { border-radius: 12px; letter-spacing: 0.2px; }
+.btn-primary:hover, .btn-success:hover, .btn-warning:hover, .btn-danger:hover { transform: translateY(-1px); filter: brightness(1.04); }
+.btn-outline { background: rgba(255,255,255,0.82); border-color: var(--hairline); }
+.form-group input { border-radius: 12px; border-color: var(--hairline); background: rgba(248,250,252,0.92); }
+.form-group input:focus { box-shadow: 0 0 0 4px rgba(37,99,235,0.12); background: #fff; }
+body.theme-economist .form-group input:focus { box-shadow: 0 0 0 4px rgba(13,148,136,0.14); }
+.progress-bar { height: 6px; background: rgba(148,163,184,0.2); border-radius: 99px; }
+.progress-fill { border-radius: 99px; background: linear-gradient(90deg, var(--primary), #60a5fa); box-shadow: 0 0 10px rgba(37,99,235,0.35); }
+body.theme-economist .progress-fill { background: linear-gradient(90deg, #0d9488, #2dd4bf); box-shadow: 0 0 10px rgba(13,148,136,0.35); }
+.fav-star { font-size: 0; }
+.fav-star::before {
+  content: ''; display: block; width: 21px; height: 21px;
+  background-color: #cbd5e1; -webkit-mask: var(--ic-star) center/contain no-repeat; mask: var(--ic-star) center/contain no-repeat;
+}
+.fav-star.active::before { background-color: #f59e0b; }
+.timer-icon { font-size: 0; }
+.timer-icon::before {
+  content: ''; display: inline-block; width: 18px; height: 18px; vertical-align: -3px;
+  background-color: currentColor; -webkit-mask: var(--ic-clock) center/contain no-repeat; mask: var(--ic-clock) center/contain no-repeat;
+}
+.version-btn {
+  font-size: 0; top: auto; right: 8px; bottom: calc(84px + var(--safe-bottom)); transform: none;
+  width: 32px; height: 32px; background: rgba(255,255,255,0.92); color: var(--primary);
+  border: 1px solid var(--hairline); box-shadow: 0 6px 16px rgba(15,23,42,0.12); opacity: 0.88;
+}
+.version-btn:active { transform: scale(0.92); }
+.version-btn::before {
+  content: ''; display: block; width: 17px; height: 17px;
+  background-color: currentColor; -webkit-mask: var(--ic-history) center/contain no-repeat; mask: var(--ic-history) center/contain no-repeat;
+}
+.overlay-card, .upgrade-card { border: 1px solid rgba(255,255,255,0.45); box-shadow: 0 30px 80px rgba(0,0,0,0.34); }
+
+/* 弹窗主图标与欢迎页按钮：统一线性风格 */
+#welcomeScreen .overlay-logo,
+#registerScreen .overlay-logo,
+#loginScreen .overlay-logo,
+#adminLoginScreen .overlay-logo { font-size: 0; }
+#welcomeScreen .overlay-logo::before,
+#registerScreen .overlay-logo::before,
+#loginScreen .overlay-logo::before,
+#adminLoginScreen .overlay-logo::before {
+  content: ''; display: block; width: 44px; height: 44px; margin: 0 auto 8px;
+  background-color: var(--primary); -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  -webkit-mask-position: center; mask-position: center; -webkit-mask-size: contain; mask-size: contain;
+}
+#welcomeScreen .overlay-logo::before { -webkit-mask-image: var(--ic-book); mask-image: var(--ic-book); }
+#registerScreen .overlay-logo::before,
+#loginScreen .overlay-logo::before { -webkit-mask-image: var(--ic-user); mask-image: var(--ic-user); }
+#adminLoginScreen .overlay-logo::before { -webkit-mask-image: var(--ic-gear); mask-image: var(--ic-gear); }
+#welcomeEnterAdmin, #linkToRegisterFromWelcomeBtn, #linkToLoginFromWelcomeBtn { font-size: 0; }
+#welcomeEnterAdmin::before, #linkToRegisterFromWelcomeBtn::before, #linkToLoginFromWelcomeBtn::before {
+  content: ''; display: inline-block; width: 17px; height: 17px; vertical-align: -3px; margin-right: 8px;
+  background-color: currentColor; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  -webkit-mask-position: center; mask-position: center; -webkit-mask-size: contain; mask-size: contain;
+}
+#welcomeEnterAdmin::after { content: '进入管理后台'; font-size: 14px; }
+#linkToRegisterFromWelcomeBtn::after { content: '新用户注册'; font-size: 14px; }
+#linkToLoginFromWelcomeBtn::after { content: '已有账号，立即登录'; font-size: 14px; }
+#welcomeEnterAdmin::before { -webkit-mask-image: var(--ic-gear); mask-image: var(--ic-gear); }
+#linkToRegisterFromWelcomeBtn::before { -webkit-mask-image: var(--ic-user); mask-image: var(--ic-user); }
+#linkToLoginFromWelcomeBtn::before { -webkit-mask-image: var(--ic-user); mask-image: var(--ic-user); }
+.welcome-admin { font-size: 0; }
+.welcome-admin::before {
+  content: ''; display: inline-block; width: 12px; height: 12px; vertical-align: -2px; margin-right: 4px;
+  background-color: currentColor; -webkit-mask: var(--ic-gear) center/contain no-repeat; mask: var(--ic-gear) center/contain no-repeat;
+}
+.welcome-admin::after { content: '管理员入口（通用）'; font-size: 11px; }
+
+/* 版本选择卡与考试切换：线性图标 */
+.version-card .vc-icon { font-size: 0; }
+.version-card .vc-icon::before {
+  content: ''; display: block; width: 30px; height: 30px; margin: 0 auto 6px;
+  background-color: var(--primary); -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  -webkit-mask-position: center; mask-position: center; -webkit-mask-size: contain; mask-size: contain;
+}
+.vc-hrm3 .vc-icon::before { background-color: #2563eb; -webkit-mask-image: var(--ic-building); mask-image: var(--ic-building); }
+.vc-economist .vc-icon::before { background-color: #0d9488; -webkit-mask-image: var(--ic-trend); mask-image: var(--ic-trend); }
+.exam-group-btn .es-icon, .exam-switch-btn .es-icon { font-size: 0; }
+.exam-group-btn .es-icon::before, .exam-switch-btn .es-icon::before {
+  content: ''; display: inline-block; width: 14px; height: 14px; vertical-align: -2px;
+  background-color: currentColor; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  -webkit-mask-position: center; mask-position: center; -webkit-mask-size: contain; mask-size: contain;
+}
+.exam-group-btn[data-group="hrm3_group"] .es-icon::before { -webkit-mask-image: var(--ic-building); mask-image: var(--ic-building); }
+.exam-group-btn[data-group="eco_group"] .es-icon::before { -webkit-mask-image: var(--ic-trend); mask-image: var(--ic-trend); }
+
 /* ===== Responsive ===== */
 @media (max-width: 380px) {
   .q-text { font-size: 15px; }
@@ -939,6 +1155,11 @@ body {
     <button class="version-panel-close" id="versionPanelClose" data-page-node-id="Xa1Xz8m9TKbIhDcYL9QmFq">✕</button>
   </div>
   <div class="version-panel-body" id="versionPanelBody" data-page-node-id="ip8iR3IaL6LwFUYsDyRcmV">
+    <div class="version-item">
+      <span class="version-tag" style="background:#0d9488">V33</span>
+      <div class="version-date">2026-11-25</div>
+      <div class="version-desc">✨ 视觉体系升级：保留蓝色/青绿原色调，加入低饱和光晕、玻璃高光、细腻网格与层次阴影，界面更有科技感但不刺眼<br>🔣 图标统一改为线性风格：消息、设置、版本切换、底部导航、考试切换、收藏、计时等，风格一致更现代<br>🎛 分段控件、筛选标签、按钮、进度条、输入框重新打磨，桌面与手机端均保持清晰顺畅</div>
+    </div>
     <div class="version-item">
       <span class="version-tag" style="background:#0d9488">V32</span>
       <div class="version-date">2026-11-25</div>
