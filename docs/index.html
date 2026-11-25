@@ -935,7 +935,7 @@ body {
     <div class="version-item">
       <span class="version-tag" style="background:#0d9488">V31</span>
       <div class="version-date">2026-11-25</div>
-      <div class="version-desc">📚 「广东题库」更名为「章节练习（第四版教材）」，题库内容不变<br>🎁 非会员试用改为整体累计限额：企业HR三级累计44题、中级经济师累计40题；试用账号可进入章节练习<br>🔒 累计答满即禁止继续练习并弹窗提醒扫码购买，横幅/设置/注册/弹窗描述同步更新</div>
+      <div class="version-desc">📚 企业HR三级：「广东题库」更名为「章节练习（第四版教材）」，题库内容不变；中级经济师名称不变<br>🎁 非会员试用改为整体累计限额：企业HR三级累计44题、中级经济师累计40题；试用账号可进入章节练习<br>🔒 累计答满即禁止继续练习并弹窗提醒扫码购买，横幅/设置/注册/弹窗描述同步更新</div>
     </div>
     <div class="version-item">
       <span class="version-tag" style="background:#0d9488">V30</span>
@@ -5915,6 +5915,12 @@ window.switchTab = function(tabName) {
     document.getElementById("gdPracticingScreen").classList.add("hidden");
     document.getElementById("gdPracticeScreen").classList.add("hidden");
     document.getElementById("gdChapterScreen").classList.remove("hidden");
+    // 章节页标题按版本区分：仅企业HR三级使用「第四版教材」，中级经济师保持原名
+    const chapterTitle = document.getElementById('gdChapterMainTitle');
+    if (chapterTitle) {
+      chapterTitle.textContent = (EXAM_GROUP_MAP[currentExamId] === 'hrm3_group')
+        ? '📚 章节练习（第四版教材）' : '📚 章节练习';
+    }
     // Render chapter list
     // 描述依据实际章节数据动态生成，避免写死数字与实际题库不一致
     const activeChapters = (GD_CHAPTERS || []).filter(ch => ch.total > 0);
@@ -5961,7 +5967,7 @@ window.switchTab = function(tabName) {
   <div class="overlay-card" style="max-width:440px;max-height:85vh;overflow-y:auto" data-page-node-id="efxAzYrFAPfUALR2zluIG5">
     <div style="text-align:left;display:flex;align-items:center;gap:12px;margin-bottom:16px" data-page-node-id="kPla1EYQFVi0X6H2JDxko2">
       <button class="btn btn-ghost btn-sm" onclick="switchTab('practice')" style="font-size:20px;padding:4px 8px" data-page-node-id="7Ha8I2jCaDyUsGdEhZXsB6">&larr;</button>
-      <div style="font-weight:800;font-size:18px" data-page-node-id="xujov05ShYHJZuNdpYuAmt">📚 章节练习（第四版教材）</div>
+      <div id="gdChapterMainTitle" style="font-weight:800;font-size:18px" data-page-node-id="xujov05ShYHJZuNdpYuAmt">📚 章节练习（第四版教材）</div>
     </div>
     <div id="gdChapterSubDesc" style="font-size:12px;color:#64748b;margin-bottom:16px" data-page-node-id="jpzfauHrONknOF73WAdzvy">企业人力资源管理师三级 · 章节练习</div>
     <div id="gdChapterList" style="display:flex;flex-direction:column;gap:8px" data-page-node-id="bdRGlEn2r0iI8jVeZBMTWI"></div>
