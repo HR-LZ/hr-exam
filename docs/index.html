@@ -158,7 +158,8 @@ body {
 /* ===== Upgrade Prompt Overlay ===== */
 .upgrade-overlay {
   position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.7); z-index: 9998;
+  /* 必须高于 .full-overlay(9999)/.admin-overlay(10000)，否则在章节练习页触发的购买弹窗会被盖住 */
+  background: rgba(0,0,0,0.7); z-index: 10001;
   display: flex; align-items: center; justify-content: center; padding: 20px;
 }
 .upgrade-card {
@@ -198,12 +199,15 @@ body {
 }
 .header-row { display: flex; justify-content: center; align-items: flex-start; }
 .header-main { width: 100%; max-width: 100%; }
-.header-title-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+/* 窄屏把标题与用户/按钮拆成两行，避免挤成一团或文字截断 */
+.header-title-row { display: flex; flex-direction: column; align-items: stretch; gap: 10px; }
 .header-titles { flex: 1; min-width: 0; }
-.header-title { font-size: 20px; font-weight: 800; letter-spacing: 0.4px; text-shadow: 0 2px 4px rgba(0,0,0,0.18); }
+.header-title { font-size: 20px; font-weight: 800; letter-spacing: 0.4px; text-shadow: 0 2px 4px rgba(0,0,0,0.18); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .header-sub { font-size: 12px; font-weight: 500; opacity: 0.88; margin-top: 4px; display: inline-flex; align-items: center; gap: 5px; }
 .header-sub::before { content: '✦'; opacity: 0.7; font-size: 10px; }
-.header-admin-inline { display: flex; align-items: center; gap: 10px; flex-shrink: 0; margin-top: 2px; }
+.header-admin-inline { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 6px 8px; flex-shrink: 0; margin-top: 0; width: 100%; }
+.header-admin-inline .user-info { margin-right: auto; }
+.header-btn { white-space: nowrap; font-size: 11px; padding: 0 8px; width: auto; min-width: 32px; height: 32px; border-radius: 16px; gap: 3px; }
 .user-info { display: flex; align-items: center; gap: 8px; }
 .user-avatar {
   width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.2);
@@ -218,7 +222,8 @@ body {
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.6} }
 .header-btn {
   background: rgba(255,255,255,0.15); border: none; color: #fff;
-  width: 32px; height: 32px; border-radius: 50%; font-size: 16px;
+  min-width: 32px; width: auto; height: 32px; border-radius: 16px; font-size: 11px;
+  padding: 0 8px; white-space: nowrap; gap: 3px;
   cursor: pointer; display: flex; align-items: center; justify-content: center;
   transition: background 0.2s;
 }
@@ -928,6 +933,11 @@ body {
   </div>
   <div class="version-panel-body" id="versionPanelBody" data-page-node-id="ip8iR3IaL6LwFUYsDyRcmV">
     <div class="version-item">
+      <span class="version-tag" style="background:#0d9488">V31</span>
+      <div class="version-date">2026-11-25</div>
+      <div class="version-desc">📚 「广东题库」更名为「章节练习（第四版教材）」，题库内容不变<br>🎁 非会员试用改为整体累计限额：企业HR三级累计44题、中级经济师累计40题；试用账号可进入章节练习<br>🔒 累计答满即禁止继续练习并弹窗提醒扫码购买，横幅/设置/注册/弹窗描述同步更新</div>
+    </div>
+    <div class="version-item">
       <span class="version-tag" style="background:#0d9488">V30</span>
       <div class="version-date">2026-11-24</div>
       <div class="version-desc">📱 微信内 H5 图片无法弹出「识别二维码」属微信自身限制，网页无法强制；付款页改为明确的「保存图片→扫一扫相册识别」四步指引<br>💾 按钮与提示同步改为「已完成付款？点此继续」「保存不了图片？点此打开大图」，与实际操作一致</div>
@@ -1081,7 +1091,7 @@ body {
 
   <div class="trial-banner hidden" id="trialBanner" data-page-node-id="1g8mLJPADVzbbkRr3RriJJ">
     <div class="trial-left" data-page-node-id="O2fiuWBTGIy5hbZYqCZRj5">🎁 <b data-page-node-id="ZJVIFHAnBHhk0DBzBhOhmF">试用模式</b></div>
-    <div class="trial-count" data-page-node-id="BGDS23NZAhUu9guD4BhJY0">剩余 <span id="trialRemaining" data-page-node-id="prBcgaWUiq2cSXsHJa6r9Y">单选30 · 多选10 · 简答3 · 案例1</span></div>
+    <div class="trial-count" data-page-node-id="BGDS23NZAhUu9guD4BhJY0">还剩 <span id="trialRemaining" data-page-node-id="prBcgaWUiq2cSXsHJa6r9Y">44/44</span> 题</div>
     <button class="btn btn-sm btn-warning" id="btnUpgradeNow" data-page-node-id="GBADXyhB0DcP7YZcKbUJvO">🔓 激活全部</button>
   </div>
 
@@ -1120,7 +1130,7 @@ body {
     <span class="tab-icon" data-page-node-id="V57m5JZ8ai51qKEN7cFvFD">📊</span><span data-page-node-id="OsVgLYOZwcC8Y4c4OrLIY9">统计</span>
   </button>
   <button class="tab-item" data-tab="gd" data-page-node-id="s793tdM2lkucZKLFfbTWus">
-    <span class="tab-icon" data-page-node-id="3ellDp3Vcgu1wYSzfSFi9g">📚</span><span data-page-node-id="VDVqWiZD7zDobZUxzBox4m">广东题库</span>
+    <span class="tab-icon" data-page-node-id="3ellDp3Vcgu1wYSzfSFi9g">📚</span><span data-page-node-id="VDVqWiZD7zDobZUxzBox4m">章节练习</span>
   </button>
 </div>
 
@@ -1130,16 +1140,18 @@ const ADMIN_PHONE = "13760449307";
 const ADMIN_PASSWORD_HASH = "aaffebecec560fec66e75f24062224ffa4e07696d2ae9a1fee3707c3f8fd9373";
 const EMBEDDED_HASHES = ["3ff6aac90cedfcb0879087adea662d2b2d1a268fc4df8d67cd2811d2c3f30a03", "80751e9e1a13a72911c51c0a99685161d115703d8bdd7878fd47d0cfa25c743d", "a60bfe291d8a52111d19cbdc992ccf88a0f46ac795db912a374c05dd8c568d99", "64c76e51b66ee0e236341895c20595351c45fbb13cdbd7906e0b21ac14cfd79d", "6c1df43b606ab74e55ab58d7c7ee7258bdace7604cfd12bada44fa4f2a62e8a1", "2b796c76d0e0afa0188c3b76c7269e738a13a3525297defb3ed8f0f822fc43f5", "866b3b12df470e48112f365b998772a47c691915d95353230edfd2a319b35350", "936cd948bcc85bc5db5388efa0bcc7c8d83dec278904825694272ade95d00a52", "e7fef3e670346dcc17891bd1ad5d145b4160be58366c172fa325e71d759f08af", "c437bb54b96c46172a90a7d6c73f27d9c51bc476c115a819f133064a48eea901", "0bda9dd58f552ba57ceac80cb1d790d0e28f964429e57ea84971db4b7f6f723d", "dcf56d17239c302036d352ed4d6f38ee05fe1509a152d4abff754417f633a709", "3bdde4c8d6d6d880efd0bb3ece72c6de898b9b18f8f2b5c0dd560c0a1360403f", "587c26c3403407193ce0c9321ef45733edd3e72a7657906d5db4498f4bbb8ab9", "ccaf84ca528346751cefd69c0b184e8d0454cf1a8bdb028652ef00b26727c151", "cef76fe88162f69665c3c1726c2c34c77413432a643a97fcac073181da3dbfc7", "fd6a8d85c1f84cd96d2293d7c13057f711ab95753f1ff234f8fda0a0a403995b", "ee9ecc724fdde055a61969915f066555064ee361e2187cc6d18c15cbf9cd27b9", "07408f1d915926277bbd4069a23b7033b6109a2164bed84be3efb9f42ba5929a", "8e3ea995b603434004204848184171016ee8df8030905c44bf00f0bfb7b98ab8"];
 const ACTIVATION_VALIDITY_DAYS = 365;
-// 试用额度：按版本×题型分别限制
-// hrm3: 30单选 + 10多选 + 3简答 + 1案例；economist: 30单选 + 10多选
+// 试用额度：按版本【整体累计】限制（不分题型），累计答满即禁止并弹窗购买
+// hrm3 上限 44 题（=30单选+10多选+3简答+1案例）；economist 上限 40 题（=30单选+10多选）
+const TRIAL_TOTAL_LIMIT = { hrm3: 44, economist: 40 };
+// TRIAL_QUOTA 保留按题型结构，仅供试用模考出卷使用（不再用于练习额度限制）
 const TRIAL_QUOTA = {
   hrm3: { single: 30, multi: 10, short: 3, case: 1 },
   economist: { single: 30, multi: 10 }
 };
 const TRIAL_TYPES = ['single','multi','short','case'];
 const TRIAL_TYPE_LABEL = { single:'单选', multi:'多选', short:'简答', case:'案例' };
-// 兼容旧代码：TRIAL_LIMIT 表示该版本所有题型额度之和，动态计算
-const TRIAL_LIMIT = 30;
+// 兼容旧代码：TRIAL_LIMIT 为 hrm3 整体上限
+const TRIAL_LIMIT = 44;
 const AUTH_KEY = 'hr_exam_v5_auth';
 const ADMIN_CODES_KEY = 'hr_exam_v5_admin_codes';
 const REQUESTS_KEY = 'hr_exam_v5_requests';
@@ -2385,9 +2397,10 @@ function markCodeUsed(hash) {
   } catch(e) {}
 }
 
-// 按题型分别计数（存 localStorage 一个对象：{single,multi,short,case}）
+// 试用计数：底层仍按题型存储（兼容服务端与旧数据），但额度判定改为【整体累计】
 const TRIAL_TYPES_KEY = 'hr_exam_v7_trial_types';
 function getTrialQuota(v) { return TRIAL_QUOTA[v || getVersion()] || TRIAL_QUOTA.hrm3; }
+function getTrialTotalLimit(v) { return TRIAL_TOTAL_LIMIT[v || getVersion()] || TRIAL_TOTAL_LIMIT.hrm3; }
 function emptyTrialCounts() { return { single:0, multi:0, short:0, case:0 }; }
 function getTrialCounts() {
   const k = TRIAL_TYPES_KEY + '_' + getVersion();
@@ -2397,19 +2410,13 @@ function getTrialCounts() {
   } catch(e) {}
   return emptyTrialCounts();
 }
-function getTrialTypeCount(type) { return getTrialCounts()[type] || 0; }
-// 某题型是否已用尽额度；额度未配置(0/未列出)视为不允许
-function isTrialTypeExhausted(type) {
-  const quota = getTrialQuota(getVersion());
-  const limit = quota[type] || 0;
-  if (limit <= 0) return true;
-  return getTrialTypeCount(type) >= limit;
-}
 function trialTotalUsed() {
   const c = getTrialCounts();
   return TRIAL_TYPES.reduce((s,t) => s + (c[t]||0), 0);
 }
 function getTrialCount() { return trialTotalUsed(); }
+// 整体累计是否已达上限：达上限即禁止继续试用并弹窗购买
+function isTrialExhausted() { return trialTotalUsed() >= getTrialTotalLimit(getVersion()); }
 function saveTrialCounts(c) {
   localStorage.setItem(TRIAL_TYPES_KEY + '_' + getVersion(), JSON.stringify(c));
 }
@@ -2451,9 +2458,7 @@ function showScreen(screenId) {
   // 注册页免费试用描述跟随当前版本额度
   const regSub = document.getElementById('regTrialSub');
   if (regSub && typeof getTrialQuota === 'function') {
-    const q = getTrialQuota(getVersion());
-    const parts = TRIAL_TYPES.filter(t => (q[t]||0) > 0).map(t => (q[t]||0) + '道' + (TYPE_LABELS[t] || TRIAL_TYPE_LABEL[t]));
-    regSub.textContent = '注册后即可免费试用：' + parts.join('、');
+    regSub.textContent = '注册后即可免费试用 ' + getTrialTotalLimit(getVersion()) + ' 道题';
   }
 }
 
@@ -2926,9 +2931,7 @@ function showUpgradePrompt() {
   // 描述按当前版本实际试用额度动态生成
   const d = document.getElementById('upgradeDesc');
   if (d) {
-    const q = getTrialQuota(getVersion());
-    const parts = TRIAL_TYPES.filter(t => (q[t]||0) > 0).map(t => (q[t]||0) + '道' + (TYPE_LABELS[t] || TRIAL_TYPE_LABEL[t]));
-    d.innerHTML = parts.join('、') + '免费试用名额已用完<br>扫码激活后即可继续学习全部题库';
+    d.innerHTML = '您的 ' + getTrialTotalLimit(getVersion()) + ' 道免费试用题已答完<br>扫码激活后即可继续学习全部题库';
   }
   showScreen('upgradeOverlay');
 }
@@ -3181,17 +3184,25 @@ async function enterApp() {
   const forceOwn = !isAdmin;
 
   // Restore last selected exam (must happen after EXAM_REGISTRY is defined)
+  // 关键：无 last_exam 记录时，也要把题库切到本版本默认考试，
+  // 否则新用户进经济师版本时章节练习仍显示 HR 三级章节（GD_CHAPTERS 未切换）。
   try {
     const le = localStorage.getItem(LAST_EXAM_KEY);
-    if (forceOwn && le && EXAM_REGISTRY[le] && EXAM_GROUP_MAP[le] !== ownGroup) {
-      currentExamId = VERSION_DEFAULT_EXAM[getVersion()];
-      applyExam(currentExamId);
-      localStorage.setItem(LAST_EXAM_KEY, currentExamId);
+    const defaultExam = VERSION_DEFAULT_EXAM[getVersion()] || 'hrm3';
+    if (forceOwn) {
+      // 非管理员：只能待在本版本，记录缺失/越界都回落到本版本默认考试
+      if (!le || !EXAM_REGISTRY[le] || EXAM_GROUP_MAP[le] !== ownGroup || le !== currentExamId) {
+        currentExamId = defaultExam;
+        applyExam(currentExamId);
+        localStorage.setItem(LAST_EXAM_KEY, currentExamId);
+      } else {
+        updateExamSwitchUI(currentExamId);
+      }
     } else if (le && EXAM_REGISTRY[le] && le !== currentExamId) {
       currentExamId = le;
       applyExam(le);
     } else {
-      updateExamSwitchUI(currentExamId);
+      applyExam(currentExamId);
     }
   } catch(e) {}
   applyVersionTheme(getVersion());
@@ -3296,10 +3307,11 @@ function updateHeaderInfo() {
 function updateTrialBanner() {
   const banner = document.getElementById('trialBanner');
   if (!banner) return;
-  // Hide for admin and activated users (check role strictly, also check expiresAt as fallback)
+  // trial 角色始终显示试用横幅；expired/activated 才隐藏
+  // 注意：旧版注册会给 trial 账号也写 expiresAt，不能据此把它误判成已激活
   const isActivated = isAdmin || !currentUser || currentUser.role === 'activated' ||
-    (currentUser.expiresAt && currentUser.expiresAt > Date.now()) ||
-    (currentUser.phone && isPhoneActivated(currentUser.phone));
+    (currentUser.role !== 'trial' && currentUser.expiresAt && currentUser.expiresAt > Date.now()) ||
+    (currentUser.role !== 'trial' && currentUser.phone && isPhoneActivated(currentUser.phone));
   if (isActivated) {
     banner.classList.add('hidden');
     // Also fix role if it's wrong
@@ -3311,16 +3323,11 @@ function updateTrialBanner() {
     }
     return;
   }
-  const quota = getTrialQuota(getVersion());
-  const counts = getTrialCounts();
-  const details = TRIAL_TYPES.filter(t => (quota[t] || 0) > 0).map(t => {
-    const left = Math.max(0, (quota[t]||0) - (counts[t]||0));
-    return TRIAL_TYPE_LABEL[t] + left;
-  });
-  const allDone = details.every(d => /0$/.test(d));
-  document.getElementById('trialRemaining').textContent = details.join(' · ');
+  const totalLimit = getTrialTotalLimit(getVersion());
+  const leftTotal = Math.max(0, totalLimit - trialTotalUsed());
+  document.getElementById('trialRemaining').textContent = leftTotal + '/' + totalLimit;
   banner.classList.remove('hidden');
-  if (allDone) {
+  if (leftTotal <= 0) {
     banner.querySelector('.trial-left').innerHTML = '🔒 <b>试用结束</b>';
   } else {
     banner.querySelector('.trial-left').innerHTML = '🎁 <b>试用模式</b>';
@@ -3356,9 +3363,7 @@ function showUserSettings() {
   html += '手机号：' + (currentUser.phone || '-') + '<br>';
   html += '昵称：' + (currentUser.userName || '学员') + '<br>';
   if (currentUser.role === 'trial') {
-    const _q = getTrialQuota(getVersion()), _c = getTrialCounts();
-    const _usedDesc = TRIAL_TYPES.filter(t => (_q[t]||0) > 0).map(t => TRIAL_TYPE_LABEL[t] + (_c[t]||0) + '/' + _q[t]).join('、');
-    html += '状态：<b style="color:#ea580c">试用中</b>（' + _usedDesc + '）<br>';
+    html += '状态：<b style="color:#ea580c">试用中</b>（已答 ' + getTrialCount() + '/' + getTrialTotalLimit(getVersion()) + ' 题）<br>';
     // Show payment claim status
     if (myPendingClaim) {
       html += '<div style="margin-top:6px;background:#fef9c3;border:1px solid #fde047;border-radius:6px;padding:8px 10px;font-size:12px;color:#854d0e">⏳ 您的付款申请正在等待管理员核实</div>';
@@ -3965,8 +3970,8 @@ function renderPractice() {
     return;
   }
 
-  // 试用按题型限额：当前题目题型额度用尽则拦截
-  if (currentUser && currentUser.role === 'trial' && q && isTrialTypeExhausted(q.type)) {
+  // 试用整体累计限额：累计答满即禁止
+  if (currentUser && currentUser.role === 'trial' && isTrialExhausted()) {
     showUpgradePrompt();
     return;
   }
@@ -4070,7 +4075,7 @@ function renderPractice() {
 function trackTrialAnswer(type) {
   incrementTrialCount(type);
   updateTrialBanner();
-  if (isTrialTypeExhausted(type)) {
+  if (isTrialExhausted()) {
     setTimeout(() => showUpgradePrompt(), 800);
   }
 }
@@ -5614,15 +5619,14 @@ function renderGDPracticeCurrent() {
     document.getElementById("gdPracticeContent").innerHTML = html;
     return;
   }
-  // 试用按题型限额（仅练习模式，不含考试）：当前题型额度用尽则锁屏
-  if (!gdExamMode && currentUser && currentUser.role === 'trial' && isTrialTypeExhausted(q.type)) {
-    const quota = getTrialQuota(getVersion());
-    const label = TYPE_LABELS[q.type] || '该题';
+  // 试用整体累计限额（仅练习模式，不含考试）：累计答满即锁屏
+  if (!gdExamMode && currentUser && currentUser.role === 'trial' && isTrialExhausted()) {
+    const totalLimit = getTrialTotalLimit(getVersion());
     document.getElementById("gdPracticeContent").innerHTML =
       '<div style="text-align:center;padding:60px 20px">' +
       '<div style="font-size:48px;margin-bottom:16px">🔒</div>' +
-      '<div style="font-size:18px;font-weight:700;margin-bottom:8px">' + label + '免费试用名额已用完</div>' +
-      '<div style="font-size:14px;color:#64748b;margin-bottom:8px">您已用完 ' + (quota[q.type]||0) + ' 道免费' + label + '</div>' +
+      '<div style="font-size:18px;font-weight:700;margin-bottom:8px">免费试用题已答完</div>' +
+      '<div style="font-size:14px;color:#64748b;margin-bottom:8px">您已完成 ' + totalLimit + ' 道免费试用题</div>' +
       '<div style="font-size:14px;color:#64748b;margin-bottom:20px">扫码激活后：无限刷题 + 参加模拟考试</div>' +
       '<button class="btn btn-primary" onclick="showUpgradePrompt()">📱 扫码激活</button></div>';
     return;
@@ -5778,7 +5782,7 @@ function checkGDAnswer(userAns, correctAns, qtype) {
   // 练习模式消耗当前题型试用额度（考试模式不计入）
   if (!gdExamMode && currentUser && currentUser.role === 'trial') {
     incrementTrialCount(qtype);
-    if (isTrialTypeExhausted(qtype)) {
+    if (isTrialExhausted()) {
       setTimeout(function(){ showUpgradePrompt(); }, 700);
     }
   }
@@ -5957,7 +5961,7 @@ window.switchTab = function(tabName) {
   <div class="overlay-card" style="max-width:440px;max-height:85vh;overflow-y:auto" data-page-node-id="efxAzYrFAPfUALR2zluIG5">
     <div style="text-align:left;display:flex;align-items:center;gap:12px;margin-bottom:16px" data-page-node-id="kPla1EYQFVi0X6H2JDxko2">
       <button class="btn btn-ghost btn-sm" onclick="switchTab('practice')" style="font-size:20px;padding:4px 8px" data-page-node-id="7Ha8I2jCaDyUsGdEhZXsB6">&larr;</button>
-      <div style="font-weight:800;font-size:18px" data-page-node-id="xujov05ShYHJZuNdpYuAmt">📚 广东题库 · 章节练习</div>
+      <div style="font-weight:800;font-size:18px" data-page-node-id="xujov05ShYHJZuNdpYuAmt">📚 章节练习（第四版教材）</div>
     </div>
     <div id="gdChapterSubDesc" style="font-size:12px;color:#64748b;margin-bottom:16px" data-page-node-id="jpzfauHrONknOF73WAdzvy">企业人力资源管理师三级 · 章节练习</div>
     <div id="gdChapterList" style="display:flex;flex-direction:column;gap:8px" data-page-node-id="bdRGlEn2r0iI8jVeZBMTWI"></div>
