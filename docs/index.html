@@ -1079,9 +1079,19 @@ body.theme-economist .hero-actions .hero-main { color: #0f766e; }
       <label data-page-node-id="wcCPAWgRlE4IXrTas4tY12">🔒 确认密码</label>
       <input type="password" id="regPassword2" placeholder="再次输入密码" maxlength="20" autocomplete="new-password" data-page-node-id="7pvrho1miGEmT5VLcDj83I">
     </div>
-    <div class="form-group" data-page-node-id="J1AZE6ppLSiahcghhPER6D">
-      <label data-page-node-id="zXspdaSrqCzGKKEkWEmj2t">👤 昵称（选填）</label>
-      <input type="text" id="regName" placeholder="请输入昵称" maxlength="20" autocomplete="off" data-page-node-id="iDswtSOfHsHtfIXbCGnedv">
+    <div class="form-group">
+      <label>👤 昵称（选填）</label>
+      <input type="text" id="regName" placeholder="请输入昵称" maxlength="20" autocomplete="off">
+    </div>
+    <div class="form-group">
+      <label>🛡️ 密保问题（忘记密码时自助找回）</label>
+      <select id="regSecurityQ" style="width:100%;padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;background:var(--card);color:var(--text)"></select>
+      <input type="text" id="regSecurityA" placeholder="填写答案（至少2个字，请牢记）" maxlength="30" autocomplete="off" style="margin-top:8px">
+    </div>
+    <div class="form-group">
+      <label>🎫 注册码（选填，换设备/多账号时需管理员发放）</label>
+      <input type="text" id="regCode" placeholder="本机首次注册无需填写" maxlength="12" autocomplete="off" autocapitalize="characters" style="text-transform:uppercase">
+      <div style="font-size:11px;color:var(--text-secondary);margin-top:4px">一台设备仅可注册一个账号；如需在本机注册其它账号，请向管理员索取注册码</div>
     </div>
     <button class="btn btn-primary btn-block" id="regBtn" data-page-node-id="N5g5aoJUt1jJ2chLAPHTFE">✅ 注册并开始试用</button>
     <div class="form-msg" id="regMsg" data-page-node-id="nfdg7fKLqC5UWAgax9mELD"></div>
@@ -1106,11 +1116,46 @@ body.theme-economist .hero-actions .hero-main { color: #0f766e; }
     </div>
     <button class="btn btn-primary btn-block" id="loginBtn" data-page-node-id="J5im7KauyDTrZblsYjx7rA">🔐 登录</button>
     <div class="form-msg" id="loginMsg" data-page-node-id="Xe9StesMimPtTrlKHW8OSb"></div>
+    <div class="link-text" id="linkForgotPwd" style="margin-top:6px">🔑 忘记密码？</div>
     <div class="text-divider" data-page-node-id="1uflBvIWJkIAv2VGLWZVV3">或</div>
     <div class="link-text" id="linkToRegisterFromLogin" data-page-node-id="Hn1USrHTrf322z6XSB2HFF">📝 没有账号？立即注册</div>
     <button class="btn btn-ghost btn-sm-block" id="backToWelcomeFromLogin" style="margin-top:8px" data-page-node-id="rFk9v1BEyocs4rg7BZxXeA">↩ 返回欢迎页</button>
   </div>
 </div>
+
+<!-- ===== SCREEN: FORGOT PASSWORD ===== -->
+<div class="full-overlay hidden" id="forgotPwdScreen">
+  <div class="overlay-card">
+    <div class="overlay-logo">🔑</div>
+    <div class="overlay-title">找回密码</div>
+    <div class="overlay-sub">回答注册时设置的密保问题即可自助重置</div>
+    <div class="form-group">
+      <label>📱 注册手机号</label>
+      <input type="tel" id="fpPhone" placeholder="请输入注册手机号" maxlength="11" autocomplete="tel">
+    </div>
+    <button class="btn btn-outline btn-block" id="fpQueryBtn">查询密保问题</button>
+    <div id="fpAnswerBox" style="display:none">
+      <div class="form-group" style="margin-top:12px">
+        <label id="fpQuestionLabel">🛡️ 密保问题</label>
+        <input type="text" id="fpAnswer" placeholder="请输入答案" maxlength="30" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label>🔒 新密码</label>
+        <input type="password" id="fpNewPwd" placeholder="至少6位" maxlength="20" autocomplete="new-password">
+      </div>
+      <div class="form-group">
+        <label>🔒 确认新密码</label>
+        <input type="password" id="fpNewPwd2" placeholder="再次输入新密码" maxlength="20" autocomplete="new-password">
+      </div>
+      <button class="btn btn-primary btn-block" id="fpResetBtn">重置密码</button>
+    </div>
+    <div class="form-msg" id="fpMsg"></div>
+    <div class="text-divider">或</div>
+    <div class="link-text" id="fpContactAdmin">👨‍💼 联系管理员重置</div>
+    <button class="btn btn-ghost btn-sm-block" id="fpBack" style="margin-top:8px">↩ 返回登录</button>
+  </div>
+</div>
+
 <div class="full-overlay hidden" id="activateScreen" data-page-node-id="J4PZZnnwenIeWQtBRB4rHn">
   <div class="overlay-card" data-page-node-id="cvvgWvCJxIVCmBkXNPwO59">
     <div class="overlay-logo" data-page-node-id="DFIAcz0553loFtV6otPuHw">🔑</div>
@@ -1284,6 +1329,11 @@ body.theme-economist .hero-actions .hero-main { color: #0f766e; }
     <button class="version-panel-close" id="versionPanelClose" data-page-node-id="Xa1Xz8m9TKbIhDcYL9QmFq">✕</button>
   </div>
   <div class="version-panel-body" id="versionPanelBody" data-page-node-id="ip8iR3IaL6LwFUYsDyRcmV">
+    <div class="version-item">
+      <span class="version-tag" style="background:#2563eb">V36</span>
+      <div class="version-date">2026-11-26</div>
+      <div class="version-desc">🔑 新增忘记密码：注册时设置密保问题，忘记密码可答对密保自助重置；老账号无密保可联系管理员在后台重置<br>🛡 新增设备锁：一台设备仅可注册一个账号，防止换手机号反复注册刷试用；确需在本机注册多个账号可向管理员索取一次性注册码<br>🎫 注册码由管理员在后台生成，填对即可放行设备锁，一码一次有效；无需实名、不收身份证、全程零成本</div>
+    </div>
     <div class="version-item">
       <span class="version-tag" style="background:#2563eb">V35</span>
       <div class="version-date">2026-11-25</div>
@@ -1577,6 +1627,16 @@ let _apiProbePromise = null;
 // 账号体系：一个手机号 + 密码 = 一个全局账号，可进入两个板块；
 // 会员（激活名单）与试用计数仍按版本独立，A 板块开通不影响 B 板块。
 // 管理账号（admin / 子管理员）与系统级集合保持全局。
+// 密保问题列表（跨 script 全局可见）：注册时选一题并填答案，忘记密码时自助重置。
+const SECURITY_QUESTIONS = [
+  '你母亲的姓名？',
+  '你的出生城市（县级）？',
+  '你就读的小学名称？',
+  '你最要好的朋友姓名？',
+  '你的配偶（或恋人）姓名？'
+];
+function normalizeSecAnswer(s) { return String(s || '').trim().toLowerCase().replace(/\s+/g, ''); }
+
 const DB_DEFAULT = {
   accounts: {},   // 全局账号 { phone: { hash, name, registeredAt, updatedAt?, createdBy? } }
   versions: {
@@ -1585,6 +1645,7 @@ const DB_DEFAULT = {
   },
   admin_codes: [],
   used_codes: {},
+  reg_codes: [],       // 一次性注册码 [{ code, createdAt, usedAt?, usedBy? }]，管理员发放
   requests: [],
   transactions: [],
   payment_claims: [],
@@ -1606,6 +1667,7 @@ function ensureVersions(db) {
     };
   }
   if (!db.accounts || typeof db.accounts !== 'object' || Array.isArray(db.accounts)) db.accounts = {};
+  if (!Array.isArray(db.reg_codes)) db.reg_codes = [];
   // 补齐历史数据里可能缺失的子字段，避免 .push / 下标访问报错
   ['hrm3', 'economist'].forEach(function(v) {
     const vs = db.versions[v] || {};
@@ -1921,17 +1983,70 @@ async function giteeRoute(rawPath, method, body) {
     const phone = body.phone, password = body.password, name = body.name;
     if (!phone || !/^1[3-9]\d{9}$/.test(phone)) return R({ ok: false, error: '无效的手机号' });
     if (!password || password.length < 6) return R({ ok: false, error: '密码至少6位' });
+    const sec = body.security || {};
+    const q = Number(sec.q);
+    const secAns = normalizeSecAnswer(sec.answer);
+    if (!Number.isInteger(q) || q < 0 || q >= SECURITY_QUESTIONS.length || secAns.length < 2) {
+      return R({ ok: false, error: '请设置密保问题和答案（至少2个字）' });
+    }
+    const regCode = String(body.regCode || '').trim().toUpperCase();
     let out;
     await dbMutate(db => {
       if (db.accounts && db.accounts[phone]) { out = { ok: false, error: '该手机号已注册' }; return; }
       const VS = vstore(db);
       if (VS.accounts[phone]) { out = { ok: false, error: '该手机号已注册' }; return; }
+      // 注册码：填了就必须有效且未使用（用于放行设备锁）；不填则走普通注册流程
+      if (regCode) {
+        const rc = (db.reg_codes || []).find(c => c.code === regCode);
+        if (!rc) { out = { ok: false, error: '注册码无效，请检查后重试' }; return; }
+        if (rc.usedAt) { out = { ok: false, error: '该注册码已被使用' }; return; }
+      }
       const now = Date.now();
-      const acc = { hash: sha256Hex(phone + ':' + password), name: name || '学员', registeredAt: now };
+      const acc = {
+        hash: sha256Hex(phone + ':' + password), name: name || '学员', registeredAt: now,
+        security: { q: q, a: sha256Hex(phone + ':' + secAns) },
+        viaCode: regCode || null
+      };
       mirrorAccount(db, phone, acc);
-      out = { ok: true, user: { phone: phone, userName: acc.name, role: 'trial', version: apiVersion, registeredAt: now } };
+      if (regCode) {
+        const rc = db.reg_codes.find(c => c.code === regCode);
+        rc.usedAt = now; rc.usedBy = phone;
+      }
+      out = { ok: true, viaCode: !!regCode, user: { phone: phone, userName: acc.name, role: 'trial', version: apiVersion, registeredAt: now } };
     });
     return R(out);
+  }
+
+  // 找回密码第一步：按手机号取密保问题（不返回答案）
+  if (path === '/api/auth/security-question' && method === 'POST') {
+    const phone = String((body && body.phone) || '').trim();
+    const db = await dbRead();
+    const acc = (db.accounts && db.accounts[phone]) || vstore(db).accounts[phone];
+    if (!acc) return R({ ok: false, error: '账号不存在，请先注册' });
+    if (!acc.security || !Number.isInteger(acc.security.q)) {
+      return R({ ok: false, error: '该账号未设置密保，请联系管理员重置密码' });
+    }
+    return R({ ok: true, q: acc.security.q, question: SECURITY_QUESTIONS[acc.security.q] || '' });
+  }
+
+  // 找回密码第二步：密保答案正确 → 直接重置密码（全局生效）
+  if (path === '/api/auth/reset-password' && method === 'POST') {
+    const phone = String((body && body.phone) || '').trim();
+    const answer = normalizeSecAnswer(body && body.answer);
+    const nw = body && body.newPassword;
+    if (!/^1[3-9]\d{9}$/.test(phone)) return R({ ok: false, error: '请输入有效的手机号' });
+    if (!nw || nw.length < 6) return R({ ok: false, error: '新密码至少6位' });
+    let res;
+    await dbMutate(db => {
+      const acc = (db.accounts && db.accounts[phone]) || vstore(db).accounts[phone];
+      if (!acc) { res = { ok: false, error: '账号不存在' }; return; }
+      if (!acc.security || !Number.isInteger(acc.security.q)) { res = { ok: false, error: '该账号未设置密保，请联系管理员重置密码' }; return; }
+      if (sha256Hex(phone + ':' + answer) !== acc.security.a) { res = { ok: false, error: '密保答案不正确' }; return; }
+      acc.hash = sha256Hex(phone + ':' + nw); acc.updatedAt = Date.now();
+      mirrorAccount(db, phone, acc);
+      res = { ok: true };
+    });
+    return R(res);
   }
 
   if (path === '/api/auth/login' && method === 'POST') {
@@ -2000,6 +2115,34 @@ async function giteeRoute(rawPath, method, body) {
 
   // ===== 账号 / 子管理员 管理（仅最高权限管理员可操作）=====
   const isSuperAdmin = (body && body.superPhone === SRV_ADMIN_PHONE) || (query.get('superPhone') === SRV_ADMIN_PHONE);
+
+  // 一次性注册码 CRUD（最高权限管理员）：用于放行「一机一号」设备锁，给确需多账号的学员
+  const regCodeMatch = path.match(/^\/api\/reg-codes(?:\/([^\/]+))?$/);
+  if (regCodeMatch && isSuperAdmin) {
+    if (method === 'GET') return R((await dbRead()).reg_codes || []);
+    if (method === 'POST') {
+      const code = String((body && body.code) || '').trim().toUpperCase();
+      if (!/^[A-Z0-9]{6,12}$/.test(code)) return R({ ok: false, error: '注册码需为6-12位大写字母或数字' });
+      let res;
+      await dbMutate(db => {
+        if (!Array.isArray(db.reg_codes)) db.reg_codes = [];
+        if (db.reg_codes.some(c => c.code === code)) { res = { ok: false, error: '该注册码已存在' }; return; }
+        db.reg_codes.push({ code: code, createdAt: Date.now() });
+        res = { ok: true };
+      });
+      return R(res);
+    }
+    if (method === 'DELETE' && regCodeMatch[1]) {
+      const code = decodeURIComponent(regCodeMatch[1]);
+      let res;
+      await dbMutate(db => {
+        const before = (db.reg_codes || []).length;
+        db.reg_codes = (db.reg_codes || []).filter(c => c.code !== code);
+        res = { ok: db.reg_codes.length < before };
+      });
+      return R(res);
+    }
+  }
 
   // 会员本人修改密码
   const ownPwMatch = path.match(/^\/api\/accounts\/([^\/]+)\/password$/);
@@ -2487,6 +2630,25 @@ async function getAdminCodesFromServer() {
   catch(e) { return null; }
 }
 
+// 一次性注册码（管理员发放，用于放行「一机一号」设备锁）
+const REG_CODES_KEY = 'hr_exam_v36_reg_codes';
+function getRegCodes() {
+  try { const r = localStorage.getItem(REG_CODES_KEY); return r ? JSON.parse(r) : []; }
+  catch(e) { return []; }
+}
+async function getRegCodesFromServer() {
+  try {
+    const r = await apiGet('/api/reg-codes?superPhone=' + encodeURIComponent(ADMIN_PHONE));
+    if (r) { localStorage.setItem(REG_CODES_KEY, JSON.stringify(r)); return r; }
+  } catch(e) { return null; }
+}
+function genRegCodeString() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let s = '';
+  for (let i = 0; i < 8; i++) s += chars[Math.floor(Math.random() * chars.length)];
+  return s;
+}
+
 let lastGeneratedCode = null;
 
 function addAdminCode(code, hash) {
@@ -2868,7 +3030,7 @@ function incrementTrialCount(type) {
 
 // ===== SCREEN NAVIGATION =====
 function showScreen(screenId) {
-  ['welcomeScreen','registerScreen','loginScreen','activateScreen',
+  ['welcomeScreen','registerScreen','loginScreen','forgotPwdScreen','activateScreen',
    'adminLoginScreen','upgradeOverlay',
    'wechatSendOverlay','expiredOverlay','scanPayOverlay','chatOverlay'].forEach(id => {
     const el = document.getElementById(id);
@@ -2994,17 +3156,17 @@ function verifyAccount(phone, pwdHash) {
 }
 
 // ===== REGISTRATION via API =====
-async function registerViaAPI(phone, pwd, name) {
+async function registerViaAPI(phone, pwd, name, security, regCode) {
   try {
-    const r = await apiPost('/api/auth/register', { phone, password: pwd, name, version: getVersion() });
+    const r = await apiPost('/api/auth/register', { phone, password: pwd, name, version: getVersion(), security: security, regCode: regCode || '' });
     return r;
   } catch(e) { return null; }
 }
 // Fire-and-forget version: register on server without blocking
-function registerViaAPIBackground(phone, pwd, name) {
+function registerViaAPIBackground(phone, pwd, name, security, regCode) {
   (async function() {
     await waitForApiProbe();
-    registerViaAPI(phone, pwd, name);
+    registerViaAPI(phone, pwd, name, security, regCode);
   })().catch(e => console.log('Background register error:', e));
 }
 async function loginViaAPI(phone, pwd) {
@@ -3052,6 +3214,7 @@ async function syncAllAdminData() {
   await getTransactionsFromServer();
   await getPaymentClaimsFromServer();
   await getAllActivatedPhonesFromServer();
+  await getRegCodesFromServer();
   await getMessagesFromServer();
   await getNotificationsFromServer(null, true);
 }
@@ -3079,6 +3242,56 @@ function syncUserDataBackground(phone) {
   })().catch(e => console.log('Background user sync error:', e));
 }
 
+// ===== 设备锁（一机一号）+ 本地密保（离线兜底）=====
+const DEVICE_KEY = 'hr_exam_v36_device';
+const LOCAL_SECURITY_KEY = 'hr_exam_v36_security';
+function getDeviceRegister() {
+  try {
+    const d = JSON.parse(localStorage.getItem(DEVICE_KEY) || '{}');
+    if (!Array.isArray(d.phones)) d.phones = [];
+    return d;
+  } catch(e) { return { phones: [] }; }
+}
+// 本机已登记其它号码 → 拦截；本机已登记该号码 → 不拦（走"已注册"流程）
+function isDevicePhoneLocked(phone) {
+  if (!phone) return false;
+  const d = getDeviceRegister();
+  return d.phones.indexOf(phone) < 0 && d.phones.length > 0;
+}
+function getDevicePhones() { return getDeviceRegister().phones; }
+function recordDevicePhone(phone) {
+  if (!phone) return;
+  const d = getDeviceRegister();
+  if (d.phones.indexOf(phone) < 0) d.phones.push(phone);
+  d.createdAt = d.createdAt || Date.now();
+  try { localStorage.setItem(DEVICE_KEY, JSON.stringify(d)); } catch(e) {}
+}
+function getLocalSecurity() {
+  try { return JSON.parse(localStorage.getItem(LOCAL_SECURITY_KEY) || '{}'); } catch(e) { return {}; }
+}
+async function saveLocalSecurity(phone, q, answer) {
+  const all = getLocalSecurity();
+  all[phone] = { q: q, a: await sha256(phone + ':' + normalizeSecAnswer(answer)) };
+  try { localStorage.setItem(LOCAL_SECURITY_KEY, JSON.stringify(all)); } catch(e) {}
+}
+async function resetLocalPassword(phone, answer, newPwd) {
+  const sec = getLocalSecurity()[phone];
+  if (!sec) return { ok: false, error: '该账号未设置密保，请联系管理员重置密码' };
+  const a = await sha256(phone + ':' + normalizeSecAnswer(answer));
+  if (a !== sec.a) return { ok: false, error: '密保答案不正确' };
+  const accounts = getAccounts();
+  if (!accounts[phone]) return { ok: false, error: '账号不存在，请先在注册过的设备上操作' };
+  accounts[phone] = await sha256(phone + ':' + newPwd);
+  try { localStorage.setItem(accountStoreKey(), JSON.stringify(accounts)); } catch(e) {}
+  return { ok: true };
+}
+// 初始化密保问题下拉（全局 SECURITY_QUESTIONS 在上方 script 段定义）
+(function initSecQuestionSelect() {
+  const sel = document.getElementById('regSecurityQ');
+  if (!sel || typeof SECURITY_QUESTIONS === 'undefined') return;
+  sel.innerHTML = SECURITY_QUESTIONS.map((q, i) => '<option value="' + i + '">' + q + '</option>').join('');
+})();
+
 // ===== REGISTRATION =====
 document.getElementById('regBtn').addEventListener('click', async function() {
   const btn = this;
@@ -3086,6 +3299,10 @@ document.getElementById('regBtn').addEventListener('click', async function() {
   const pwd = document.getElementById('regPassword').value;
   const pwd2 = document.getElementById('regPassword2').value;
   const name = document.getElementById('regName').value.trim() || '学员';
+  const secQ = document.getElementById('regSecurityQ');
+  const q = secQ ? Number(secQ.value) : 0;
+  const secAnswer = (document.getElementById('regSecurityA') || {}).value || '';
+  const regCode = ((document.getElementById('regCode') || {}).value || '').trim().toUpperCase();
   const msg = document.getElementById('regMsg');
 
   if (!phone || !/^1[3-9]\d{9}$/.test(phone)) {
@@ -3100,7 +3317,22 @@ document.getElementById('regBtn').addEventListener('click', async function() {
     msg.className = 'form-msg error'; msg.textContent = '两次密码不一致';
     return;
   }
+  if (!Number.isInteger(q) || q < 0 || typeof SECURITY_QUESTIONS === 'undefined' || q >= SECURITY_QUESTIONS.length) {
+    msg.className = 'form-msg error'; msg.textContent = '请选择密保问题';
+    return;
+  }
+  if (normalizeSecAnswer(secAnswer).length < 2) {
+    msg.className = 'form-msg error'; msg.textContent = '请填写密保答案（至少2个字）';
+    return;
+  }
+  // 设备锁：本机已注册过其它手机号 → 必须凭管理员注册码放行
+  if (!regCode && isDevicePhoneLocked(phone)) {
+    msg.className = 'form-msg error';
+    msg.textContent = '本机已注册过账号（' + getDevicePhones().join('、') + '）。如需再注册，请向管理员索取注册码，或换用其它设备。';
+    return;
+  }
 
+  const security = { q: q, answer: secAnswer };
   btn.disabled = true;
   msg.className = 'form-msg'; msg.textContent = '⏳ 正在校验账号...';
 
@@ -3108,16 +3340,22 @@ document.getElementById('regBtn').addEventListener('click', async function() {
   await waitForApiProbe();
   if (API_OK) {
     try {
-      const r = await registerViaAPI(phone, pwd, name);
+      const r = await registerViaAPI(phone, pwd, name, security, regCode);
       if (r && r.ok) {
         // 服务器注册成功
         const pwdHash = await sha256(phone + ':' + pwd);
         saveAccount(phone, pwdHash);
+        await saveLocalSecurity(phone, q, secAnswer);
+        recordDevicePhone(phone);
         currentUser = { phone: phone, userName: name, role: 'trial', version: getVersion(), registeredAt: Date.now() };
         isAdmin = false; saveAuth(); localStorage.setItem(TRIAL_KEY + '_' + getVersion(), '0');
-        msg.className = 'form-msg success'; msg.textContent = '注册成功！进入试用模式...';
+        msg.className = 'form-msg success';
+        msg.textContent = '注册成功！进入试用模式...';
         setTimeout(() => { enterApp(); }, 500);
         return;
+      }
+      if (r && r.ok === false && /注册码/.test(r.error || '')) {
+        msg.className = 'form-msg error'; msg.textContent = r.error; btn.disabled = false; return;
       }
       if (r && r.ok === false && /已注册/.test(r.error || '')) {
         // 该手机号已在其它设备注册 → 用本密码尝试直接登录（跨设备）
@@ -3125,7 +3363,7 @@ document.getElementById('regBtn').addEventListener('click', async function() {
         if (lr && lr.ok) {
           currentUser = lr.user; isAdmin = (currentUser.role === 'admin' || currentUser.role === 'subadmin');
           if (isAdmin) adminMode = true;
-          saveAuth();
+          saveAuth(); recordDevicePhone(phone);
           msg.className = 'form-msg success'; msg.textContent = '该账号已存在，已自动登录！';
           setTimeout(() => { enterApp(); }, 500);
           return;
@@ -3134,6 +3372,9 @@ document.getElementById('regBtn').addEventListener('click', async function() {
         msg.textContent = '该手机号已注册，但密码不正确，请用注册时的密码登录';
         btn.disabled = false;
         return;
+      }
+      if (r && r.ok === false && /密保/.test(r.error || '')) {
+        msg.className = 'form-msg error'; msg.textContent = r.error; btn.disabled = false; return;
       }
       // 其它服务器错误 → 降级到本机注册
     } catch (e) { /* 网络抖动 → 降级本机注册 */ }
@@ -3147,9 +3388,11 @@ document.getElementById('regBtn').addEventListener('click', async function() {
   }
   const pwdHash = await sha256(phone + ':' + pwd);
   saveAccount(phone, pwdHash);
+  await saveLocalSecurity(phone, q, secAnswer);
+  recordDevicePhone(phone);
   currentUser = { phone: phone, userName: name, role: 'trial', version: getVersion(), registeredAt: Date.now() };
   isAdmin = false; saveAuth(); localStorage.setItem(TRIAL_KEY + '_' + getVersion(), '0');
-  registerViaAPIBackground(phone, pwd, name);
+  registerViaAPIBackground(phone, pwd, name, security, regCode);
   msg.className = 'form-msg success';
   msg.textContent = API_OK ? '注册成功！进入试用模式...' : '已在本机注册（离线，联网后自动同步）';
   setTimeout(() => { enterApp(); }, 600);
@@ -3238,6 +3481,99 @@ document.getElementById('loginBtn').addEventListener('click', async function() {
     btn.disabled = false; btn.textContent = '🔐 登录';
   }
 });
+
+// ===== FORGOT PASSWORD（密保自助 + 管理员兜底）=====
+let _fpQuestion = null;   // 当前查询到的 { q, question }
+(function initForgotPwd() {
+  const link = document.getElementById('linkForgotPwd');
+  const back = document.getElementById('fpBack');
+  const queryBtn = document.getElementById('fpQueryBtn');
+  const resetBtn = document.getElementById('fpResetBtn');
+  const contactBtn = document.getElementById('fpContactAdmin');
+  if (!link || !queryBtn || !resetBtn) return;
+
+  link.addEventListener('click', function() {
+    showScreen('forgotPwdScreen');
+    document.getElementById('fpMsg').textContent = '';
+    document.getElementById('fpAnswerBox').style.display = 'none';
+    _fpQuestion = null;
+  });
+  back.addEventListener('click', function() { showScreen('loginScreen'); });
+  contactBtn.addEventListener('click', function() {
+    msgInfo('fpMsg', '请在下方填写注册手机号，然后到首页「设置 → 在线客服」联系管理员核实身份后重置密码。');
+  });
+
+  function msgInfo(id, text) { const e = document.getElementById(id); e.className = 'form-msg info'; e.textContent = text; }
+  function msgErr(text) { const e = document.getElementById('fpMsg'); e.className = 'form-msg error'; e.textContent = text; }
+  function msgOk(text) { const e = document.getElementById('fpMsg'); e.className = 'form-msg success'; e.textContent = text; }
+
+  queryBtn.addEventListener('click', async function() {
+    const phone = document.getElementById('fpPhone').value.trim();
+    const msg = document.getElementById('fpMsg');
+    if (!/^1[3-9]\d{9}$/.test(phone)) { msgErr('请输入有效的注册手机号'); return; }
+    queryBtn.disabled = true;
+    msg.className = 'form-msg info'; msg.textContent = '⏳ 正在查询密保问题...';
+
+    // 先问服务器（跨设备密保）
+    if (API_OK) {
+      try {
+        const r = await apiPost('/api/auth/security-question', { phone, version: getVersion() });
+        if (r && r.ok) { _fpQuestion = r; }
+        else if (r && r.error) { msgErr(r.error); queryBtn.disabled = false; return; }
+      } catch(e) {}
+    }
+    // 服务器不可用 → 查本地密保（离线注册的账号）
+    if (!_fpQuestion) {
+      const local = getLocalSecurity()[phone];
+      if (local && typeof SECURITY_QUESTIONS !== 'undefined' && SECURITY_QUESTIONS[local.q]) {
+        _fpQuestion = { q: local.q, question: SECURITY_QUESTIONS[local.q] };
+      } else {
+        msgErr(API_OK ? '未查询到密保信息，请联系管理员重置密码' : '网络未连接且本机无此账号密保信息，请联网后再试或联系管理员');
+        queryBtn.disabled = false; return;
+      }
+    }
+    document.getElementById('fpQuestionLabel').textContent = '🛡️ ' + _fpQuestion.question;
+    document.getElementById('fpAnswerBox').style.display = '';
+    msg.className = 'form-msg'; msg.textContent = '请回答密保问题并设置新密码';
+    queryBtn.disabled = false;
+  });
+
+  resetBtn.addEventListener('click', async function() {
+    const phone = document.getElementById('fpPhone').value.trim();
+    const answer = document.getElementById('fpAnswer').value;
+    const nw = document.getElementById('fpNewPwd').value;
+    const nw2 = document.getElementById('fpNewPwd2').value;
+    if (!_fpQuestion) { msgErr('请先查询密保问题'); return; }
+    if (normalizeSecAnswer(answer).length < 2) { msgErr('请输入密保答案'); return; }
+    if (!nw || nw.length < 6) { msgErr('新密码至少6位'); return; }
+    if (nw !== nw2) { msgErr('两次新密码不一致'); return; }
+
+    resetBtn.disabled = true;
+    msg.className = 'form-msg info'; msg.textContent = '⏳ 正在验证并重置...';
+    let ok = false, err = '';
+    if (API_OK) {
+      try {
+        const r = await apiPost('/api/auth/reset-password', { phone, answer, newPassword: nw, version: getVersion() });
+        if (r && r.ok) ok = true; else err = (r && r.error) || '重置失败，请重试';
+      } catch(e) { err = '网络错误，请重试'; }
+    }
+    // 本地兜底：用本地密保校验并改本地密码（离线注册的账号）
+    if (!ok && !API_OK) {
+      const r = await resetLocalPassword(phone, answer, nw);
+      ok = !!(r && r.ok); err = (r && r.error) || '';
+    }
+    if (ok) {
+      msgOk('✓ 密码已重置，请用新密码登录');
+      ['fpAnswer','fpNewPwd','fpNewPwd2'].forEach(id => { document.getElementById(id).value = ''; });
+      document.getElementById('fpAnswerBox').style.display = 'none';
+      _fpQuestion = null;
+      setTimeout(function() { showScreen('loginScreen'); document.getElementById('loginPhone').value = phone; }, 1200);
+    } else {
+      msgErr(err || '重置失败，请联系管理员处理');
+    }
+    resetBtn.disabled = false;
+  });
+})();
 
 // ===== ACTIVATION =====
 document.getElementById('activateBtn').addEventListener('click', async function() {
@@ -4073,6 +4409,25 @@ async function renderAdminDashboard() {
       html += '</div></div>';
     });
     html += '</div></div>';
+
+    // 一次性注册码管理：放行「一机一号」设备锁
+    let regCodes = getRegCodes();
+    if (API_OK) { const rr = await apiGet('/api/reg-codes?superPhone=' + encodeURIComponent(ADMIN_PHONE)); if (rr) { regCodes = rr; localStorage.setItem(REG_CODES_KEY, JSON.stringify(rr)); } }
+    const unusedCodes = regCodes.filter(c => !c.usedAt);
+    html += '<div class="admin-section" style="border-top:2px solid var(--primary);margin-top:8px"><h4>🎫 一次性注册码（' + unusedCodes.length + ' 个未使用）</h4>';
+    html += '<div style="font-size:11px;color:var(--text-secondary);margin-bottom:6px">发放给确需在本机注册第二个账号的学员：注册时填入可绕过「一机一号」设备锁；每个码仅用一次。</div>';
+    html += '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">';
+    html += '<input type="text" id="regCodeInput" placeholder="留空则自动生成" maxlength="12" style="flex:1;min-width:110px;padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;text-transform:uppercase">';
+    html += '<button class="btn btn-primary btn-sm" id="btnGenRegCode">➕ 生成注册码</button>';
+    html += '</div><div id="regCodeMsg" class="form-msg"></div><div id="regCodeListWrap">';
+    if (regCodes.length === 0) html += '<p style="font-size:12px;color:#94a3b8">暂无注册码</p>';
+    else regCodes.slice().reverse().forEach(c => {
+      const used = c.usedAt ? '<span style="color:#94a3b8;font-size:11px">已用于 ' + escapeHtml(c.usedBy || '') + '</span>' : '<span style="color:#16a34a;font-size:11px">●未使用</span>';
+      html += '<div class="request-item" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px">';
+      html += '<div><b style="letter-spacing:1px">' + escapeHtml(c.code) + '</b> ' + used + '</div>';
+      html += '<button class="btn btn-outline btn-sm regcode-del" data-code="' + escapeHtml(c.code) + '" style="color:#dc2626;border-color:#dc2626">🗑 删除</button></div>';
+    });
+    html += '</div></div>';
   }
 
   html += '<button class="btn btn-ghost btn-sm-block" id="btnAdminBackToPractice">🏠 返回学习首页</button>';
@@ -4236,11 +4591,41 @@ async function renderAdminDashboard() {
     document.querySelectorAll('.mem-pwd').forEach(function(btn) {
       btn.addEventListener('click', async function() {
         const phone = this.getAttribute('data-phone');
-        const np = prompt('为账号 ' + phone + ' 设置新密码（至少6位，两个板块通用）');
+        const np = prompt('为账号 ' + phone + ' 设置新密码（至少6位，两个板块通用）\n（忘记密码的学员核实身份后可在此重置）');
         if (np === null) return;
         if (np.length < 6) { alert('密码至少6位'); return; }
         const r = await apiPut('/api/admin/accounts/' + encodeURIComponent(phone) + '?superPhone=' + ADMIN_PHONE + '&version=' + adminMemVersion, { newPassword: np });
         if (r && r.ok) alert('✅ 密码已更新'); else alert((r && r.error) || '修改失败');
+      });
+    });
+    // 注册码：生成 / 删除
+    const btnGen = document.getElementById('btnGenRegCode');
+    if (btnGen) btnGen.addEventListener('click', async function() {
+      const inp = document.getElementById('regCodeInput');
+      const cm = document.getElementById('regCodeMsg');
+      let code = inp.value.trim().toUpperCase();
+      if (!code) code = genRegCodeString();
+      if (!/^[A-Z0-9]{6,12}$/.test(code)) { cm.className = 'form-msg error'; cm.textContent = '注册码需为6-12位大写字母或数字'; return; }
+      this.disabled = true;
+      let r = null;
+      if (API_OK) r = await apiPost('/api/reg-codes?superPhone=' + ADMIN_PHONE, { code: code });
+      if (r && r.ok) {
+        cm.className = 'form-msg success'; cm.textContent = '✓ 已生成注册码：' + code + '（请复制发给学员）';
+        inp.value = '';
+        await getRegCodesFromServer();
+        renderAdminDashboard();
+      } else {
+        cm.className = 'form-msg error'; cm.textContent = (r && r.error) || (API_OK ? '生成失败' : '网络未连接，无法生成注册码');
+        this.disabled = false;
+      }
+    });
+    document.querySelectorAll('.regcode-del').forEach(function(btn) {
+      btn.addEventListener('click', async function() {
+        const code = this.getAttribute('data-code');
+        if (!confirm('确定删除注册码 ' + code + '？删除后该码立即失效。')) return;
+        const r = await apiDelete('/api/reg-codes/' + encodeURIComponent(code) + '?superPhone=' + ADMIN_PHONE);
+        if (r && r.ok) { await getRegCodesFromServer(); renderAdminDashboard(); }
+        else alert((r && r.error) || '删除失败');
       });
     });
   }
