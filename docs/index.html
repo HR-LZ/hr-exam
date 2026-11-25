@@ -1142,11 +1142,14 @@ body.theme-economist .hero-actions .hero-main { color: #0f766e; }
     </div>
     <div id="fpAnswerBox">
       <div class="form-group" style="margin-top:12px">
-        <label id="fpQuestionLabel">🛡️ 密保问题</label>
-        <div id="fpQuestionHint" style="font-size:12px;color:var(--text-secondary);line-height:1.6;margin:2px 0 8px">输入注册手机号后，这里会自动显示你的密保问题</div>
-        <input type="text" id="fpAnswer" placeholder="请输入密保答案" maxlength="30" autocomplete="off">
+        <label>🛡️ 你的密保问题</label>
+        <div id="fpQuestionLabel" style="font-size:13px;color:var(--text-primary);line-height:1.6;background:var(--accent-soft);border:1px solid var(--border);border-radius:8px;padding:9px 12px;min-height:36px">输入注册手机号后，这里会自动显示你的密保问题</div>
       </div>
-      <button class="btn btn-primary btn-block" id="fpVerifyBtn">提交</button>
+      <div class="form-group">
+        <label>✏️ 密保答案（填写框）</label>
+        <input type="text" id="fpAnswer" placeholder="请在这里填写密保答案" maxlength="30" autocomplete="off">
+      </div>
+      <button class="btn btn-primary btn-block" id="fpVerifyBtn">提交答案</button>
     </div>
     <div id="fpResetBox" style="display:none">
       <div class="form-group" style="margin-top:12px">
@@ -1369,6 +1372,11 @@ body.theme-economist .hero-actions .hero-main { color: #0f766e; }
     <button class="version-panel-close" id="versionPanelClose" data-page-node-id="Xa1Xz8m9TKbIhDcYL9QmFq">✕</button>
   </div>
   <div class="version-panel-body" id="versionPanelBody" data-page-node-id="ip8iR3IaL6LwFUYsDyRcmV">
+    <div class="version-item">
+      <span class="version-tag" style="background:#2563eb">V42</span>
+      <div class="version-date">2026-11-26</div>
+      <div class="version-desc">✏️ 找回密码页结构更清晰：密保问题为独立显示区、密保答案单独标注「填写框」，提交按钮改为「提交答案」</div>
+    </div>
     <div class="version-item">
       <span class="version-tag" style="background:#2563eb">V41</span>
       <div class="version-date">2026-11-26</div>
@@ -3575,9 +3583,7 @@ let _fpVerifiedAnswer = null;  // 已验证通过的密保答案（用于第二�
   if (!link || !phoneInput || !verifyBtn || !resetBtn) return;
 
   function restoreQuestionPlaceholder() {
-    document.getElementById('fpQuestionLabel').textContent = '🛡️ 密保问题';
-    const hint = document.getElementById('fpQuestionHint');
-    if (hint) hint.style.display = '';
+    document.getElementById('fpQuestionLabel').textContent = '输入注册手机号后，这里会自动显示你的密保问题';
   }
   function resetFpState() {
     _fpQuestion = null;
@@ -3673,9 +3679,7 @@ let _fpVerifiedAnswer = null;  // 已验证通过的密保答案（用于第二�
       msgErr(API_OK ? '未查询到密保信息，请联系管理员重置密码' : '网络未连接且本机无此账号密保信息，请联网后再试或联系管理员');
       return false;
     }
-    document.getElementById('fpQuestionLabel').textContent = '🛡️ ' + _fpQuestion.question;
-    const hint = document.getElementById('fpQuestionHint');
-    if (hint) hint.style.display = 'none';
+    document.getElementById('fpQuestionLabel').textContent = _fpQuestion.question;
     document.getElementById('fpAnswerBox').style.display = '';
     document.getElementById('fpResetBox').style.display = 'none';
     msgInfo('请输入密保答案，验证通过后再设置新密码');
