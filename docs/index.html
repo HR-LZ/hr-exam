@@ -1028,7 +1028,7 @@ body.theme-economist .hero-actions .hero-main { color: #0f766e; }
   <div class="overlay-card" data-page-node-id="aEunW3WWFpfrWrLqc5Ewus">
     <div class="overlay-logo" data-page-node-id="uqL5gLDTp8yxRKIDjMW9iK">📋</div>
     <div class="overlay-title" data-page-node-id="M3mPuJGbfGMCt2QgHlZdGP">人力资源考试刷题平台</div>
-    <div class="overlay-sub" data-page-node-id="Sc51amAMucCCUEgAAAnZCa">请选择要进入的考试版本</div>
+    <div class="overlay-sub" data-page-node-id="Sc51amAMucCCUEgAAAnZCa">请选择要进入的考试版本 · 一个账号可进入两个板块，会员按板块分别开通</div>
 
     <div class="version-cards" id="versionCards">
       <button class="version-card vc-hrm3 active" id="vcHrm3" data-version="hrm3" type="button">
@@ -1065,7 +1065,7 @@ body.theme-economist .hero-actions .hero-main { color: #0f766e; }
   <div class="overlay-card" data-page-node-id="QpC9NyxOCawjyq7G9Et5WZ">
     <div class="overlay-logo" data-page-node-id="v9t2tfKAwyrW1oWHVB41PB">📝</div>
     <div class="overlay-title" data-page-node-id="w2KIC23lXfY7d0EAxlpqKZ">注册新账号</div>
-    <div class="overlay-sub" data-page-node-id="1F8HUWLRy6QelqhZOEByTK" id="regTrialSub">注册后即可免费试用（按题型赠送额度）</div>
+    <div class="overlay-sub" data-page-node-id="1F8HUWLRy6QelqhZOEByTK" id="regTrialSub">一个账号可进入两个板块，会员按板块开通</div>
     <div class="js-conn-status conn-pending" data-page-node-id="daFe1IlaarxKbgxFom4fJV">⏳ 连接中…</div>
     <div class="form-group" data-page-node-id="30DkZST11idQz0oYoH4qvb">
       <label data-page-node-id="IYsXJucdTJK51p5rMttmpl">📱 手机号</label>
@@ -1284,6 +1284,11 @@ body.theme-economist .hero-actions .hero-main { color: #0f766e; }
     <button class="version-panel-close" id="versionPanelClose" data-page-node-id="Xa1Xz8m9TKbIhDcYL9QmFq">✕</button>
   </div>
   <div class="version-panel-body" id="versionPanelBody" data-page-node-id="ip8iR3IaL6LwFUYsDyRcmV">
+    <div class="version-item">
+      <span class="version-tag" style="background:#2563eb">V35</span>
+      <div class="version-date">2026-11-25</div>
+      <div class="version-desc">🔑 注册一个账号即可进入两个板块，无需分别注册；密码与昵称两个板块通用<br>🎯 会员按板块分别开通：A 板块开通不影响 B 板块，切换板块后身份与试用额度自动切换<br>🛠 管理员可为已有账号直接开通任一块会员，取消会员只影响当前板块；历史账号自动合并</div>
+    </div>
     <div class="version-item">
       <span class="version-tag" style="background:#2563eb">V34</span>
       <div class="version-date">2026-11-25</div>
@@ -1569,10 +1574,11 @@ let API_OK = false;
 let _apiProbeDone = false;
 let _apiProbePromise = null;
 
-// 账号体系按「考试版本」彻底拆分：现有全局账号整体迁移进 hrm3（企业HR三级），
-// 经济师版本拥有完全独立的账号池、试用计数与激活名单。管理账号（admin / 子管理员）
-// 与系统级集合保持全局。
+// 账号体系：一个手机号 + 密码 = 一个全局账号，可进入两个板块；
+// 会员（激活名单）与试用计数仍按版本独立，A 板块开通不影响 B 板块。
+// 管理账号（admin / 子管理员）与系统级集合保持全局。
 const DB_DEFAULT = {
+  accounts: {},   // 全局账号 { phone: { hash, name, registeredAt, updatedAt?, createdBy? } }
   versions: {
     hrm3:      { accounts: {}, trials: {}, activated_phones: [] },  // 企业人力资源管理师三级
     economist: { accounts: {}, trials: {}, activated_phones: [] }   // 中级经济师人力资源管理
@@ -1587,8 +1593,10 @@ const DB_DEFAULT = {
   subadmins: {}           // { phone: { hash, name, createdAt } }  子管理员账号（全局，仅最高权限管理员可管理）
 };
 
-// 一次性迁移：把旧版全局 accounts/trials/activated_phones 合并进 hrm3 版本。
-// 幂等：迁移完成后这些顶层字段被删除，后续读取不再重复迁移。
+// 一次性迁移 + 幂等归一化：
+// 1) 旧版「按版本隔离」的 accounts 合并为一个全局账号池（任意版本注册过即可共用）；
+// 2) 全局账号为权威，镜像回各版本 accounts，兼容仍读 vstore().accounts 的旧代码；
+// 3) 试用计数、激活名单继续留在各自版本，互不影响。
 function ensureVersions(db) {
   if (!db || typeof db !== 'object') return db;
   if (!db.versions) {
@@ -1597,21 +1605,22 @@ function ensureVersions(db) {
       economist: { accounts: {}, trials: {}, trial_counts: {}, activated_phones: [] }
     };
   }
-  if (db.versions) {
-    // 补齐历史数据里可能缺失的子字段，避免 .push / 下标访问报错
-    ['hrm3', 'economist'].forEach(function(v) {
-      const vs = db.versions[v] || {};
-      if (!vs.accounts || typeof vs.accounts !== 'object') vs.accounts = {};
-      if (!vs.trials || typeof vs.trials !== 'object') vs.trials = {};
-      if (!vs.trial_counts || typeof vs.trial_counts !== 'object') vs.trial_counts = {};
-      if (!Array.isArray(vs.activated_phones)) vs.activated_phones = [];
-      db.versions[v] = vs;
+  if (!db.accounts || typeof db.accounts !== 'object' || Array.isArray(db.accounts)) db.accounts = {};
+  // 补齐历史数据里可能缺失的子字段，避免 .push / 下标访问报错
+  ['hrm3', 'economist'].forEach(function(v) {
+    const vs = db.versions[v] || {};
+    if (!vs.accounts || typeof vs.accounts !== 'object') vs.accounts = {};
+    if (!vs.trials || typeof vs.trials !== 'object') vs.trials = {};
+    if (!vs.trial_counts || typeof vs.trial_counts !== 'object') vs.trial_counts = {};
+    if (!Array.isArray(vs.activated_phones)) vs.activated_phones = [];
+    db.versions[v] = vs;
+    Object.keys(vs.accounts).forEach(function(p) {
+      if (!db.accounts[p]) db.accounts[p] = vs.accounts[p];
     });
-  }
-  if (db.accounts) {
-    Object.keys(db.accounts).forEach(function(p) { db.versions.hrm3.accounts[p] = db.accounts[p]; });
-    delete db.accounts;
-  }
+    Object.keys(db.accounts).forEach(function(p) {
+      if (!vs.accounts[p]) vs.accounts[p] = db.accounts[p];
+    });
+  });
   if (db.trials) {
     Object.keys(db.trials).forEach(function(p) { db.versions.hrm3.trials[p] = db.trials[p]; });
     delete db.trials;
@@ -1896,10 +1905,16 @@ async function giteeRoute(rawPath, method, body) {
   const query = new URLSearchParams(qi === -1 ? '' : rawPath.slice(qi + 1));
   const R = (data, status) => ({ status: status || 200, data: data });
 
-  // ===== 版本作用域：账号/试用/激活按考试版本完全独立 =====
+  // ===== 账号全局共用；试用计数与激活名单按考试版本独立 =====
   const reqVersion = (body && typeof body.version !== 'undefined') ? body.version : (query.get('version') || 'hrm3');
   const apiVersion = (reqVersion === 'hrm3' || reqVersion === 'economist') ? reqVersion : 'hrm3';
   const vstore = (db2) => (db2.versions[apiVersion] || db2.versions.hrm3);
+  const mirrorAccount = (db2, phone, acc) => {
+    db2.accounts[phone] = acc;
+    ['hrm3', 'economist'].forEach(function(v) {
+      if (db2.versions[v]) db2.versions[v].accounts[phone] = acc;
+    });
+  };
 
   // ===== AUTH =====
   if (path === '/api/auth/register' && method === 'POST') {
@@ -1908,11 +1923,13 @@ async function giteeRoute(rawPath, method, body) {
     if (!password || password.length < 6) return R({ ok: false, error: '密码至少6位' });
     let out;
     await dbMutate(db => {
+      if (db.accounts && db.accounts[phone]) { out = { ok: false, error: '该手机号已注册' }; return; }
       const VS = vstore(db);
       if (VS.accounts[phone]) { out = { ok: false, error: '该手机号已注册' }; return; }
       const now = Date.now();
-      VS.accounts[phone] = { hash: sha256Hex(phone + ':' + password), name: name || '学员', registeredAt: now, version: apiVersion };
-      out = { ok: true, user: { phone: phone, userName: name || '学员', role: 'trial', version: apiVersion, registeredAt: now } };
+      const acc = { hash: sha256Hex(phone + ':' + password), name: name || '学员', registeredAt: now };
+      mirrorAccount(db, phone, acc);
+      out = { ok: true, user: { phone: phone, userName: acc.name, role: 'trial', version: apiVersion, registeredAt: now } };
     });
     return R(out);
   }
@@ -1930,7 +1947,8 @@ async function giteeRoute(rawPath, method, body) {
       return R({ ok: true, user: { phone: phone, userName: db.subadmins[phone].name || '子管理员', role: 'subadmin' } });
     }
     const VS = vstore(db);
-    const acc = VS.accounts[phone];
+    // 账号全局共用：任意板块注册过都能登录另一个板块，会员身份按所登录板块判定
+    const acc = (db.accounts && db.accounts[phone]) || VS.accounts[phone];
     if (!acc) return R({ ok: false, error: '账号不存在，请先注册' });
     if (acc.hash !== sha256Hex(phone + ':' + password)) return R({ ok: false, error: '密码错误' });
     const isActivated = Array.isArray(VS.activated_phones) && VS.activated_phones.some(p => p.phone === phone);
@@ -1991,10 +2009,11 @@ async function giteeRoute(rawPath, method, body) {
     if (!nw || nw.length < 6) return R({ ok: false, error: '新密码至少6位' });
     let res;
     await dbMutate(db => {
-      const acc = vstore(db).accounts[phone];
+      const acc = (db.accounts && db.accounts[phone]) || vstore(db).accounts[phone];
       if (!acc) { res = { ok: false, error: '账号不存在' }; return; }
       if (sha256Hex(phone + ':' + cur) !== acc.hash) { res = { ok: false, error: '当前密码错误' }; return; }
       acc.hash = sha256Hex(phone + ':' + nw); acc.updatedAt = Date.now();
+      mirrorAccount(db, phone, acc);   // 密码全局生效，两个板块共用
       res = { ok: true };
     });
     return R(res);
@@ -2050,7 +2069,8 @@ async function giteeRoute(rawPath, method, body) {
       const db = await dbRead();
       const VS = vstore(db);
       const activated = (VS.activated_phones || []).map(p => p.phone);
-      return R(Object.keys(VS.accounts).map(p => ({ phone: p, name: VS.accounts[p].name, activated: activated.includes(p), createdBy: VS.accounts[p].createdBy || null, version: apiVersion })));
+      // 列出全部共用账号，按当前管理版本标注是否已开通会员
+      return R(Object.keys(db.accounts || {}).map(p => ({ phone: p, name: db.accounts[p].name, activated: activated.includes(p), createdBy: db.accounts[p].createdBy || null, version: apiVersion })));
     }
     if (method === 'POST') {
       const phone = body.phone;
@@ -2060,11 +2080,19 @@ async function giteeRoute(rawPath, method, body) {
       let res;
       await dbMutate(db => {
         const VS = vstore(db);
-        if (VS.accounts[phone]) { res = { ok: false, error: '该会员已存在' }; return; }
-        const now = Date.now();
-        VS.accounts[phone] = { hash: sha256Hex(phone + ':' + pwd), name: body.name || '会员', registeredAt: now, createdBy: 'admin', version: apiVersion };
-        VS.activated_phones.push({ phone: phone, activatedAt: now, byAdmin: true });
-        res = { ok: true };
+        let acc = (db.accounts && db.accounts[phone]) || VS.accounts[phone];
+        let created = false;
+        if (!acc) {
+          const now = Date.now();
+          acc = { hash: sha256Hex(phone + ':' + pwd), name: body.name || '会员', registeredAt: now, createdBy: 'admin' };
+          created = true;
+        }
+        // 账号已存在时只开通当前板块会员，不覆盖原密码
+        mirrorAccount(db, phone, acc);
+        if (!VS.activated_phones.some(p => p.phone === phone)) {
+          VS.activated_phones.push({ phone: phone, activatedAt: Date.now(), byAdmin: true });
+        }
+        res = { ok: true, created: created };
       });
       return R(res);
     }
@@ -2074,9 +2102,10 @@ async function giteeRoute(rawPath, method, body) {
       if (!pwd || pwd.length < 6) return R({ ok: false, error: '新密码至少6位' });
       let res;
       await dbMutate(db => {
-        const VS = vstore(db);
-        if (!VS.accounts[phone]) { res = { ok: false, error: '会员不存在' }; return; }
-        VS.accounts[phone].hash = sha256Hex(phone + ':' + pwd);
+        const acc = (db.accounts && db.accounts[phone]) || vstore(db).accounts[phone];
+        if (!acc) { res = { ok: false, error: '账号不存在' }; return; }
+        acc.hash = sha256Hex(phone + ':' + pwd);
+        mirrorAccount(db, phone, acc);   // 改密全局生效
         res = { ok: true };
       });
       return R(res);
@@ -2085,8 +2114,10 @@ async function giteeRoute(rawPath, method, body) {
       let res;
       await dbMutate(db => {
         const VS = vstore(db);
-        if (!VS.accounts[phone]) { res = { ok: false, error: '会员不存在' }; return; }
-        delete VS.accounts[phone];
+        if (!(db.accounts && db.accounts[phone]) && !VS.accounts[phone]) {
+          res = { ok: false, error: '账号不存在' }; return;
+        }
+        // 只取消当前板块会员资格，账号与其它板块会员均保留
         VS.activated_phones = (VS.activated_phones || []).filter(p => p.phone !== phone);
         res = { ok: true };
       });
@@ -2338,7 +2369,7 @@ async function syncDelete(key) { await waitForApiProbe(); if (!API_OK) return; t
 
 async function syncAuthToServer() {
   if (!API_OK || !currentUser) return;
-  // 同一手机号可能同时拥有两个版本账号：按版本分别存键，避免互相覆盖。
+  // 同一账号可进入两个板块且会员资格不同：按版本分别存键，避免互相覆盖。
   // hrm3 额外写回旧键 auth，兼容升级前已存的数据。
   const v = currentUser.version || getVersion();
   const patch = {};
@@ -2418,11 +2449,12 @@ function loadAuth() {
       currentUser = JSON.parse(raw);
       isAdmin = (currentUser.role === 'admin' || currentUser.role === 'subadmin');
       if (isAdmin) adminMode = true;
-      // 账号归属版本：升级前的老会话无 version 字段，整体归入 HR 三级。
+      // 账号两个板块通用：版本只决定当前所在板块，不由账号归属覆盖
       if (!isAdmin) {
-        currentVersion = currentUser.version || 'hrm3';
+        let savedVer = null;
+        try { savedVer = localStorage.getItem(VERSION_KEY); } catch(e) {}
+        currentVersion = (savedVer === 'hrm3' || savedVer === 'economist') ? savedVer : 'hrm3';
         currentUser.version = currentVersion;
-        try { localStorage.setItem(VERSION_KEY, currentVersion); } catch(e) {}
       }
       applyVersionTheme(currentVersion);
       if (!isAdmin && currentUser.role !== 'trial') {
@@ -2573,10 +2605,30 @@ function markPhoneActivated(phone, v) {
 function isPhoneActivated(phone, v) {
   return getActivatedPhones(v).some(p => p.phone === phone);
 }
+// 同一账号切换板块时，按目标板块的会员名单重算身份：
+// A 板块开通会员不会让 B 板块自动变成会员；试用计数也各自独立。
+function refreshMembershipForVersion(v) {
+  if (!currentUser || isAdmin || currentUser.role === 'admin' || currentUser.role === 'subadmin') return;
+  const ver = (v === 'hrm3' || v === 'economist') ? v : getVersion();
+  const active = isPhoneActivated(currentUser.phone, ver);
+  currentUser.version = ver;
+  if (active) {
+    currentUser.role = 'activated';
+    if (!currentUser.expiresAt || currentUser.expiresAt <= Date.now()) {
+      currentUser.expiresAt = Date.now() + ACTIVATION_VALIDITY_DAYS * 24 * 60 * 60 * 1000;
+    }
+    currentUser.activatedAt = currentUser.activatedAt || Date.now();
+  } else {
+    currentUser.role = 'trial';
+    delete currentUser.expiresAt;
+    delete currentUser.activatedAt;
+  }
+  saveAuth();
+}
 function activateCurrentUser() {
   if (!currentUser || currentUser.role === 'activated') return;
   currentUser.role = 'activated';
-  currentUser.version = currentUser.version || getVersion();
+  currentUser.version = getVersion();
   currentUser.expiresAt = Date.now() + ACTIVATION_VALIDITY_DAYS * 24 * 60 * 60 * 1000;
   currentUser.activatedAt = Date.now();
   saveAuth();
@@ -2585,7 +2637,7 @@ function activateUserByPhone(phone, v) {
   const ver = v || (typeof adminMemVersion !== 'undefined' ? adminMemVersion : getVersion());
   markPhoneActivated(phone, ver);
   if (currentUser && currentUser.phone === phone && currentUser.role !== 'admin'
-      && (currentUser.version || 'hrm3') === ver) {
+      && getVersion() === ver) {
     activateCurrentUser();
   }
 }
@@ -2828,7 +2880,7 @@ function showScreen(screenId) {
   // 注册页免费试用描述跟随当前版本额度
   const regSub = document.getElementById('regTrialSub');
   if (regSub && typeof getTrialQuota === 'function') {
-    regSub.textContent = '注册后即可免费试用 ' + getTrialTotalLimit(getVersion()) + ' 道题';
+    regSub.textContent = '注册后本板块可试用 ' + getTrialTotalLimit(getVersion()) + ' 道题 · 账号通用，会员按板块开通';
   }
 }
 
@@ -2841,10 +2893,24 @@ function selectVersion(v) {
   if (changed) { try { localStorage.removeItem(LAST_EXAM_KEY); } catch(e) {} }
   try { localStorage.setItem(VERSION_KEY, v); } catch(e) {}
   applyVersionTheme(v);
+  // 账号通用：切换板块立即按目标板块的会员名单重算身份（会员不跨板块）
+  refreshMembershipForVersion(v);
   document.querySelectorAll('#versionCards .version-card').forEach(function(c) {
     c.classList.toggle('active', c.dataset.version === v);
   });
   renderWelcomeActions();
+  // 在线时再以服务器会员名单复核一次，避免本地缓存过期导致误判
+  if (currentUser && !isAdmin && API_OK) {
+    (async function() {
+      try {
+        await getActivatedPhonesFromServer(v);
+        if (getVersion() === v) {
+          refreshMembershipForVersion(v);
+          renderWelcomeActions();
+        }
+      } catch(e) {}
+    })();
+  }
 }
 
 function renderWelcomeActions() {
@@ -2852,16 +2918,20 @@ function renderWelcomeActions() {
   const quick = document.getElementById('welcomeQuick');
   const forms = document.getElementById('welcomeAuthForms');
   const head = document.getElementById('vaHead');
-  if (head) head.textContent = '当前版本：' + (VERSION_LABELS[v] || '');
-  if (!quick || !forms) return;
   const adminU = currentUser && isAdmin;
-  const loggedV = currentUser && !isAdmin && currentUser.version === v;
+  const loggedV = !!currentUser && !isAdmin;
+  const actInThisV = !!(loggedV && isPhoneActivated(currentUser.phone, v));
+  if (head) {
+    head.textContent = '当前版本：' + (VERSION_LABELS[v] || '')
+      + (adminU ? ' · 管理视角' : (loggedV ? (actInThisV ? ' · 本板块会员已开通' : ' · 本板块试用中') : ' · 一个账号可进入两个板块'));
+  }
+  if (!quick || !forms) return;
   if (adminU) {
     quick.innerHTML = '<button class="btn btn-warning btn-block" id="welcomeEnterAdmin">⚙️ 进入管理后台</button>';
     document.getElementById('welcomeEnterAdmin').onclick = function() { enterApp(); };
     forms.style.display = 'none';
   } else if (loggedV) {
-    quick.innerHTML = '<button class="btn btn-primary btn-block" id="welcomeEnterApp">✅ 进入学习（已登录）</button>'
+    quick.innerHTML = '<button class="btn btn-primary btn-block" id="welcomeEnterApp">✅ 进入学习（' + (actInThisV ? '会员' : '试用中') + '）</button>'
       + '<button class="btn btn-ghost btn-sm-block" id="welcomeLogout" style="margin-top:8px">🚪 退出该账号</button>';
     document.getElementById('welcomeEnterApp').onclick = function() { enterApp(); };
     document.getElementById('welcomeLogout').onclick = function() { logout(); };
@@ -2890,17 +2960,26 @@ function prepareWelcome() {
   else bind();
 })();
 
-// ===== ACCOUNT STORAGE（按版本隔离，旧全局账号一次性迁入 hrm3）=====
-function accountStoreKey() { return 'hr_exam_v6_accounts_' + getVersion(); }
+// ===== ACCOUNT STORAGE（账号全局共用；旧按版本账号一次性并入）=====
+const ACCOUNT_KEY = 'hr_exam_v6_accounts';
+function accountStoreKey() { return ACCOUNT_KEY; }
 function getAccounts() {
-  const key = accountStoreKey();
   try {
-    let r = localStorage.getItem(key);
-    if (!r && getVersion() === 'hrm3') {
-      const legacy = localStorage.getItem('hr_exam_v6_accounts');
-      if (legacy) { localStorage.setItem(key, legacy); r = legacy; }
+    const merged = {};
+    // 升级前两个板块各自存了一份账号，这里统一合并到一个账号池
+    ['hr_exam_v6_accounts_hrm3', 'hr_exam_v6_accounts_economist'].forEach(function(k) {
+      try {
+        const old = JSON.parse(localStorage.getItem(k) || '{}');
+        Object.keys(old).forEach(function(p) { if (!merged[p]) merged[p] = old[p]; });
+      } catch(e) {}
+    });
+    const raw = localStorage.getItem(ACCOUNT_KEY);
+    if (raw) {
+      const cur = JSON.parse(raw);
+      Object.keys(cur).forEach(function(p) { merged[p] = cur[p]; });
     }
-    return r ? JSON.parse(r) : {};
+    if (Object.keys(merged).length) localStorage.setItem(ACCOUNT_KEY, JSON.stringify(merged));
+    return merged;
   } catch(e) { return {}; }
 }
 function saveAccount(phone, pwdHash) {
@@ -2988,19 +3067,12 @@ function syncUserDataBackground(phone) {
   (async function() {
     await waitForApiProbe();
     if (API_OK && currentUser) {
-      // Cross-device sync: pull latest auth
-      const serverAuth = await syncAuthFromServer(phone);
-      if (serverAuth && serverAuth.role === 'activated' && (!serverAuth.version || serverAuth.version === getVersion()) && currentUser.role !== 'activated') {
-        currentUser = serverAuth;
-        isAdmin = false;
-        saveAuth();
-        updateHeaderInfo();
-        updateTrialBanner();
-        updateBadge();
-      }
-      // Auto-activate if phone is approved
-      if (currentUser && currentUser.role === 'trial' && isPhoneActivated(phone)) {
-        activateCurrentUser();
+      // 跨设备同步：按当前板块的会员名单重算身份（不跨板块套用 auth）
+      await getActivatedPhonesFromServer(getVersion());
+      const beforeRole = currentUser.role;
+      refreshMembershipForVersion(getVersion());
+      if (beforeRole !== currentUser.role) {
+        updateHeaderInfo(); updateTrialBanner(); updateBadge(); render();
       }
       await syncUserDataFromServer(phone);
     }
@@ -3132,29 +3204,24 @@ document.getElementById('loginBtn').addEventListener('click', async function() {
       currentUser = apiResult.user;
       isAdmin = (currentUser.role === 'admin' || currentUser.role === 'subadmin');
       if (isAdmin) adminMode = true;
-      else currentUser.version = currentUser.version || getVersion();
+      else {
+        currentUser.version = getVersion();
+        try { await getActivatedPhonesFromServer(getVersion()); } catch(e) {}
+        refreshMembershipForVersion(getVersion());
+      }
       saveAuth();
     } else if (localOk) {
-      // Restore user data from local storage
-      const savedAuth = localStorage.getItem(AUTH_KEY);
-      if (savedAuth) {
-        try {
-          currentUser = JSON.parse(savedAuth);
-          isAdmin = (currentUser.role === 'admin' || currentUser.role === 'subadmin');
-          if (isAdmin) adminMode = true;
-          if (!isAdmin && currentUser.role !== 'trial' && Date.now() > currentUser.expiresAt) {
-            document.getElementById('expiredOverlay').classList.remove('hidden');
-            document.getElementById('loginScreen').classList.add('hidden');
-            btn.disabled = false; btn.textContent = '🔐 登录';
-            return;
-          }
-        } catch(e) { currentUser = null; }
-      }
-      if (!currentUser) {
-        currentUser = { phone, userName: '学员', role: 'trial', version: getVersion(), registeredAt: Date.now() };
+      // 本地登录：账号通用，身份按当前板块会员名单重算
+      let restored = null;
+      try { const savedAuth = localStorage.getItem(AUTH_KEY); if (savedAuth) restored = JSON.parse(savedAuth); } catch(e) {}
+      if (restored && restored.phone === phone && !isAdmin) {
+        currentUser = restored;
         isAdmin = false;
-        saveAuth();
+      } else {
+        currentUser = { phone, userName: (restored && restored.userName) || '学员', role: 'trial', version: getVersion(), registeredAt: Date.now() };
+        isAdmin = false;
       }
+      refreshMembershipForVersion(getVersion());
     } else {
       msg.className = 'form-msg error'; msg.textContent = '手机号或密码错误';
       btn.disabled = false; btn.textContent = '🔐 登录';
@@ -3480,7 +3547,7 @@ document.getElementById('backToWelcome').addEventListener('click', function() {
 document.getElementById('backToWelcomeFromLogin').addEventListener('click', function() {
   showScreen('welcomeScreen');
 });
-// 顶栏「切换版本」：回到欢迎页重新选择版本（不清空登录态，另一版本需另行登录）
+// 顶栏「切换版本」：回到欢迎页重新选择版本（登录态共用，会员资格按版本分别判定）
 document.getElementById('switchVersionBtn').addEventListener('click', function() {
   document.getElementById('mainApp').classList.add('hidden');
   showScreen('welcomeScreen');
@@ -3550,6 +3617,8 @@ async function enterApp() {
   });
   document.getElementById('mainApp').classList.remove('hidden');
   loadDB();
+  // 账号通用：进入时按当前板块的会员名单校正身份，避免沿用上一板块的会员态
+  refreshMembershipForVersion(getVersion());
 
   // 应用当前版本色系；非管理员强制停留在本版本的子考试（管理员可跨版本查看）
   applyVersionTheme(getVersion());
@@ -3609,20 +3678,22 @@ async function enterApp() {
     // Sync user data in background — non-blocking
     (async function() {
       await waitForApiProbe();
-      // === CROSS-DEVICE SYNC: Pull latest auth state from server ===
+      // === CROSS-DEVICE SYNC: 以当前板块的服务器会员名单为准（不再跨板块套用 auth）===
       if (API_OK && currentUser && currentUser.role !== 'admin') {
-        const serverAuth = await syncAuthFromServer(currentUser.phone);
-        if (serverAuth && serverAuth.role === 'activated' && (!serverAuth.version || serverAuth.version === getVersion()) && currentUser.role !== 'activated') {
-          currentUser = serverAuth;
-          isAdmin = false;
-          saveAuth();
-          updateHeaderInfo();
-          updateTrialBanner();
-          updateBadge();
+        const beforeRole = currentUser.role;
+        const remote = await getActivatedPhonesFromServer(getVersion());
+        if (remote) {
+          refreshMembershipForVersion(getVersion());
+          if (beforeRole !== currentUser.role) {
+            updateHeaderInfo();
+            updateTrialBanner();
+            updateBadge();
+            render();
+          }
         }
       }
       // Auto-activate: check if user's phone is in the approved list
-      if (currentUser && currentUser.role === 'trial' && isPhoneActivated(currentUser.phone)) {
+      if (currentUser && currentUser.role === 'trial' && isPhoneActivated(currentUser.phone, getVersion())) {
         activateCurrentUser();
       }
       if (API_OK && currentUser) await syncUserDataFromServer(currentUser.phone);
@@ -3977,17 +4048,18 @@ async function renderAdminDashboard() {
     html += '<div style="display:flex;gap:8px;margin-bottom:6px">';
     html += '<button class="btn btn-sm adm-ver-btn" data-ver="hrm3" style="flex:1;' + (adminMemVersion === 'hrm3' ? 'background:#2563eb;color:#fff' : 'background:#fff;color:var(--text);border:2px solid var(--border)') + '">🏢 企业HR三级</button>';
     html += '<button class="btn btn-sm adm-ver-btn" data-ver="economist" style="flex:1;' + (adminMemVersion === 'economist' ? 'background:#0d9488;color:#fff' : 'background:#fff;color:var(--text);border:2px solid var(--border)') + '">📈 中级经济师</button>';
-    html += '</div><div style="font-size:11px;color:var(--text-secondary)">当前管理：' + (VERSION_LABELS[adminMemVersion] || '') + '　（普通账号与会员账号互不相通）</div></div>';
+    html += '</div><div style="font-size:11px;color:var(--text-secondary)">当前管理：' + (VERSION_LABELS[adminMemVersion] || '') + '　（账号两个板块通用，会员资格按板块分别开通）</div></div>';
 
     // 会员
     let memList = [];
     try { const r = await apiGet('/api/admin/accounts?superPhone=' + ADMIN_PHONE + '&version=' + adminMemVersion); if (r) memList = r; } catch(e) {}
-    html += '<div class="admin-section" style="border-top:2px solid var(--primary);margin-top:8px"><h4>👥 ' + (VERSION_LABELS[adminMemVersion] || '') + ' · 会员账号管理（' + memList.length + '）</h4>';
+    html += '<div class="admin-section" style="border-top:2px solid var(--primary);margin-top:8px"><h4>👥 ' + (VERSION_LABELS[adminMemVersion] || '') + ' · 账号与会员管理（' + memList.length + '）</h4>';
+    html += '<div style="font-size:11px;color:var(--text-secondary);margin-bottom:6px">同一手机号可登录两个板块；下方状态仅表示「本板块」是否已开通会员。</div>';
     html += '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">';
     html += '<input type="text" id="memPhone" placeholder="会员手机号" style="flex:1;min-width:110px;padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit">';
     html += '<input type="text" id="memName" placeholder="昵称" style="width:80px;padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit">';
     html += '<input type="password" id="memPwd" placeholder="密码" style="width:80px;padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit">';
-    html += '<button class="btn btn-primary btn-sm" id="btnAddMem">➕ 添加已激活会员</button>';
+    html += '<button class="btn btn-primary btn-sm" id="btnAddMem">➕ 开通本板块会员</button>';
     html += '</div><div id="memListWrap">';
     if (memList.length === 0) html += '<p style="font-size:12px;color:#94a3b8">暂无会员</p>';
     else memList.forEach(m => {
@@ -4156,7 +4228,7 @@ async function renderAdminDashboard() {
     document.querySelectorAll('.mem-del').forEach(function(btn) {
       btn.addEventListener('click', async function() {
         const phone = this.getAttribute('data-phone');
-        if (!confirm('确定删除会员 ' + phone + '？该账号将不能再登录（答题数据保留）。')) return;
+        if (!confirm('确定取消 ' + phone + ' 的本板块会员资格？账号仍可登录，另一板块会员不受影响。')) return;
         const r = await apiDelete('/api/admin/accounts/' + encodeURIComponent(phone) + '?superPhone=' + ADMIN_PHONE + '&version=' + adminMemVersion);
         if (r && r.ok) renderAdminDashboard(); else alert((r && r.error) || '删除失败');
       });
@@ -4164,7 +4236,7 @@ async function renderAdminDashboard() {
     document.querySelectorAll('.mem-pwd').forEach(function(btn) {
       btn.addEventListener('click', async function() {
         const phone = this.getAttribute('data-phone');
-        const np = prompt('为会员 ' + phone + ' 设置新密码（至少6位）');
+        const np = prompt('为账号 ' + phone + ' 设置新密码（至少6位，两个板块通用）');
         if (np === null) return;
         if (np.length < 6) { alert('密码至少6位'); return; }
         const r = await apiPut('/api/admin/accounts/' + encodeURIComponent(phone) + '?superPhone=' + ADMIN_PHONE + '&version=' + adminMemVersion, { newPassword: np });
