@@ -1050,6 +1050,7 @@ body.theme-economist .hero-actions .hero-main { color: #0f766e; }
         <button class="btn btn-primary btn-block" id="linkToRegisterFromWelcomeBtn" data-page-node-id="9RJqUYVp5OgWXpWvmuDsil">📝 新用户注册</button>
         <div class="text-divider" data-page-node-id="UNewWXHDxRLeYdweSLvycr">或</div>
         <button class="btn btn-outline btn-block" id="linkToLoginFromWelcomeBtn" data-page-node-id="fMgcHKygmk9cLlN7erTSgf">👤 已有账号，立即登录</button>
+        <div class="link-text" id="welcomeForgotPwd" style="margin-top:10px">🔑 忘记密码？</div>
       </div>
     </div>
     <div style="margin-top:20px;text-align:center" data-page-node-id="oJsP9knKTDRtKDEPRwpap0">
@@ -1089,17 +1090,16 @@ body.theme-economist .hero-actions .hero-main { color: #0f766e; }
       <div style="font-size:11px;color:var(--text-secondary);margin-top:4px">仅在你忘记密保、申请管理员重置时用于核实身份，不公开展示</div>
     </div>
     <div class="form-group">
-      <label>🏢 单位 / 学校 / 身份（选填，辅助核实身份）</label>
-      <input type="text" id="regOrg" placeholder="如：XX公司 / XX学校 / 自由职业 / 待业（可留空）" maxlength="40" autocomplete="off">
-      <div style="font-size:11px;color:var(--text-secondary);margin-top:4px">暂无工作单位可留空，或填“待业 / 自由职业 / 在校”，不影响注册和后续找回密码</div>
+      <label>🔢 你的注册编号</label>
+      <input type="text" id="regNo" readonly value="" maxlength="12" autocomplete="off" style="font-weight:700;letter-spacing:1px;color:var(--primary)">
+      <div style="font-size:11px;color:var(--text-secondary);margin-top:4px">请截图保存此编号，忘记密码时作为找回凭证；每个新账号的编号都不同</div>
     </div>
     <div class="form-group">
       <label>🛡️ 自定义密保问题（忘记密码时自助找回，请牢记）</label>
       <input type="text" id="regSecurityQ" placeholder="自己写一个问题，如：我第一只宠物的名字？" maxlength="60" autocomplete="off">
       <input type="text" id="regSecurityA" placeholder="填写答案（至少2个字，请牢记）" maxlength="30" autocomplete="off" style="margin-top:8px">
-      <div style="font-size:11px;color:var(--text-secondary);margin-top:4px">问题和答案都自己设定，忘记密码时凭此自助重置；忘记答案可联系管理员核实身份后重置</div>
+      <div style="font-size:11px;color:var(--text-secondary);margin-top:4px">问题和答案都自己设定，忘记密码时凭此自助重置，请牢记</div>
     </div>
-    <div style="font-size:11px;color:var(--text-secondary);margin:2px 0 10px;line-height:1.6">🔒 您已试用过，无法再注册。</div>
     <button class="btn btn-primary btn-block" id="regBtn" data-page-node-id="N5g5aoJUt1jJ2chLAPHTFE">✅ 注册并开始试用</button>
     <div class="form-msg" id="regMsg" data-page-node-id="nfdg7fKLqC5UWAgax9mELD"></div>
     <button class="btn btn-ghost btn-sm-block" id="backToWelcome" style="margin-top:8px" data-page-node-id="oFNDAXxVzFHqyELTuXIFlC">↩ 返回欢迎页</button>
@@ -1178,8 +1178,9 @@ body.theme-economist .hero-actions .hero-main { color: #0f766e; }
       <input type="text" id="rrName" placeholder="注册时填写的真实姓名" maxlength="20" autocomplete="off">
     </div>
     <div class="form-group">
-      <label>🏢 单位 / 学校 / 身份（选填）</label>
-      <input type="text" id="rrOrg" placeholder="注册时填的内容；没有单位可留空" maxlength="40" autocomplete="off">
+      <label>🔢 注册编号（选填，忘记密码的重要凭证）</label>
+      <input type="text" id="rrRegNo" placeholder="注册时截图保存的编号；老账号可留空" maxlength="12" autocomplete="off">
+      <div style="font-size:11px;color:var(--text-secondary);margin-top:4px">填写后管理员可凭编号快速核对账号身份</div>
     </div>
     <div class="form-group">
       <label>📝 情况说明（选填）</label>
@@ -1366,9 +1367,14 @@ body.theme-economist .hero-actions .hero-main { color: #0f766e; }
   </div>
   <div class="version-panel-body" id="versionPanelBody" data-page-node-id="ip8iR3IaL6LwFUYsDyRcmV">
     <div class="version-item">
+      <span class="version-tag" style="background:#2563eb">V39</span>
+      <div class="version-date">2026-11-26</div>
+      <div class="version-desc">🆔 注册编号替代单位信息：进入注册页自动生成唯一编号，请截图保存，忘记密码时作为找回凭证<br>🔑 欢迎页新增「忘记密码？」入口；注册页不再常驻显示「您已试用过」提示，该提示仅在重复注册时出现<br>🛡 密保说明去掉联系管理员提示，找回页填写注册编号即可向管理员申请核实重置</div>
+    </div>
+    <div class="version-item">
       <span class="version-tag" style="background:#2563eb">V38</span>
       <div class="version-date">2026-11-26</div>
-      <div class="version-desc">🗑 取消一次性注册码：保留「一机一号」设备锁，您已试用过，无法再注册<br>🏢 身份核实字段调整为「单位 / 学校 / 身份（选填）」：暂无工作单位可留空，也可填待业 / 自由职业 / 在校，不影响注册与找回密码</div>
+      <div class="version-desc">🗑 取消一次性注册码：保留「一机一号」设备锁，您已试用过，无法再注册<br>🏢 身份核实字段调整为「单位 / 学校 / 身份（选填）」：暂无工作单位可留空，也可填待业 / 自由职业 / 在校，不影响注册与找回密码（该字段已在 V39 改为注册编号）</div>
     </div>
     <div class="version-item">
       <span class="version-tag" style="background:#2563eb">V37</span>
@@ -2027,6 +2033,7 @@ async function giteeRoute(rawPath, method, body) {
     const phone = body.phone, password = body.password, name = body.name;
     const realName = String((body && body.realName) || '').trim();
     const org = String((body && body.org) || '').trim();
+    const regNo = String((body && body.regNo) || '').trim().toUpperCase();
     if (!phone || !/^1[3-9]\d{9}$/.test(phone)) return R({ ok: false, error: '无效的手机号' });
     if (!password || password.length < 6) return R({ ok: false, error: '密码至少6位' });
     if (realName.length < 2) return R({ ok: false, error: '请填写真实姓名（用于身份核实）' });
@@ -2042,10 +2049,14 @@ async function giteeRoute(rawPath, method, body) {
       if (db.accounts && db.accounts[phone]) { out = { ok: false, error: '该手机号已注册' }; return; }
       const VS = vstore(db);
       if (VS.accounts[phone]) { out = { ok: false, error: '该手机号已注册' }; return; }
+      // 注册编号唯一：撞号时要求用户回到注册页换一个新编号（编号由客户端生成）
+      if (regNo && Object.keys(db.accounts || {}).some(k => (db.accounts[k] || {}).regNo === regNo)) {
+        out = { ok: false, error: '注册编号已被使用，请返回注册页刷新后重试' }; return;
+      }
       const now = Date.now();
       const acc = {
         hash: sha256Hex(phone + ':' + password), name: name || '学员', registeredAt: now,
-        realName: realName, org: org,
+        realName: realName, org: org, regNo: regNo || null,
         security: { q: q, a: sha256Hex(phone + ':' + secAns) }
       };
       mirrorAccount(db, phone, acc);
@@ -2226,7 +2237,7 @@ async function giteeRoute(rawPath, method, body) {
       const VS = vstore(db);
       const activated = (VS.activated_phones || []).map(p => p.phone);
       // 列出全部共用账号，按当前管理版本标注是否已开通会员
-      return R(Object.keys(db.accounts || {}).map(p => ({ phone: p, name: db.accounts[p].name, activated: activated.includes(p), createdBy: db.accounts[p].createdBy || null, version: apiVersion })));
+      return R(Object.keys(db.accounts || {}).map(p => ({ phone: p, name: db.accounts[p].name, regNo: db.accounts[p].regNo || null, activated: activated.includes(p), createdBy: db.accounts[p].createdBy || null, version: apiVersion })));
     }
     if (method === 'POST') {
       const phone = body.phone;
@@ -3031,6 +3042,8 @@ function showScreen(screenId) {
   document.getElementById(screenId).classList.remove('hidden');
   if (typeof updateConnStatus === 'function') updateConnStatus();
   if (screenId === 'welcomeScreen' && typeof prepareWelcome === 'function') prepareWelcome();
+  // 进入注册页时生成/显示本次注册编号（刷新页面不换，注册成功后作废）
+  if (screenId === 'registerScreen' && typeof fillRegNo === 'function') fillRegNo();
   // 注册页免费试用描述跟随当前版本额度
   const regSub = document.getElementById('regTrialSub');
   if (regSub && typeof getTrialQuota === 'function') {
@@ -3148,17 +3161,17 @@ function verifyAccount(phone, pwdHash) {
 }
 
 // ===== REGISTRATION via API =====
-async function registerViaAPI(phone, pwd, name, security, realName, org) {
+async function registerViaAPI(phone, pwd, name, security, realName, org, regNo) {
   try {
-    const r = await apiPost('/api/auth/register', { phone, password: pwd, name, version: getVersion(), security: security, realName: realName || '', org: org || '' });
+    const r = await apiPost('/api/auth/register', { phone, password: pwd, name, version: getVersion(), security: security, realName: realName || '', org: org || '', regNo: regNo || '' });
     return r;
   } catch(e) { return null; }
 }
 // Fire-and-forget version: register on server without blocking
-function registerViaAPIBackground(phone, pwd, name, security, realName, org) {
+function registerViaAPIBackground(phone, pwd, name, security, realName, org, regNo) {
   (async function() {
     await waitForApiProbe();
-    registerViaAPI(phone, pwd, name, security, realName, org);
+    registerViaAPI(phone, pwd, name, security, realName, org, regNo);
   })().catch(e => console.log('Background register error:', e));
 }
 async function loginViaAPI(phone, pwd) {
@@ -3234,6 +3247,41 @@ function syncUserDataBackground(phone) {
 }
 
 // ===== 设备锁（一机一号）+ 本地密保（离线兜底）=====
+// ===== 注册编号（找回密码凭证）=====
+const REG_NO_KEY = 'hr_exam_v39_pending_regno';
+function genRegNo() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  const nums = new Uint32Array(8);
+  if (typeof crypto !== 'undefined' && crypto.getRandomValues) crypto.getRandomValues(nums);
+  else for (let i = 0; i < 8; i++) nums[i] = Math.floor(Math.random() * 4294967296);
+  let s = '';
+  for (let i = 0; i < 8; i++) s += chars[nums[i] % chars.length];
+  return 'LZ' + s;
+}
+function getPendingRegNo() {
+  let n = '';
+  try { n = String(localStorage.getItem(REG_NO_KEY) || '').trim().toUpperCase(); } catch(e) {}
+  if (!/^LZ[ABCDEFGHJKLMNPQRSTUVWXYZ23456789]{8}$/.test(n)) {
+    n = genRegNo();
+    try { localStorage.setItem(REG_NO_KEY, n); } catch(e) {}
+  }
+  return n;
+}
+function refreshRegNo() {
+  const n = genRegNo();
+  try { localStorage.setItem(REG_NO_KEY, n); } catch(e) {}
+  const el = document.getElementById('regNo');
+  if (el) el.value = n;
+  return n;
+}
+function fillRegNo() {
+  const el = document.getElementById('regNo');
+  if (el) el.value = getPendingRegNo();
+}
+function consumeRegNo() {
+  try { localStorage.removeItem(REG_NO_KEY); } catch(e) {}
+}
+
 const DEVICE_KEY = 'hr_exam_v36_device';
 const LOCAL_SECURITY_KEY = 'hr_exam_v36_security';
 function getDeviceRegister() {
@@ -3287,7 +3335,8 @@ document.getElementById('regBtn').addEventListener('click', async function() {
   const pwd2 = document.getElementById('regPassword2').value;
   const name = document.getElementById('regName').value.trim() || '学员';
   const realName = (document.getElementById('regRealName') || {}).value ? document.getElementById('regRealName').value.trim() : '';
-  const org = (document.getElementById('regOrg') || {}).value ? document.getElementById('regOrg').value.trim() : '';
+  const org = ''; // V39 起注册页不再收集单位信息，字段保留仅为兼容旧调用
+  const regNo = ((document.getElementById('regNo') || {}).value || '').trim().toUpperCase() || getPendingRegNo();
   const secQ = document.getElementById('regSecurityQ');
   const q = secQ ? String(secQ.value || '').trim() : '';
   const secAnswer = (document.getElementById('regSecurityA') || {}).value || '';
@@ -3332,11 +3381,12 @@ document.getElementById('regBtn').addEventListener('click', async function() {
   await waitForApiProbe();
   if (API_OK) {
     try {
-      const r = await registerViaAPI(phone, pwd, name, security, realName, org);
+      const r = await registerViaAPI(phone, pwd, name, security, realName, org, regNo);
       if (r && r.ok) {
         // 服务器注册成功
         const pwdHash = await sha256(phone + ':' + pwd);
         saveAccount(phone, pwdHash);
+        consumeRegNo();
         await saveLocalSecurity(phone, q, secAnswer);
         recordDevicePhone(phone);
         currentUser = { phone: phone, userName: name, role: 'trial', version: getVersion(), registeredAt: Date.now() };
@@ -3362,6 +3412,12 @@ document.getElementById('regBtn').addEventListener('click', async function() {
         btn.disabled = false;
         return;
       }
+      if (r && r.ok === false && /注册编号/.test(r.error || '')) {
+        const fresh = refreshRegNo();
+        msg.className = 'form-msg error';
+        msg.textContent = '编号已被占用，已为你更换为 ' + fresh + '，请截图保存后重新注册。';
+        btn.disabled = false; return;
+      }
       if (r && r.ok === false && /密保/.test(r.error || '')) {
         msg.className = 'form-msg error'; msg.textContent = r.error; btn.disabled = false; return;
       }
@@ -3379,9 +3435,10 @@ document.getElementById('regBtn').addEventListener('click', async function() {
   saveAccount(phone, pwdHash);
   await saveLocalSecurity(phone, q, secAnswer);
   recordDevicePhone(phone);
+  consumeRegNo();
   currentUser = { phone: phone, userName: name, role: 'trial', version: getVersion(), registeredAt: Date.now() };
   isAdmin = false; saveAuth(); localStorage.setItem(TRIAL_KEY + '_' + getVersion(), '0');
-  registerViaAPIBackground(phone, pwd, name, security, realName, org);
+  registerViaAPIBackground(phone, pwd, name, security, realName, org, regNo);
   msg.className = 'form-msg success';
   msg.textContent = API_OK ? '注册成功！进入试用模式...' : '已在本机注册（离线，联网后自动同步）';
   setTimeout(() => { enterApp(); }, 600);
@@ -3503,7 +3560,7 @@ let _fpQuestion = null;   // 当前查询到的 { q, question }
   if (rrSend) rrSend.addEventListener('click', async function() {
     const phone = document.getElementById('rrPhone').value.trim();
     const rname = document.getElementById('rrName').value.trim();
-    const org = document.getElementById('rrOrg').value.trim();
+    const regNo = (document.getElementById('rrRegNo') || {}).value.trim().toUpperCase();
     const note = document.getElementById('rrNote').value.trim();
     const rrMsg = document.getElementById('rrMsg');
     if (!/^1[3-9]\d{9}$/.test(phone)) { rrMsg.className = 'form-msg error'; rrMsg.textContent = '请输入有效的注册手机号'; return; }
@@ -3522,17 +3579,17 @@ let _fpQuestion = null;   // 当前查询到的 { q, question }
     const text = '【密码重置·身份核实申请】\n'
       + '注册手机号：' + phone + '\n'
       + '真实姓名：' + rname + '\n'
-      + '单位/学校/身份：' + (org || '未填写') + '\n'
+      + '注册编号：' + (regNo || '未填写') + '\n'
       + '情况说明：' + (note || '忘记密保答案，申请管理员协助重置密码') + '\n'
       + '申请时间：' + new Date().toLocaleString('zh-CN');
     // 复用客服消息通道（不依赖登录态），发给管理员
-    const fromName = rname + (org ? '·' + org : '');
+    const fromName = rname + (regNo ? '·' + regNo : '');
     sendMessage(phone, fromName, 'admin', text);
     addNotification('admin', 'reset_request', '🔐 ' + fromName + '（' + phone + '）申请重置密码，请核实身份');
     try { localStorage.setItem(lastKey, String(Date.now())); } catch(e) {}
     rrMsg.className = 'form-msg success';
     rrMsg.textContent = '✓ 申请已发送给管理员。核实身份后管理员会通过客服消息通知你并在后台重置密码，请留意消息。';
-    ['rrName','rrOrg','rrNote'].forEach(id => { document.getElementById(id).value = ''; });
+    ['rrName','rrRegNo','rrNote'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
     rrSend.disabled = false;
   });
 
@@ -3898,6 +3955,12 @@ document.getElementById('linkToLoginFromWelcomeBtn').addEventListener('click', f
   document.getElementById('loginMsg').className = 'form-msg';
   document.getElementById('loginBtn').disabled = false;
   document.getElementById('loginBtn').textContent = '🔐 登录';
+});
+// Welcome -> Forgot password（复用登录页的忘记密码入口逻辑）
+const welcomeForgot = document.getElementById('welcomeForgotPwd');
+if (welcomeForgot) welcomeForgot.addEventListener('click', function() {
+  const loginForgot = document.getElementById('linkForgotPwd');
+  if (loginForgot) loginForgot.click(); else showScreen('forgotPwdScreen');
 });
 // Login -> Register
 document.getElementById('linkToRegisterFromLogin').addEventListener('click', function() {
@@ -4443,7 +4506,7 @@ async function renderAdminDashboard() {
       const act = m.activated ? '<span style="color:#16a34a;font-size:11px">●已激活</span>' : '<span style="color:#94a3b8;font-size:11px">○试用</span>';
       const tag = m.createdBy === 'admin' ? '<span style="color:#2563eb;font-size:11px">后台创建</span>' : '';
       html += '<div class="request-item" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px">';
-      html += '<div><b>' + escapeHtml(m.phone) + '</b> · ' + escapeHtml(m.name || '会员') + ' ' + act + ' ' + tag + '</div>';
+      html += '<div><b>' + escapeHtml(m.phone) + '</b> · ' + escapeHtml(m.name || '会员') + (m.regNo ? ' · 编号 ' + escapeHtml(m.regNo) : '') + ' ' + act + ' ' + tag + '</div>';
       html += '<div style="display:flex;gap:6px">';
       html += '<button class="btn btn-outline btn-sm mem-pwd" data-phone="' + escapeHtml(m.phone) + '" style="color:#2563eb;border-color:#2563eb">🔑 改密</button>';
       html += '<button class="btn btn-outline btn-sm mem-del" data-phone="' + escapeHtml(m.phone) + '" style="color:#dc2626;border-color:#dc2626">🗑 删除</button>';
