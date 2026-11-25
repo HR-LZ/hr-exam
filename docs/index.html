@@ -1089,8 +1089,9 @@ body.theme-economist .hero-actions .hero-main { color: #0f766e; }
       <div style="font-size:11px;color:var(--text-secondary);margin-top:4px">仅在你忘记密保、申请管理员重置时用于核实身份，不公开展示</div>
     </div>
     <div class="form-group">
-      <label>🏢 单位 / 部门（选填，辅助核实身份）</label>
-      <input type="text" id="regOrg" placeholder="如：XX公司 / XX部门" maxlength="40" autocomplete="off">
+      <label>🏢 单位 / 学校 / 身份（选填，辅助核实身份）</label>
+      <input type="text" id="regOrg" placeholder="如：XX公司 / XX学校 / 自由职业 / 待业（可留空）" maxlength="40" autocomplete="off">
+      <div style="font-size:11px;color:var(--text-secondary);margin-top:4px">暂无工作单位可留空，或填“待业 / 自由职业 / 在校”，不影响注册和后续找回密码</div>
     </div>
     <div class="form-group">
       <label>🛡️ 自定义密保问题（忘记密码时自助找回，请牢记）</label>
@@ -1098,11 +1099,7 @@ body.theme-economist .hero-actions .hero-main { color: #0f766e; }
       <input type="text" id="regSecurityA" placeholder="填写答案（至少2个字，请牢记）" maxlength="30" autocomplete="off" style="margin-top:8px">
       <div style="font-size:11px;color:var(--text-secondary);margin-top:4px">问题和答案都自己设定，忘记密码时凭此自助重置；忘记答案可联系管理员核实身份后重置</div>
     </div>
-    <div class="form-group">
-      <label>🎫 注册码（选填，换设备/多账号时需管理员发放）</label>
-      <input type="text" id="regCode" placeholder="本机首次注册无需填写" maxlength="12" autocomplete="off" autocapitalize="characters" style="text-transform:uppercase">
-      <div style="font-size:11px;color:var(--text-secondary);margin-top:4px">一台设备仅可注册一个账号；如需在本机注册其它账号，请向管理员索取注册码</div>
-    </div>
+    <div style="font-size:11px;color:var(--text-secondary);margin:2px 0 10px;line-height:1.6">🔒 同一台设备仅可注册一个账号；如需在本机注册其它账号，请换用其它设备，或联系管理员在后台为你开通。</div>
     <button class="btn btn-primary btn-block" id="regBtn" data-page-node-id="N5g5aoJUt1jJ2chLAPHTFE">✅ 注册并开始试用</button>
     <div class="form-msg" id="regMsg" data-page-node-id="nfdg7fKLqC5UWAgax9mELD"></div>
     <button class="btn btn-ghost btn-sm-block" id="backToWelcome" style="margin-top:8px" data-page-node-id="oFNDAXxVzFHqyELTuXIFlC">↩ 返回欢迎页</button>
@@ -1181,8 +1178,8 @@ body.theme-economist .hero-actions .hero-main { color: #0f766e; }
       <input type="text" id="rrName" placeholder="注册时填写的真实姓名" maxlength="20" autocomplete="off">
     </div>
     <div class="form-group">
-      <label>🏢 单位 / 部门（选填）</label>
-      <input type="text" id="rrOrg" placeholder="注册时填写的单位或部门" maxlength="40" autocomplete="off">
+      <label>🏢 单位 / 学校 / 身份（选填）</label>
+      <input type="text" id="rrOrg" placeholder="注册时填的内容；没有单位可留空" maxlength="40" autocomplete="off">
     </div>
     <div class="form-group">
       <label>📝 情况说明（选填）</label>
@@ -1369,6 +1366,11 @@ body.theme-economist .hero-actions .hero-main { color: #0f766e; }
   </div>
   <div class="version-panel-body" id="versionPanelBody" data-page-node-id="ip8iR3IaL6LwFUYsDyRcmV">
     <div class="version-item">
+      <span class="version-tag" style="background:#2563eb">V38</span>
+      <div class="version-date">2026-11-26</div>
+      <div class="version-desc">🗑 取消一次性注册码：保留「一机一号」设备锁，确需在本机注册其它账号请换设备或联系管理员在后台开通<br>🏢 身份核实字段调整为「单位 / 学校 / 身份（选填）」：暂无工作单位可留空，也可填待业 / 自由职业 / 在校，不影响注册与找回密码</div>
+    </div>
+    <div class="version-item">
       <span class="version-tag" style="background:#2563eb">V37</span>
       <div class="version-date">2026-11-26</div>
       <div class="version-desc">✍️ 密保问题改为用户自定义：注册时自己写问题与答案（仅一个），比固定问题更难被猜到；老账号仍兼容原预设问题<br>🪪 注册新增真实姓名（必填）与单位/部门（选填），仅用于忘记密保时核实身份，不公开展示<br>👨‍💼 忘记密保可在找回密码页直接填写注册信息发送核实申请给管理员，管理员核实身份后在后台帮你重置密码</div>
@@ -1376,7 +1378,7 @@ body.theme-economist .hero-actions .hero-main { color: #0f766e; }
     <div class="version-item">
       <span class="version-tag" style="background:#2563eb">V36</span>
       <div class="version-date">2026-11-26</div>
-      <div class="version-desc">🔑 新增忘记密码：注册时设置密保问题，忘记密码可答对密保自助重置；老账号无密保可联系管理员在后台重置<br>🛡 新增设备锁：一台设备仅可注册一个账号，防止换手机号反复注册刷试用；确需在本机注册多个账号可向管理员索取一次性注册码<br>🎫 注册码由管理员在后台生成，填对即可放行设备锁，一码一次有效；无需实名、不收身份证、全程零成本</div>
+      <div class="version-desc">🔑 新增忘记密码：注册时设置密保问题，忘记密码可答对密保自助重置；老账号无密保可联系管理员在后台重置<br>🛡 新增设备锁：一台设备仅可注册一个账号，防止换手机号反复注册刷试用；确需在本机注册多个账号可向管理员索取一次性注册码（此注册码功能已在 V38 取消）<br>🎫 注册码由管理员在后台生成，填对即可放行设备锁，一码一次有效（已在 V38 取消）；无需实名、不收身份证、全程零成本</div>
     </div>
     <div class="version-item">
       <span class="version-tag" style="background:#2563eb">V35</span>
@@ -1689,7 +1691,6 @@ const DB_DEFAULT = {
   },
   admin_codes: [],
   used_codes: {},
-  reg_codes: [],       // 一次性注册码 [{ code, createdAt, usedAt?, usedBy? }]，管理员发放
   requests: [],
   transactions: [],
   payment_claims: [],
@@ -1711,7 +1712,6 @@ function ensureVersions(db) {
     };
   }
   if (!db.accounts || typeof db.accounts !== 'object' || Array.isArray(db.accounts)) db.accounts = {};
-  if (!Array.isArray(db.reg_codes)) db.reg_codes = [];
   // 补齐历史数据里可能缺失的子字段，避免 .push / 下标访问报错
   ['hrm3', 'economist'].forEach(function(v) {
     const vs = db.versions[v] || {};
@@ -2037,31 +2037,19 @@ async function giteeRoute(rawPath, method, body) {
     if (q.length < 4 || secAns.length < 2) {
       return R({ ok: false, error: '请自定义密保问题（至少4个字）并填写答案（至少2个字）' });
     }
-    const regCode = String(body.regCode || '').trim().toUpperCase();
     let out;
     await dbMutate(db => {
       if (db.accounts && db.accounts[phone]) { out = { ok: false, error: '该手机号已注册' }; return; }
       const VS = vstore(db);
       if (VS.accounts[phone]) { out = { ok: false, error: '该手机号已注册' }; return; }
-      // 注册码：填了就必须有效且未使用（用于放行设备锁）；不填则走普通注册流程
-      if (regCode) {
-        const rc = (db.reg_codes || []).find(c => c.code === regCode);
-        if (!rc) { out = { ok: false, error: '注册码无效，请检查后重试' }; return; }
-        if (rc.usedAt) { out = { ok: false, error: '该注册码已被使用' }; return; }
-      }
       const now = Date.now();
       const acc = {
         hash: sha256Hex(phone + ':' + password), name: name || '学员', registeredAt: now,
         realName: realName, org: org,
-        security: { q: q, a: sha256Hex(phone + ':' + secAns) },
-        viaCode: regCode || null
+        security: { q: q, a: sha256Hex(phone + ':' + secAns) }
       };
       mirrorAccount(db, phone, acc);
-      if (regCode) {
-        const rc = db.reg_codes.find(c => c.code === regCode);
-        rc.usedAt = now; rc.usedBy = phone;
-      }
-      out = { ok: true, viaCode: !!regCode, user: { phone: phone, userName: acc.name, role: 'trial', version: apiVersion, registeredAt: now } };
+      out = { ok: true, user: { phone: phone, userName: acc.name, role: 'trial', version: apiVersion, registeredAt: now } };
     });
     return R(out);
   }
@@ -2168,34 +2156,6 @@ async function giteeRoute(rawPath, method, body) {
 
   // ===== 账号 / 子管理员 管理（仅最高权限管理员可操作）=====
   const isSuperAdmin = (body && body.superPhone === SRV_ADMIN_PHONE) || (query.get('superPhone') === SRV_ADMIN_PHONE);
-
-  // 一次性注册码 CRUD（最高权限管理员）：用于放行「一机一号」设备锁，给确需多账号的学员
-  const regCodeMatch = path.match(/^\/api\/reg-codes(?:\/([^\/]+))?$/);
-  if (regCodeMatch && isSuperAdmin) {
-    if (method === 'GET') return R((await dbRead()).reg_codes || []);
-    if (method === 'POST') {
-      const code = String((body && body.code) || '').trim().toUpperCase();
-      if (!/^[A-Z0-9]{6,12}$/.test(code)) return R({ ok: false, error: '注册码需为6-12位大写字母或数字' });
-      let res;
-      await dbMutate(db => {
-        if (!Array.isArray(db.reg_codes)) db.reg_codes = [];
-        if (db.reg_codes.some(c => c.code === code)) { res = { ok: false, error: '该注册码已存在' }; return; }
-        db.reg_codes.push({ code: code, createdAt: Date.now() });
-        res = { ok: true };
-      });
-      return R(res);
-    }
-    if (method === 'DELETE' && regCodeMatch[1]) {
-      const code = decodeURIComponent(regCodeMatch[1]);
-      let res;
-      await dbMutate(db => {
-        const before = (db.reg_codes || []).length;
-        db.reg_codes = (db.reg_codes || []).filter(c => c.code !== code);
-        res = { ok: db.reg_codes.length < before };
-      });
-      return R(res);
-    }
-  }
 
   // 会员本人修改密码
   const ownPwMatch = path.match(/^\/api\/accounts\/([^\/]+)\/password$/);
@@ -2682,27 +2642,6 @@ async function getAdminCodesFromServer() {
   try { const r = await apiGet('/api/admin/codes'); if (r) { localStorage.setItem(ADMIN_CODES_KEY, JSON.stringify(r)); return r; } }
   catch(e) { return null; }
 }
-
-// 一次性注册码（管理员发放，用于放行「一机一号」设备锁）
-const REG_CODES_KEY = 'hr_exam_v36_reg_codes';
-function getRegCodes() {
-  try { const r = localStorage.getItem(REG_CODES_KEY); return r ? JSON.parse(r) : []; }
-  catch(e) { return []; }
-}
-async function getRegCodesFromServer() {
-  try {
-    const r = await apiGet('/api/reg-codes?superPhone=' + encodeURIComponent(ADMIN_PHONE));
-    if (r) { localStorage.setItem(REG_CODES_KEY, JSON.stringify(r)); return r; }
-  } catch(e) { return null; }
-}
-function genRegCodeString() {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  let s = '';
-  for (let i = 0; i < 8; i++) s += chars[Math.floor(Math.random() * chars.length)];
-  return s;
-}
-
-let lastGeneratedCode = null;
 
 function addAdminCode(code, hash) {
   const codes = getAdminCodes();
@@ -3209,17 +3148,17 @@ function verifyAccount(phone, pwdHash) {
 }
 
 // ===== REGISTRATION via API =====
-async function registerViaAPI(phone, pwd, name, security, regCode, realName, org) {
+async function registerViaAPI(phone, pwd, name, security, realName, org) {
   try {
-    const r = await apiPost('/api/auth/register', { phone, password: pwd, name, version: getVersion(), security: security, regCode: regCode || '', realName: realName || '', org: org || '' });
+    const r = await apiPost('/api/auth/register', { phone, password: pwd, name, version: getVersion(), security: security, realName: realName || '', org: org || '' });
     return r;
   } catch(e) { return null; }
 }
 // Fire-and-forget version: register on server without blocking
-function registerViaAPIBackground(phone, pwd, name, security, regCode, realName, org) {
+function registerViaAPIBackground(phone, pwd, name, security, realName, org) {
   (async function() {
     await waitForApiProbe();
-    registerViaAPI(phone, pwd, name, security, regCode, realName, org);
+    registerViaAPI(phone, pwd, name, security, realName, org);
   })().catch(e => console.log('Background register error:', e));
 }
 async function loginViaAPI(phone, pwd) {
@@ -3267,7 +3206,6 @@ async function syncAllAdminData() {
   await getTransactionsFromServer();
   await getPaymentClaimsFromServer();
   await getAllActivatedPhonesFromServer();
-  await getRegCodesFromServer();
   await getMessagesFromServer();
   await getNotificationsFromServer(null, true);
 }
@@ -3353,7 +3291,6 @@ document.getElementById('regBtn').addEventListener('click', async function() {
   const secQ = document.getElementById('regSecurityQ');
   const q = secQ ? String(secQ.value || '').trim() : '';
   const secAnswer = (document.getElementById('regSecurityA') || {}).value || '';
-  const regCode = ((document.getElementById('regCode') || {}).value || '').trim().toUpperCase();
   const msg = document.getElementById('regMsg');
 
   if (!phone || !/^1[3-9]\d{9}$/.test(phone)) {
@@ -3380,10 +3317,10 @@ document.getElementById('regBtn').addEventListener('click', async function() {
     msg.className = 'form-msg error'; msg.textContent = '请填写密保答案（至少2个字）';
     return;
   }
-  // 设备锁：本机已注册过其它手机号 → 必须凭管理员注册码放行
-  if (!regCode && isDevicePhoneLocked(phone)) {
+  // 设备锁：本机已注册过其它手机号 → 拦截（已取消注册码放行）
+  if (isDevicePhoneLocked(phone)) {
     msg.className = 'form-msg error';
-    msg.textContent = '本机已注册过账号（' + getDevicePhones().join('、') + '）。如需再注册，请向管理员索取注册码，或换用其它设备。';
+    msg.textContent = '本机已注册过账号（' + getDevicePhones().join('、') + '），一台设备仅可注册一个账号。请换用其它设备，或联系管理员在后台为你开通。';
     return;
   }
 
@@ -3395,7 +3332,7 @@ document.getElementById('regBtn').addEventListener('click', async function() {
   await waitForApiProbe();
   if (API_OK) {
     try {
-      const r = await registerViaAPI(phone, pwd, name, security, regCode, realName, org);
+      const r = await registerViaAPI(phone, pwd, name, security, realName, org);
       if (r && r.ok) {
         // 服务器注册成功
         const pwdHash = await sha256(phone + ':' + pwd);
@@ -3408,9 +3345,6 @@ document.getElementById('regBtn').addEventListener('click', async function() {
         msg.textContent = '注册成功！进入试用模式...';
         setTimeout(() => { enterApp(); }, 500);
         return;
-      }
-      if (r && r.ok === false && /注册码/.test(r.error || '')) {
-        msg.className = 'form-msg error'; msg.textContent = r.error; btn.disabled = false; return;
       }
       if (r && r.ok === false && /已注册/.test(r.error || '')) {
         // 该手机号已在其它设备注册 → 用本密码尝试直接登录（跨设备）
@@ -3447,7 +3381,7 @@ document.getElementById('regBtn').addEventListener('click', async function() {
   recordDevicePhone(phone);
   currentUser = { phone: phone, userName: name, role: 'trial', version: getVersion(), registeredAt: Date.now() };
   isAdmin = false; saveAuth(); localStorage.setItem(TRIAL_KEY + '_' + getVersion(), '0');
-  registerViaAPIBackground(phone, pwd, name, security, regCode, realName, org);
+  registerViaAPIBackground(phone, pwd, name, security, realName, org);
   msg.className = 'form-msg success';
   msg.textContent = API_OK ? '注册成功！进入试用模式...' : '已在本机注册（离线，联网后自动同步）';
   setTimeout(() => { enterApp(); }, 600);
@@ -3588,7 +3522,7 @@ let _fpQuestion = null;   // 当前查询到的 { q, question }
     const text = '【密码重置·身份核实申请】\n'
       + '注册手机号：' + phone + '\n'
       + '真实姓名：' + rname + '\n'
-      + '单位/部门：' + (org || '未填写') + '\n'
+      + '单位/学校/身份：' + (org || '未填写') + '\n'
       + '情况说明：' + (note || '忘记密保答案，申请管理员协助重置密码') + '\n'
       + '申请时间：' + new Date().toLocaleString('zh-CN');
     // 复用客服消息通道（不依赖登录态），发给管理员
@@ -4517,24 +4451,6 @@ async function renderAdminDashboard() {
     });
     html += '</div></div>';
 
-    // 一次性注册码管理：放行「一机一号」设备锁
-    let regCodes = getRegCodes();
-    if (API_OK) { const rr = await apiGet('/api/reg-codes?superPhone=' + encodeURIComponent(ADMIN_PHONE)); if (rr) { regCodes = rr; localStorage.setItem(REG_CODES_KEY, JSON.stringify(rr)); } }
-    const unusedCodes = regCodes.filter(c => !c.usedAt);
-    html += '<div class="admin-section" style="border-top:2px solid var(--primary);margin-top:8px"><h4>🎫 一次性注册码（' + unusedCodes.length + ' 个未使用）</h4>';
-    html += '<div style="font-size:11px;color:var(--text-secondary);margin-bottom:6px">发放给确需在本机注册第二个账号的学员：注册时填入可绕过「一机一号」设备锁；每个码仅用一次。</div>';
-    html += '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">';
-    html += '<input type="text" id="regCodeInput" placeholder="留空则自动生成" maxlength="12" style="flex:1;min-width:110px;padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;text-transform:uppercase">';
-    html += '<button class="btn btn-primary btn-sm" id="btnGenRegCode">➕ 生成注册码</button>';
-    html += '</div><div id="regCodeMsg" class="form-msg"></div><div id="regCodeListWrap">';
-    if (regCodes.length === 0) html += '<p style="font-size:12px;color:#94a3b8">暂无注册码</p>';
-    else regCodes.slice().reverse().forEach(c => {
-      const used = c.usedAt ? '<span style="color:#94a3b8;font-size:11px">已用于 ' + escapeHtml(c.usedBy || '') + '</span>' : '<span style="color:#16a34a;font-size:11px">●未使用</span>';
-      html += '<div class="request-item" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px">';
-      html += '<div><b style="letter-spacing:1px">' + escapeHtml(c.code) + '</b> ' + used + '</div>';
-      html += '<button class="btn btn-outline btn-sm regcode-del" data-code="' + escapeHtml(c.code) + '" style="color:#dc2626;border-color:#dc2626">🗑 删除</button></div>';
-    });
-    html += '</div></div>';
   }
 
   html += '<button class="btn btn-ghost btn-sm-block" id="btnAdminBackToPractice">🏠 返回学习首页</button>';
@@ -4703,36 +4619,6 @@ async function renderAdminDashboard() {
         if (np.length < 6) { alert('密码至少6位'); return; }
         const r = await apiPut('/api/admin/accounts/' + encodeURIComponent(phone) + '?superPhone=' + ADMIN_PHONE + '&version=' + adminMemVersion, { newPassword: np });
         if (r && r.ok) alert('✅ 密码已更新'); else alert((r && r.error) || '修改失败');
-      });
-    });
-    // 注册码：生成 / 删除
-    const btnGen = document.getElementById('btnGenRegCode');
-    if (btnGen) btnGen.addEventListener('click', async function() {
-      const inp = document.getElementById('regCodeInput');
-      const cm = document.getElementById('regCodeMsg');
-      let code = inp.value.trim().toUpperCase();
-      if (!code) code = genRegCodeString();
-      if (!/^[A-Z0-9]{6,12}$/.test(code)) { cm.className = 'form-msg error'; cm.textContent = '注册码需为6-12位大写字母或数字'; return; }
-      this.disabled = true;
-      let r = null;
-      if (API_OK) r = await apiPost('/api/reg-codes?superPhone=' + ADMIN_PHONE, { code: code });
-      if (r && r.ok) {
-        cm.className = 'form-msg success'; cm.textContent = '✓ 已生成注册码：' + code + '（请复制发给学员）';
-        inp.value = '';
-        await getRegCodesFromServer();
-        renderAdminDashboard();
-      } else {
-        cm.className = 'form-msg error'; cm.textContent = (r && r.error) || (API_OK ? '生成失败' : '网络未连接，无法生成注册码');
-        this.disabled = false;
-      }
-    });
-    document.querySelectorAll('.regcode-del').forEach(function(btn) {
-      btn.addEventListener('click', async function() {
-        const code = this.getAttribute('data-code');
-        if (!confirm('确定删除注册码 ' + code + '？删除后该码立即失效。')) return;
-        const r = await apiDelete('/api/reg-codes/' + encodeURIComponent(code) + '?superPhone=' + ADMIN_PHONE);
-        if (r && r.ok) { await getRegCodesFromServer(); renderAdminDashboard(); }
-        else alert((r && r.error) || '删除失败');
       });
     });
   }
