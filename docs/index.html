@@ -1270,9 +1270,9 @@ body.theme-economist .hero-actions .hero-main { color: #0f766e; }
 <div class="upgrade-overlay" id="expiredOverlay" data-page-node-id="l0WZSBRWCx5RjaKvBEB2DA">
   <div class="upgrade-card" data-page-node-id="RAAA8ACsTaLoxlFhKZk07r">
     <button class="overlay-close-btn" id="closeExpiredBtn" title="关闭" data-page-node-id="i0SpxA9ByYCCJziXAOrBWv">✕</button>
-    <div class="upg-icon" data-page-node-id="DuGCw5gXhwvawd1UN3u0OY">🔒</div>
-    <h3 data-page-node-id="WG1J18gwCpflvOurqa83pZ">尚未开通本板块</h3>
-    <p data-page-node-id="jpiwj7KEQUESaT8hNf0cGI">当前板块会员尚未开通<br data-page-node-id="lo9bBc9xykvbovg1FzUsrF">扫码激活后即可学习本板块全部题库</p>
+    <div class="upg-icon" data-page-node-id="DuGCw5gXhwvawd1UN3u0OY">⏰</div>
+    <h3 data-page-node-id="WG1J18gwCpflvOurqa83pZ">账户已过期</h3>
+    <p data-page-node-id="jpiwj7KEQUESaT8hNf0cGI">您的会员已超过365天有效期<br data-page-node-id="lo9bBc9xykvbovg1FzUsrF">请重新联系管理员激活或扫码续期</p>
     <button class="btn btn-warning btn-block" id="btnContactAdmin2" data-page-node-id="R5jFiWFsomryR7wx3gIzvK">💬 联系管理员激活</button>
     <button class="btn btn-outline btn-sm-block" id="btnScanPay2" style="margin-top:6px" data-page-node-id="q4qdeoY3CfdVmSihL3qdUi">💳 扫码付款激活</button>
     <button class="btn btn-outline btn-sm-block" id="btnRenewCode" style="margin-top:6px" data-page-node-id="clSPTHQfFs2vqGsaWwb1YX">🔑 输入激活码（旧码）</button>
@@ -1372,6 +1372,11 @@ body.theme-economist .hero-actions .hero-main { color: #0f766e; }
     <button class="version-panel-close" id="versionPanelClose" data-page-node-id="Xa1Xz8m9TKbIhDcYL9QmFq">✕</button>
   </div>
   <div class="version-panel-body" id="versionPanelBody" data-page-node-id="ip8iR3IaL6LwFUYsDyRcmV">
+    <div class="version-item">
+      <span class="version-tag" style="background:#2563eb">V44</span>
+      <div class="version-date">2026-11-26</div>
+      <div class="version-desc">⏳ 恢复会员365天有效期：激活满365天即禁止继续刷题并弹窗提醒；未到期会员顶栏显示剩余天数、设置页显示到期时间<br>🎯 试用规则不变：试用账号仅按题量限制，刷完全部免费题后禁止继续并弹窗提醒，不按时间限制</div>
+    </div>
     <div class="version-item">
       <span class="version-tag" style="background:#2563eb">V43</span>
       <div class="version-date">2026-11-26</div>
@@ -1642,7 +1647,8 @@ body.theme-economist .hero-actions .hero-main { color: #0f766e; }
 const ADMIN_PHONE = "13760449307";
 const ADMIN_PASSWORD_HASH = "aaffebecec560fec66e75f24062224ffa4e07696d2ae9a1fee3707c3f8fd9373";
 const EMBEDDED_HASHES = ["3ff6aac90cedfcb0879087adea662d2b2d1a268fc4df8d67cd2811d2c3f30a03", "80751e9e1a13a72911c51c0a99685161d115703d8bdd7878fd47d0cfa25c743d", "a60bfe291d8a52111d19cbdc992ccf88a0f46ac795db912a374c05dd8c568d99", "64c76e51b66ee0e236341895c20595351c45fbb13cdbd7906e0b21ac14cfd79d", "6c1df43b606ab74e55ab58d7c7ee7258bdace7604cfd12bada44fa4f2a62e8a1", "2b796c76d0e0afa0188c3b76c7269e738a13a3525297defb3ed8f0f822fc43f5", "866b3b12df470e48112f365b998772a47c691915d95353230edfd2a319b35350", "936cd948bcc85bc5db5388efa0bcc7c8d83dec278904825694272ade95d00a52", "e7fef3e670346dcc17891bd1ad5d145b4160be58366c172fa325e71d759f08af", "c437bb54b96c46172a90a7d6c73f27d9c51bc476c115a819f133064a48eea901", "0bda9dd58f552ba57ceac80cb1d790d0e28f964429e57ea84971db4b7f6f723d", "dcf56d17239c302036d352ed4d6f38ee05fe1509a152d4abff754417f633a709", "3bdde4c8d6d6d880efd0bb3ece72c6de898b9b18f8f2b5c0dd560c0a1360403f", "587c26c3403407193ce0c9321ef45733edd3e72a7657906d5db4498f4bbb8ab9", "ccaf84ca528346751cefd69c0b184e8d0454cf1a8bdb028652ef00b26727c151", "cef76fe88162f69665c3c1726c2c34c77413432a643a97fcac073181da3dbfc7", "fd6a8d85c1f84cd96d2293d7c13057f711ab95753f1ff234f8fda0a0a403995b", "ee9ecc724fdde055a61969915f066555064ee361e2187cc6d18c15cbf9cd27b9", "07408f1d915926277bbd4069a23b7033b6109a2164bed84be3efb9f42ba5929a", "8e3ea995b603434004204848184171016ee8df8030905c44bf00f0bfb7b98ab8"];
-const ACTIVATION_VALIDITY_DAYS = 365; // 历史兼容常量：会员已改为永久有效，不再据此拦截
+const ACTIVATION_VALIDITY_DAYS = 365;
+const ACTIVATION_MS = ACTIVATION_VALIDITY_DAYS * 24 * 60 * 60 * 1000;
 // 试用额度：按版本【整体累计】限制（不分题型），累计答满即禁止并弹窗购买
 // hrm3 上限 44 题（=30单选+10多选+3简答+1案例）；economist 上限 40 题（=30单选+10多选）
 const TRIAL_TOTAL_LIMIT = { hrm3: 44, economist: 40 };
@@ -2157,10 +2163,12 @@ async function giteeRoute(rawPath, method, body) {
     const acc = (db.accounts && db.accounts[phone]) || VS.accounts[phone];
     if (!acc) return R({ ok: false, error: '账号不存在，请先注册' });
     if (acc.hash !== sha256Hex(phone + ':' + password)) return R({ ok: false, error: '密码错误' });
-    const isActivated = Array.isArray(VS.activated_phones) && VS.activated_phones.some(p => p.phone === phone);
-    if (isActivated) {
+    const actRec = Array.isArray(VS.activated_phones) ? VS.activated_phones.find(p => p && p.phone === phone) : null;
+    if (actRec) {
+      const activatedAt = Number(actRec.activatedAt) > 0 ? Number(actRec.activatedAt)
+        : (Number(acc.activatedAt) > 0 ? Number(acc.activatedAt) : Date.now());
       return R({ ok: true, user: { phone: phone, userName: acc.name || '学员', role: 'activated', version: apiVersion,
-        activatedAt: acc.activatedAt || Date.now() } });
+        activatedAt: activatedAt, expiresAt: activatedAt + ACTIVATION_MS } });
     }
     return R({ ok: true, user: { phone: phone, userName: acc.name || '学员', role: 'trial', version: apiVersion, registeredAt: acc.registeredAt } });
   }
@@ -2295,8 +2303,13 @@ async function giteeRoute(rawPath, method, body) {
         }
         // 账号已存在时只开通当前板块会员，不覆盖原密码
         mirrorAccount(db, phone, acc);
-        if (!VS.activated_phones.some(p => p.phone === phone)) {
+        const existing = VS.activated_phones.find(p => p.phone === phone);
+        if (!existing) {
           VS.activated_phones.push({ phone: phone, activatedAt: Date.now(), byAdmin: true });
+        } else {
+          // 管理员再次开通/续期：从本次操作重新计算365天
+          existing.activatedAt = Date.now();
+          existing.byAdmin = true;
         }
         res = { ok: true, created: created };
       });
@@ -2407,8 +2420,11 @@ async function giteeRoute(rawPath, method, body) {
     if (method === 'POST') {
       await dbMutate(db => {
         const VS = vstore(db);
-        if (!VS.activated_phones.some(p => p.phone === body.phone)) {
+        const existing = VS.activated_phones.find(p => p.phone === body.phone);
+        if (!existing) {
           VS.activated_phones.push({ phone: body.phone, activatedAt: Date.now() });
+        } else if (body.renew) {
+          existing.activatedAt = Number(body.activatedAt) > 0 ? Number(body.activatedAt) : Date.now();
         }
       });
       return R({ ok: true });
@@ -2648,6 +2664,54 @@ function normalizeCode(input) {
   return 'HR3-' + s.substring(0, 4) + '-' + s.substring(4);
 }
 
+// ===== MEMBERSHIP VALIDITY（仅会员按365天到期；试用账号不参与）=====
+function getActivatedPhoneRecord(phone, v) {
+  if (!phone) return null;
+  const rec = getActivatedPhones(v).find(p => p && p.phone === phone);
+  return rec || null;
+}
+function syncMembershipExpiry(u, v) {
+  if (!u || u.role === 'trial' || u.role === 'admin' || u.role === 'subadmin') return;
+  const ver = v || u.version || getVersion();
+  const rec = getActivatedPhoneRecord(u.phone, ver);
+  const recStart = rec ? Number(rec.activatedAt) : 0;
+  if (recStart > 0) {
+    u.activatedAt = recStart;
+    u.expiresAt = recStart + ACTIVATION_MS;
+  } else if (!u.expiresAt) {
+    // 老会员名单无 activatedAt 时，保留旧 expiresAt；实在没有才按本次识别时间起算
+    const localStart = Number(u.activatedAt);
+    u.activatedAt = localStart > 0 ? localStart : Date.now();
+    u.expiresAt = u.activatedAt + ACTIVATION_MS;
+  }
+}
+function getMembershipExpiresAt(u, v) {
+  const user = u || currentUser;
+  if (!user || user.role === 'trial' || user.role === 'admin' || user.role === 'subadmin') return 0;
+  syncMembershipExpiry(user, v);
+  return Number(user.expiresAt) || 0;
+}
+function isMembershipExpired(u, v) {
+  const exp = getMembershipExpiresAt(u, v);
+  return !!exp && Date.now() > exp;
+}
+function showMembershipExpiredPrompt() {
+  clearInterval(examTimer); examActive = false; examSubmitted = false;
+  window._gdActive = false;
+  ['mainApp', 'gdPracticingScreen', 'gdPracticeScreen'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.add('hidden');
+  });
+  showScreen('expiredOverlay');
+}
+function guardMembershipAccess() {
+  if (isMembershipExpired()) {
+    showMembershipExpiredPrompt();
+    return false;
+  }
+  return true;
+}
+
 function loadAuth() {
   try {
     const raw = localStorage.getItem(AUTH_KEY);
@@ -2663,7 +2727,12 @@ function loadAuth() {
         currentUser.version = currentVersion;
       }
       applyVersionTheme(currentVersion);
-      // 会员永久有效：不再按到期时间拦截（旧账号即使带 expiresAt 也不再校验）
+      syncMembershipExpiry(currentUser, currentVersion);
+      if (isMembershipExpired(currentUser, currentVersion)) {
+        // 到期会员：保留弹窗，INIT 不再切回欢迎页或进入应用
+        document.getElementById('expiredOverlay').classList.remove('hidden');
+        return false;
+      }
       return true;
     }
   } catch(e) {}
@@ -2792,14 +2861,18 @@ async function getActivatedPhonesFromServer(v) {
 async function getAllActivatedPhonesFromServer() {
   for (const v of ['hrm3', 'economist']) { await getActivatedPhonesFromServer(v); }
 }
-function markPhoneActivated(phone, v) {
+function markPhoneActivated(phone, v, forceRenew) {
   const ver = v || getVersion();
   const phones = getActivatedPhones(ver);
-  if (!phones.some(p => p.phone === phone)) {
-    phones.push({ phone: phone, activatedAt: Date.now() });
-    localStorage.setItem(activatedKey(ver), JSON.stringify(phones));
+  const existing = phones.find(p => p.phone === phone);
+  const now = Date.now();
+  if (!existing) {
+    phones.push({ phone: phone, activatedAt: now });
+  } else if (forceRenew) {
+    existing.activatedAt = now;
   }
-  apiPost('/api/activated-phones', { phone: phone, version: ver });
+  localStorage.setItem(activatedKey(ver), JSON.stringify(phones));
+  apiPost('/api/activated-phones', { phone: phone, version: ver, renew: !!forceRenew, activatedAt: now });
 }
 function isPhoneActivated(phone, v) {
   return getActivatedPhones(v).some(p => p.phone === phone);
@@ -2813,10 +2886,8 @@ function refreshMembershipForVersion(v) {
   currentUser.version = ver;
   if (active) {
     currentUser.role = 'activated';
-    if (!currentUser.expiresAt || currentUser.expiresAt <= Date.now()) {
-      currentUser.expiresAt = Date.now() + ACTIVATION_VALIDITY_DAYS * 24 * 60 * 60 * 1000;
-    }
-    currentUser.activatedAt = currentUser.activatedAt || Date.now();
+    // 到期时间只按会员名单里的实际激活时间计算，过期不自动续期
+    syncMembershipExpiry(currentUser, ver);
   } else {
     currentUser.role = 'trial';
     delete currentUser.expiresAt;
@@ -2824,20 +2895,20 @@ function refreshMembershipForVersion(v) {
   }
   saveAuth();
 }
-function activateCurrentUser() {
-  if (!currentUser || currentUser.role === 'activated') return;
+function activateCurrentUser(forceRenew) {
+  if (!currentUser || (currentUser.role === 'activated' && !forceRenew)) return;
   currentUser.role = 'activated';
   currentUser.version = getVersion();
-  currentUser.expiresAt = Date.now() + ACTIVATION_VALIDITY_DAYS * 24 * 60 * 60 * 1000;
+  currentUser.expiresAt = Date.now() + ACTIVATION_MS;
   currentUser.activatedAt = Date.now();
   saveAuth();
 }
-function activateUserByPhone(phone, v) {
+function activateUserByPhone(phone, v, forceRenew) {
   const ver = v || (typeof adminMemVersion !== 'undefined' ? adminMemVersion : getVersion());
-  markPhoneActivated(phone, ver);
+  markPhoneActivated(phone, ver, forceRenew);
   if (currentUser && currentUser.phone === phone && currentUser.role !== 'admin'
       && getVersion() === ver) {
-    activateCurrentUser();
+    activateCurrentUser(forceRenew);
   }
 }
 
@@ -2990,7 +3061,7 @@ async function generateAndAssignCode() {
 function activateUserWithCode(code) {
   if (!currentUser) return false;
   currentUser.role = 'activated';
-  currentUser.expiresAt = Date.now() + ACTIVATION_VALIDITY_DAYS * 24 * 60 * 60 * 1000;
+  currentUser.expiresAt = Date.now() + ACTIVATION_MS;
   saveAuth();
   return true;
 }
@@ -3809,13 +3880,13 @@ document.getElementById('activateBtn').addEventListener('click', async function(
     const userName = currentUser ? currentUser.userName : '学员';
 
     // Mark phone as activated so other devices auto-activate on login
-    if (phone) markPhoneActivated(phone, getVersion());
+    if (phone) markPhoneActivated(phone, getVersion(), true);
 
     currentUser = {
       phone, userName,
       role: 'activated', codeHash: hash, version: getVersion(),
       activatedAt: now,
-      expiresAt: now + ACTIVATION_VALIDITY_DAYS * 24 * 60 * 60 * 1000
+      expiresAt: now + ACTIVATION_MS
     };
     isAdmin = false;
     saveAuth();
@@ -4140,7 +4211,9 @@ document.getElementById('closeWechatBtn').addEventListener('click', function() {
   dismissOverlay('wechatSendOverlay');
 });
 document.getElementById('closeExpiredBtn').addEventListener('click', function() {
-  dismissOverlay('expiredOverlay');
+  // 到期会员关闭弹窗只回到欢迎页，绝不恢复刷题入口
+  if (isMembershipExpired()) showScreen('welcomeScreen');
+  else dismissOverlay('expiredOverlay');
 });
 
 // ===== ENTER APP =====
@@ -4152,6 +4225,7 @@ async function enterApp() {
   loadDB();
   // 账号通用：进入时按当前板块的会员名单校正身份，避免沿用上一板块的会员态
   refreshMembershipForVersion(getVersion());
+  if (!guardMembershipAccess()) return;
 
   // 应用当前版本色系；非管理员强制停留在本版本的子考试（管理员可跨版本查看）
   applyVersionTheme(getVersion());
@@ -4276,9 +4350,9 @@ function updateHeaderInfo() {
     adminBtn.title = '设置';
     adminBtn.style.color = '';
   } else {
-    // 会员永久有效：不再显示剩余天数，统一显示「会员」
-    badge.textContent = '会员';
-    badge.className = 'expiry-badge';
+    const days = getDaysRemaining();
+    badge.textContent = days >= 0 ? days + '天' : '会员';
+    badge.className = days >= 0 && days <= 30 ? 'expiry-badge warn' : 'expiry-badge';
     badge.style.background = 'rgba(255,255,255,0.2)'; badge.style.color = '#fff';
     adminBtn.innerHTML = '⚙️ <span>设置</span>';
     adminBtn.title = '设置';
@@ -4290,7 +4364,7 @@ function updateTrialBanner() {
   const banner = document.getElementById('trialBanner');
   if (!banner) return;
   // trial 角色显示试用横幅；activated / 已在会员名单的账号隐藏
-  // 会员永久有效：不再依据 expiresAt 判定，只看角色与会员名单
+  // 试用账号只按题量计费，不读 expiresAt；会员到期由到期弹窗单独拦截
   const isActivated = isAdmin || !currentUser || currentUser.role === 'activated' ||
     (currentUser.phone && isPhoneActivated(currentUser.phone));
   if (isActivated) {
@@ -4326,6 +4400,7 @@ document.getElementById('headerAdminBtn').addEventListener('click', function() {
 });
 
 function showUserSettings() {
+  const days = getDaysRemaining();
   const area = document.getElementById('contentArea');
   document.getElementById('chipRow').classList.add('hidden');
   document.getElementById('modeToggle').classList.add('hidden');
@@ -4356,7 +4431,8 @@ function showUserSettings() {
     html += '<button class="btn btn-warning btn-sm-block" id="btnSettingsActivate" style="margin-top:12px;font-size:15px;padding:11px 0">🔓 扫码激活 / 激活全部</button>';
   } else if (currentUser.role === 'activated') {
     html += '激活时间：' + new Date(currentUser.activatedAt || Date.now()).toLocaleDateString('zh-CN') + '<br>';
-    html += '有效期：<b style="color:var(--success)">永久有效</b>';
+    html += '到期时间：' + new Date(currentUser.expiresAt || Date.now()).toLocaleDateString('zh-CN') + '<br>';
+    html += '剩余天数：<b style="color:' + (days <= 30 ? 'var(--danger)' : 'var(--success)') + '">' + days + ' 天</b>';
   }
   html += '</div>';
   html += '<div style="margin-top:10px;display:flex;gap:8px">';
@@ -4643,7 +4719,7 @@ async function renderAdminDashboard() {
         try {
           const claim = updatePaymentClaim(claimId, { status: 'approved' });
           if (claim) {
-            activateUserByPhone(claim.phone, claim.version || adminMemVersion);
+            activateUserByPhone(claim.phone, claim.version || adminMemVersion, true);
             addNotification(claim.phone, 'claim_approved', '您的付款已核实，账户已被激活，现在可以畅享全部功能！');
           }
           alert('✅ 已核实到账！该用户账户已自动激活，无需激活码。');
@@ -4674,7 +4750,7 @@ async function renderAdminDashboard() {
       this.disabled = true; this.textContent = '⏳ 处理中...';
       (async function() {
         try {
-          activateUserByPhone(phone, reqVer);
+          activateUserByPhone(phone, reqVer, true);
           addNotification(phone, 'request_approved', '您的激活请求已通过，账户已被激活，现在可以畅享全部功能！');
           await apiPut('/api/requests/handle', { phone: phone, wechatId: wechat });
           alert('✅ 已激活该用户账户！');
@@ -4959,6 +5035,7 @@ function render() {
     updateTimerBar();
     updateHeaderInfo();
     if (isAdmin && adminMode) { renderAdminDashboard(); return; }
+    if (!guardMembershipAccess()) return;
     // Show tab bar for non-admin or admin in practice mode
     document.getElementById('tabBar').classList.remove('hidden');
     if (tab === 'home') renderHome();
@@ -4977,6 +5054,7 @@ function render() {
 }
 
 function renderPractice() {
+  if (!guardMembershipAccess()) return;
   const list = getCurrentList();
   generateShuffled();
   const chipRow = document.getElementById('chipRow');
@@ -5456,6 +5534,7 @@ function buildExamCases(source, count, points) {
 }
 
 function startExam() {
+  if (!guardMembershipAccess()) return;
   const isTrial = currentUser.role === 'trial';
   const entry = EXAM_REGISTRY[currentExamId] || {};
   const cfg = entry.exam || { single: 75, multi: 25, calc: 0, case: 0, minutes: 120, passRate: 0.6, points: { single: 1, multi: 1, calc: 1, case: 1 } };
@@ -5579,6 +5658,7 @@ function questionScore(q, selected) {
   return 0.5 * sel.length;                              // 少选按正确项计 0.5（partial）
 }
 function selectExamOption(label) {
+  if (!guardMembershipAccess()) return;
   if (!examActive || examSubmitted) return;
   const q = examQuestions[examIdx];
   if (!examAnswers[examIdx]) examAnswers[examIdx] = [];
@@ -5702,6 +5782,7 @@ document.addEventListener('click', function(e) {
 });
 
 function handlePracticeClick(opt) {
+  if (!guardMembershipAccess()) return;
   const q = getCurrentQuestion();
   if (!q || !q.opts) return;
   const card = opt.closest('.card');
@@ -6343,7 +6424,13 @@ buildChapterMap();
   applyVersionTheme(currentVersion);
   if (loadAuth()) {
     enterApp();
-    // 会员永久有效：不再定时检查到期时间、不再弹过期弹窗
+    if (!isAdmin) {
+      setInterval(function() {
+        if (isMembershipExpired()) showMembershipExpiredPrompt();
+      }, 60000);
+    }
+  } else if (!document.getElementById('expiredOverlay').classList.contains('hidden')) {
+    // 到期会员：loadAuth 已显示到期弹窗，保持不进入应用
   } else {
     showScreen('welcomeScreen');
   }
@@ -6420,6 +6507,7 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 function startGDExam() {
+  if (!guardMembershipAccess()) return;
   // 试用学员需先扫码激活才能参加模拟考试
   if (currentUser && currentUser.role === 'trial') {
     alert("试用学员请先扫码激活，即可参加模拟考试");
@@ -6466,6 +6554,7 @@ function selectGDChapter(chapter) {
 }
 
 function startGDPractice() {
+  if (!guardMembershipAccess()) return;
   if (!gdCurrentQuestions || gdCurrentQuestions.length === 0) {
     alert("该章节暂无题目");
     return;
@@ -6820,6 +6909,7 @@ function gdExamNextMulti() {
 }
 
 function checkGDAnswer(userAns, correctAns, qtype) {
+  if (!guardMembershipAccess()) return;
   // Prevent double-scoring
   if (gdUserAnswers[gdCurrentIndex]) return;
   const options = document.getElementById("gdOptionArea").children;
