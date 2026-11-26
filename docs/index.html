@@ -56,17 +56,20 @@ body {
 .app { max-width: 560px; margin: 0 auto; padding-bottom: calc(72px + var(--safe-bottom)); }
 
 /* ===== Fullscreen Overlays ===== */
-.full-overlay {
+.full-overlay, .full-overlay {
   position: fixed; top: 0; left: 0; right: 0; bottom: 0;
   background: var(--overlay-bg);
-  z-index: 9999; display: flex; align-items: center; justify-content: center;
-  padding: 20px; overflow-y: auto;
+  z-index: 9999; display: flex; align-items: flex-start; justify-content: center;
+  padding: 16px 12px calc(20px + env(safe-area-inset-bottom, 0px));
+  overflow-y: auto; overflow-x: hidden;
+  -webkit-overflow-scrolling: touch; overscroll-behavior: contain;
 }
 .overlay-card {
   background: var(--card); border-radius: 20px; padding: 36px 24px;
   width: 100%; max-width: 400px; box-shadow: 0 20px 60px rgba(0,0,0,0.3);
   text-align: center;
 }
+.full-overlay > .overlay-card, .full-overlay > .overlay-card { margin: auto 0; }
 .overlay-logo { font-size: 48px; margin-bottom: 8px; }
 .overlay-title { font-size: 22px; font-weight: 800; color: var(--text); margin-bottom: 4px; }
 .overlay-sub { font-size: 13px; color: var(--text-secondary); margin-bottom: 24px; line-height: 1.6; }
@@ -951,6 +954,24 @@ body.theme-economist .hero-actions .hero-main { color: #0f766e; }
 .chapter-card .cc-arrow { font-size: 13px; color: var(--text-secondary); margin-left: 5px; }
 
 /* ===== Responsive ===== */
+/* 小屏表单页：整页可滚动 + 紧凑间距，避免注册/找回页底部按钮被截断 */
+@media (max-width: 480px), (max-height: 740px) {
+  .full-overlay, .full-overlay { padding: 8px 10px calc(18px + env(safe-area-inset-bottom, 0px)); }
+  .full-overlay > .overlay-card, .full-overlay > .overlay-card { padding: 18px 16px 16px; border-radius: 16px; }
+  .overlay-logo { font-size: 30px; margin-bottom: 2px; }
+  #welcomeScreen .overlay-logo::before,
+  #registerScreen .overlay-logo::before,
+  #loginScreen .overlay-logo::before,
+  #adminLoginScreen .overlay-logo::before { width: 30px; height: 30px; margin-bottom: 4px; }
+  .overlay-title { font-size: 20px; }
+  .overlay-sub { font-size: 12px; margin-bottom: 12px; line-height: 1.5; }
+  .js-conn-status { margin: 6px 0 2px; }
+  .form-group { margin-bottom: 9px; }
+  .form-group label { font-size: 12px; margin-bottom: 3px; }
+  .form-group input { padding: 9px 12px; }
+  .code-input-box .prefix, .code-input-box input { padding: 9px 10px; }
+  .btn { padding: 11px 16px; font-size: 15px; }
+}
 @media (max-width: 380px) {
   .q-text { font-size: 15px; }
   .opt-btn { font-size: 14px; padding: 12px 14px; }
@@ -1086,7 +1107,7 @@ body.theme-economist .hero-actions .hero-main { color: #0f766e; }
       <input type="password" id="regPassword2" placeholder="再次输入密码" maxlength="20" autocomplete="new-password" data-page-node-id="7pvrho1miGEmT5VLcDj83I">
     </div>
     <div class="form-group">
-      <label>👤 昵称（选填，用于界面显示）</label>
+      <label>👤 昵称（必填，用于界面显示）</label>
       <input type="text" id="regName" placeholder="请输入昵称" maxlength="20" autocomplete="off">
     </div>
     <div class="form-group">
@@ -1370,6 +1391,11 @@ body.theme-economist .hero-actions .hero-main { color: #0f766e; }
     <button class="version-panel-close" id="versionPanelClose" data-page-node-id="Xa1Xz8m9TKbIhDcYL9QmFq">✕</button>
   </div>
   <div class="version-panel-body" id="versionPanelBody" data-page-node-id="ip8iR3IaL6LwFUYsDyRcmV">
+    <div class="version-item">
+      <span class="version-tag" style="background:#2563eb">V47</span>
+      <div class="version-date">2026-11-26</div>
+      <div class="version-desc">👤 注册昵称改为必填，页面显示的称呼不再为空<br>📱 修复手机端注册/找回等全屏表单页样式未生效、内容被截断的问题：统一固定遮罩 + 整页可滚动，小屏自动收紧间距，底部按钮可完整看到并点击</div>
+    </div>
     <div class="version-item">
       <span class="version-tag" style="background:#2563eb">V46</span>
       <div class="version-date">2026-11-26</div>
@@ -2070,11 +2096,13 @@ async function giteeRoute(rawPath, method, body) {
 
   // ===== AUTH =====
   if (path === '/api/auth/register' && method === 'POST') {
-    const phone = body.phone, password = body.password, name = body.name;
+    const phone = body.phone, password = body.password;
+    const name = String((body && body.name) || '').trim();
     const org = String((body && body.org) || '').trim();
     const regNo = String((body && body.regNo) || '').trim().toUpperCase();
     if (!phone || !/^1[3-9]\d{9}$/.test(phone)) return R({ ok: false, error: '无效的手机号' });
     if (!password || password.length < 6) return R({ ok: false, error: '密码至少6位' });
+    if (!name) return R({ ok: false, error: '请填写昵称' });
     // V46 起不再收集真实姓名，身份核实以注册编号为准
     const sec = body.security || {};
     // 密保问题为用户自定义文本；兼容旧版数字索引（旧账号仍按索引读取）
@@ -2094,7 +2122,7 @@ async function giteeRoute(rawPath, method, body) {
       }
       const now = Date.now();
       const acc = {
-        hash: sha256Hex(phone + ':' + password), name: name || '学员', registeredAt: now,
+        hash: sha256Hex(phone + ':' + password), name: name, registeredAt: now,
         org: org, regNo: regNo || null,
         security: { q: q, a: sha256Hex(phone + ':' + secAns) }
       };
@@ -3495,7 +3523,7 @@ document.getElementById('regBtn').addEventListener('click', async function() {
   const phone = document.getElementById('regPhone').value.trim();
   const pwd = document.getElementById('regPassword').value;
   const pwd2 = document.getElementById('regPassword2').value;
-  const name = document.getElementById('regName').value.trim() || '学员';
+  const name = (document.getElementById('regName').value || '').trim();
   const regNo = ((document.getElementById('regNo') || {}).value || '').trim().toUpperCase() || getPendingRegNo();
   const secQ = document.getElementById('regSecurityQ');
   const q = secQ ? String(secQ.value || '').trim() : '';
@@ -3508,6 +3536,10 @@ document.getElementById('regBtn').addEventListener('click', async function() {
   }
   if (!pwd || pwd.length < 6) {
     msg.className = 'form-msg error'; msg.textContent = '密码至少6位';
+    return;
+  }
+  if (!name) {
+    msg.className = 'form-msg error'; msg.textContent = '请填写昵称（用于界面显示）';
     return;
   }
   if (pwd !== pwd2) {
