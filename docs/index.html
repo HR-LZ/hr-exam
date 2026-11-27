@@ -1093,7 +1093,7 @@ body.theme-economist .hero-actions .hero-main { color: #0f766e; }
   <div class="overlay-card" data-page-node-id="QpC9NyxOCawjyq7G9Et5WZ">
     <div class="overlay-logo" data-page-node-id="v9t2tfKAwyrW1oWHVB41PB">📝</div>
     <div class="overlay-title" data-page-node-id="w2KIC23lXfY7d0EAxlpqKZ">注册新账号</div>
-    <div class="overlay-sub" data-page-node-id="1F8HUWLRy6QelqhZOEByTK" id="regTrialSub">注册后即可开始本板块试用</div>
+    <div class="overlay-sub" data-page-node-id="1F8HUWLRy6QelqhZOEByTK" id="regTrialSub" style="display:none"></div>
     <div class="js-conn-status conn-pending" data-page-node-id="daFe1IlaarxKbgxFom4fJV">⏳ 连接中…</div>
     <div class="form-group" data-page-node-id="30DkZST11idQz0oYoH4qvb">
       <label data-page-node-id="IYsXJucdTJK51p5rMttmpl">📱 手机号 <span class="req-star">*</span></label>
@@ -1114,16 +1114,15 @@ body.theme-economist .hero-actions .hero-main { color: #0f766e; }
     <div class="form-group">
       <label>🔢 你的注册编号</label>
       <input type="text" id="regNo" readonly value="" maxlength="12" autocomplete="off" style="font-weight:700;letter-spacing:1px;color:var(--primary)">
-      <div style="font-size:11px;color:var(--text-secondary);margin-top:4px">请截图保存此编号，忘记密码或联系管理员核实身份时作为凭证；每个新账号的编号都不同</div>
+      <div style="font-size:11px;color:var(--text-secondary);margin-top:4px">请截图保存此编号，找回密码的重要凭证</div>
     </div>
     <div class="form-group">
       <label>🛡️ 自定义密保问题 <span class="req-star">*</span></label>
       <input type="text" id="regSecurityQ" placeholder="自己写一个问题，如：我第一只宠物的名字？" maxlength="60" autocomplete="off">
       <label style="margin:8px 0 3px">🛡️ 密保答案 <span class="req-star">*</span></label>
       <input type="text" id="regSecurityA" placeholder="填写答案（至少2个字，请牢记）" maxlength="30" autocomplete="off">
-      <div style="font-size:11px;color:var(--text-secondary);margin-top:4px">问题和答案都自己设定，忘记密码时凭此自助重置，请牢记</div>
     </div>
-    <button class="btn btn-primary btn-block" id="regBtn" data-page-node-id="N5g5aoJUt1jJ2chLAPHTFE">✅ 注册并开始试用</button>
+    <button class="btn btn-primary btn-block" id="regBtn" data-page-node-id="N5g5aoJUt1jJ2chLAPHTFE">✅ 提交注册</button>
     <div class="form-msg" id="regMsg" data-page-node-id="nfdg7fKLqC5UWAgax9mELD"></div>
     <button class="btn btn-ghost btn-sm-block" id="backToWelcome" style="margin-top:8px" data-page-node-id="oFNDAXxVzFHqyELTuXIFlC">↩ 返回欢迎页</button>
   </div>
@@ -1393,6 +1392,11 @@ body.theme-economist .hero-actions .hero-main { color: #0f766e; }
     <button class="version-panel-close" id="versionPanelClose" data-page-node-id="Xa1Xz8m9TKbIhDcYL9QmFq">✕</button>
   </div>
   <div class="version-panel-body" id="versionPanelBody" data-page-node-id="ip8iR3IaL6LwFUYsDyRcmV">
+    <div class="version-item">
+      <span class="version-tag" style="background:#2563eb">V49</span>
+      <div class="version-date">2026-11-27</div>
+      <div class="version-desc">🧹 注册页精简文案：去掉试用题数提示与密保括号提醒，注册编号说明改为「请截图保存此编号，找回密码的重要凭证」<br>✅ 注册按钮改为「提交注册」</div>
+    </div>
     <div class="version-item">
       <span class="version-tag" style="background:#2563eb">V48</span>
       <div class="version-date">2026-11-27</div>
@@ -3220,11 +3224,7 @@ function showScreen(screenId) {
   // 进入注册页时清空上次残留的敏感字段，并生成新的本次注册编号
   if (screenId === 'registerScreen' && typeof resetRegisterForm === 'function') resetRegisterForm();
   if (screenId === 'registerScreen' && typeof fillRegNo === 'function') fillRegNo();
-  // 注册页免费试用描述跟随当前版本额度
-  const regSub = document.getElementById('regTrialSub');
-  if (regSub && typeof getTrialQuota === 'function') {
-    regSub.textContent = '注册后本板块可试用 ' + getTrialTotalLimit(getVersion()) + ' 道题';
-  }
+  // V49: 注册页不再显示试用题数提示
 }
 
 // ===== 版本选择（欢迎页）=====
@@ -3467,7 +3467,7 @@ function resetRegisterForm() {
   const msg = document.getElementById('regMsg');
   if (msg) { msg.className = 'form-msg'; msg.textContent = ''; }
   const btn = document.getElementById('regBtn');
-  if (btn) { btn.disabled = false; btn.textContent = '✅ 注册并开始试用'; }
+  if (btn) { btn.disabled = false; btn.textContent = '✅ 提交注册'; }
   consumeRegNo();
 }
 
@@ -4187,7 +4187,7 @@ document.getElementById('linkToRegisterFromWelcomeBtn').addEventListener('click'
   document.getElementById('regMsg').textContent = '';
   document.getElementById('regMsg').className = 'form-msg';
   document.getElementById('regBtn').disabled = false;
-  document.getElementById('regBtn').textContent = '✅ 注册并开始试用';
+  document.getElementById('regBtn').textContent = '✅ 提交注册';
 });
 // Welcome -> Login
 document.getElementById('linkToLoginFromWelcomeBtn').addEventListener('click', function() {
@@ -4215,7 +4215,7 @@ document.getElementById('linkToRegisterFromLogin').addEventListener('click', fun
   document.getElementById('regMsg').textContent = '';
   document.getElementById('regMsg').className = 'form-msg';
   document.getElementById('regBtn').disabled = false;
-  document.getElementById('regBtn').textContent = '✅ 注册并开始试用';
+  document.getElementById('regBtn').textContent = '✅ 提交注册';
 });
 // Activation -> Welcome
 document.getElementById('linkBackFromActivate').addEventListener('click', function() {
