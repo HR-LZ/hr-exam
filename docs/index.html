@@ -98,6 +98,7 @@ body {
 /* ===== Form Inputs ===== */
 .form-group { margin-bottom: 16px; text-align: left; }
 .form-group label { display: block; font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+.req-star { color: var(--danger); font-weight: 700; margin-left: 2px; }
 .form-group input {
   width: 100%; padding: 14px 16px; border: 2px solid var(--border);
   border-radius: var(--radius-sm); font-size: 16px; font-family: inherit;
@@ -1095,19 +1096,19 @@ body.theme-economist .hero-actions .hero-main { color: #0f766e; }
     <div class="overlay-sub" data-page-node-id="1F8HUWLRy6QelqhZOEByTK" id="regTrialSub">注册后即可开始本板块试用</div>
     <div class="js-conn-status conn-pending" data-page-node-id="daFe1IlaarxKbgxFom4fJV">⏳ 连接中…</div>
     <div class="form-group" data-page-node-id="30DkZST11idQz0oYoH4qvb">
-      <label data-page-node-id="IYsXJucdTJK51p5rMttmpl">📱 手机号</label>
+      <label data-page-node-id="IYsXJucdTJK51p5rMttmpl">📱 手机号 <span class="req-star">*</span></label>
       <input type="tel" id="regPhone" placeholder="请输入手机号" maxlength="11" autocomplete="tel" data-page-node-id="jmsjUZYp1vUUPtJx5mXFLg">
     </div>
     <div class="form-group" data-page-node-id="PgCVKLVtje5pkDu8dDlxGV">
-      <label data-page-node-id="fMhiCysAkFQwzd0fvG3iLG">🔒 设置密码</label>
+      <label data-page-node-id="fMhiCysAkFQwzd0fvG3iLG">🔒 设置密码 <span class="req-star">*</span></label>
       <input type="password" id="regPassword" placeholder="6-20位密码" maxlength="20" autocomplete="new-password" data-page-node-id="kKo5UetSI4nGxIrzKjEYzx">
     </div>
     <div class="form-group" data-page-node-id="qspIqlFyX6LfKBYZTUzMnS">
-      <label data-page-node-id="wcCPAWgRlE4IXrTas4tY12">🔒 确认密码</label>
+      <label data-page-node-id="wcCPAWgRlE4IXrTas4tY12">🔒 确认密码 <span class="req-star">*</span></label>
       <input type="password" id="regPassword2" placeholder="再次输入密码" maxlength="20" autocomplete="new-password" data-page-node-id="7pvrho1miGEmT5VLcDj83I">
     </div>
     <div class="form-group">
-      <label>👤 昵称（必填，用于界面显示）</label>
+      <label>👤 昵称 <span class="req-star">*</span></label>
       <input type="text" id="regName" placeholder="请输入昵称" maxlength="20" autocomplete="off">
     </div>
     <div class="form-group">
@@ -1116,9 +1117,10 @@ body.theme-economist .hero-actions .hero-main { color: #0f766e; }
       <div style="font-size:11px;color:var(--text-secondary);margin-top:4px">请截图保存此编号，忘记密码或联系管理员核实身份时作为凭证；每个新账号的编号都不同</div>
     </div>
     <div class="form-group">
-      <label>🛡️ 自定义密保问题（忘记密码时自助找回，请牢记）</label>
+      <label>🛡️ 自定义密保问题 <span class="req-star">*</span></label>
       <input type="text" id="regSecurityQ" placeholder="自己写一个问题，如：我第一只宠物的名字？" maxlength="60" autocomplete="off">
-      <input type="text" id="regSecurityA" placeholder="填写答案（至少2个字，请牢记）" maxlength="30" autocomplete="off" style="margin-top:8px">
+      <label style="margin:8px 0 3px">🛡️ 密保答案 <span class="req-star">*</span></label>
+      <input type="text" id="regSecurityA" placeholder="填写答案（至少2个字，请牢记）" maxlength="30" autocomplete="off">
       <div style="font-size:11px;color:var(--text-secondary);margin-top:4px">问题和答案都自己设定，忘记密码时凭此自助重置，请牢记</div>
     </div>
     <button class="btn btn-primary btn-block" id="regBtn" data-page-node-id="N5g5aoJUt1jJ2chLAPHTFE">✅ 注册并开始试用</button>
@@ -1391,6 +1393,11 @@ body.theme-economist .hero-actions .hero-main { color: #0f766e; }
     <button class="version-panel-close" id="versionPanelClose" data-page-node-id="Xa1Xz8m9TKbIhDcYL9QmFq">✕</button>
   </div>
   <div class="version-panel-body" id="versionPanelBody" data-page-node-id="ip8iR3IaL6LwFUYsDyRcmV">
+    <div class="version-item">
+      <span class="version-tag" style="background:#2563eb">V48</span>
+      <div class="version-date">2026-11-27</div>
+      <div class="version-desc">⭐ 注册必填项统一用红色 * 标记，去掉括号里的「必填」提醒文字：手机号、密码、确认密码、昵称、密保问题与答案未填完无法注册<br>🔢 注册编号由系统自动生成，无需填写，不加星号</div>
+    </div>
     <div class="version-item">
       <span class="version-tag" style="background:#2563eb">V47</span>
       <div class="version-date">2026-11-26</div>
@@ -3539,7 +3546,7 @@ document.getElementById('regBtn').addEventListener('click', async function() {
     return;
   }
   if (!name) {
-    msg.className = 'form-msg error'; msg.textContent = '请填写昵称（用于界面显示）';
+    msg.className = 'form-msg error'; msg.textContent = '请填写昵称';
     return;
   }
   if (pwd !== pwd2) {
